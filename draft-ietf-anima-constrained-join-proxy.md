@@ -1,9 +1,9 @@
 ---
 title: Constrained Join Proxy for Bootstrapping Protocols
 abbrev: Join-Proxy
-docname: draft-anima-constrained-join-proxy-01
+docname: draft-ietf-anima-constrained-join-proxy-01
 
-# stand_alone: true
+stand_alone: true
 
 ipr: trust200902
 area: Internet
