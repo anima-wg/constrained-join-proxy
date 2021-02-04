@@ -1,7 +1,7 @@
 ---
 title: Constrained Join Proxy for Bootstrapping Protocols
 abbrev: Join-Proxy
-docname: draft-anima-constrained-join-proxy-02
+docname: draft-ietf-anima-constrained-join-proxy-02
 
 # stand_alone: true
 
@@ -10,6 +10,7 @@ area: Internet
 wg: anima Working Group
 kw: Internet-Draft
 cat: std
+
 
 pi:    # can use array (if all yes) or hash here
   toc: yes
