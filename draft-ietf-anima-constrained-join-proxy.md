@@ -32,8 +32,8 @@ author:
 
 - ins: P. Kampanakis
   name: Panos Kampanakis
-  org: Cisco Systems
-  email: pkampana@cisco.com
+  org: AWS
+  email: kpanos@amazon.com
 
 normative:
   RFC6347:
