@@ -1,7 +1,7 @@
 ---
 title: Constrained Join Proxy for Bootstrapping Protocols
 abbrev: Join-Proxy
-docname: draft-ietf-anima-constrained-join-proxy-03
+docname: draft-ietf-anima-constrained-join-proxy-04
 
 # stand_alone: true
 
@@ -28,7 +28,7 @@ author:
 - ins: P. van der Stok
   name: Peter van der Stok
   org: vanderstok consultancy
-  email: consultancy@vanderstok.org
+  email: stokcons@bbhmail.nl
 
 - ins: P. Kampanakis
   name: Panos Kampanakis
