@@ -32,16 +32,15 @@ author:
 
 - ins: P. Kampanakis
   name: Panos Kampanakis
-  org: AWS
-  email: kpanos@amazon.com
+  org: Cisco Systems
+  email: pkampana@cisco.com
 
 normative:
   RFC6347:
   RFC7049:
   RFC8366:
-  I-D.ietf-anima-bootstrapping-keyinfra:
+  RFC8995:
   I-D.ietf-ace-coap-est:
-  I-D.ietf-core-multipart-ct:
   I-D.ietf-6tisch-enrollment-enhanced-beacon:
   I-D.ietf-anima-constrained-voucher:
   I-D.ietf-anima-grasp:
@@ -60,7 +59,7 @@ informative:
 
 This document defines a protocol to securely assign a Pledge to a domain, represented by a Registrar, using an intermediary node between Pledge and Registrar. This intermediary node is known as a "constrained Join Proxy".
 
-This document extends the work of {{I-D.ietf-anima-bootstrapping-keyinfra}} by replacing the Circuit-proxy between Pledge and Registrar by a stateless/stateful constrained (CoAP) Join Proxy.
+This document extends the work of {{RFC8995}} by replacing the Circuit-proxy between Pledge and Registrar by a stateless/stateful constrained (CoAP) Join Proxy.
 It relays join traffic from the Pledge to the Registrar.
 
 --- middle
@@ -68,7 +67,7 @@ It relays join traffic from the Pledge to the Registrar.
 # Introduction
 
 Enrolment of new nodes into networks with enrolled nodes present is described in
-{{I-D.ietf-anima-bootstrapping-keyinfra}} ("BRSKI") and makes use of Enrolment over Secure Transport (EST) {{RFC7030}}
+{{RFC8995}} ("BRSKI") and makes use of Enrolment over Secure Transport (EST) {{RFC7030}}
 with {{RFC8366}} vouchers to securely enroll devices.
 BRSKI connects a new joining device (called Pledge) to "Registrars" via a Join Proxy.
 
@@ -77,7 +76,7 @@ Constrained devices possibly part of constrained networks {{RFC7228}} typically 
 
 CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC6347}} as a security protocol for authenticity and confidentiality of the messages.
 This is known as the "coaps" scheme.
-A constrained version of EST, using Coap and DTLS, is described in {{I-D.ietf-ace-coap-est}}. The {I-D.ietf-anima-constrained-voucher} extends {{I-D.ietf-ace-coap-est}} with BRSKI artefacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
+A constrained version of EST, using Coap and DTLS, is described in {{I-D.ietf-ace-coap-est}}. The {{I-D.ietf-anima-constrained-voucher}} extends {{I-D.ietf-ace-coap-est}} with BRSKI artefacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
 
 DTLS is a client-server protocol relying on the underlying IP layer to perform the routing between the DTLS Client and the DTLS Server.
 However, the new Pledge will not be IP routable until it is authenticated to the network.
@@ -95,7 +94,7 @@ This document specifies a new form of Join Proxy and protocol to act as intermed
 
 This document is very much inspired by text published earlier in {{I-D.kumar-dice-dtls-relay}}.
 {{I-D.richardson-anima-state-for-joinrouter}} outlined the various options for building a join proxy.
-{{I-D.ietf-anima-bootstrapping-keyinfra}} adopted only the Circuit Proxy method (1), leaving the other methods as future work.
+{{RFC8995}} adopted only the Circuit Proxy method (1), leaving the other methods as future work.
 This document standardizes the CoAP/DTLS (method 4).
 
 # Terminology          {#Terminology}
@@ -157,9 +156,9 @@ In stateful mode, the Join Proxy forwards the DTLS messages to the Registrar.
 
 Assume that the Pledge does not know the IP address of the Registrar it needs to contact.
 The Join Proxy has has been enrolled via the Registrar and learns the IP address and port of the Registrar, for example by using the discovery mechanism described in {{jr-disc}}. The Pledge first discovers (see {{jr-disc}}) and selects the most appropriate Join Proxy.
-(Discovery can also be based upon {{I-D.ietf-anima-bootstrapping-keyinfra}} section 4.1, or via DNS-SD service discovery {{RFC6763}}).
+(Discovery can also be based upon {{RFC8995}} section 4.1, or via DNS-SD service discovery {{RFC6763}}).
 The Pledge initiates its request as if the Join Proxy is the intended Registrar. The Join Proxy receives the message at a discoverable "Join" port.
-The Join Proxy constructs an IP packet by copying the DTLS message payload   from the message received from the Pledge, and provides source and destination addresses to forward the message to the intended Registrar.
+The Join Proxy constructs an IP packet by copying the DTLS payload from the message received from the Pledge, and provides source and destination addresses to forward the message to the intended Registrar.
 The Join Proxy maintains a 4-tuple array to translate the DTLS messages received from the Registrar and forward it back to the Pledge.
 
 In {{fig-statefull2}} the various steps of the message flow are shown, with 5684 being the standard coaps port:
@@ -197,32 +196,32 @@ IP_Jb:p_Rb = Routable IP address and client port of Join proxy
 The stateless Join Proxy aims to minimize the requirements on the constrained Join Proxy device.
 Stateless operation requires no memory in the Join Proxy device, but may also reduce the CPU impact as the device does not need to search through a state table.
 
-If an untrusted Pledge that can only use link-local addressing wants to contact a trusted Registrar, and the Registrar is more than one hop away, it sends the DTLS message to the Join Proxy.
+If an untrusted Pledge that can only use link-local addressing wants to contact a trusted Registrar, and the Registrar is more than one hop away, it sends its DTLS messages to the Join Proxy.
 
 When a Pledge attempts a DTLS connection to the Join Proxy, it uses its link-local IP address as its IP source address.
 This message is transmitted one-hop to a neighbouring (Join Proxy) node.
 Under normal circumstances, this message would be dropped at the neighbour node since the Pledge is not yet IP routable or is not yet authenticated to send messages through the network.
 However, if the neighbour device has the Join Proxy functionality enabled, it routes the DTLS message to its Registrar of choice.
 
-The Join Proxy extends this message into a new type of message called Join ProxY (JPY) message and sends it on to the Registrar.
+The Join Proxy sends a "new" JPY message which includes the DTLS data as payload.
 
 The JPY message payload consists of two parts:
 
   * Header (H) field: consisting of the source link-local address and port of the Pledge (P), and
-  * Contents (C) field: containing the original DTLS message.
+  * Contents (C) field: containing the original DTLS payload.
 
-On receiving the JPY message, the Registrar retrieves the two parts.
+On receiving the JPY message, the Registrar (or proxy) retrieves the two parts.
 
 The Registrar transiently stores the Header field information.
 The Registrar uses the Contents field to execute the Registrar functionality.
 However, when the Registrar replies, it also extends its DTLS message with the header field in a JPY message and sends it back to the Join Proxy.
 The Registrar SHOULD NOT assume that it can decode the Header Field, it should simply repeat it when responding.
-The Header contains the original source link-local address and port of the Pledge from the transient state stored earlier and the Contents field contains the DTLS message.
+The Header contains the original source link-local address and port of the Pledge from the transient state stored earlier and the Contents field contains the DTLS payload.
 
 On receiving the JPY message, the Join Proxy retrieves the two parts.
-It uses the Header field to route the DTLS message retrieved from the Contents field to the Pledge.
+It uses the Header field to route the DTLS message containing the DTLS payload retrieved from the Contents field to the Pledge.
 
-In this scenario, both the Registrar and the Join Proxy use discoverable "Join" ports.
+In this scenario, both the Registrar and the Join Proxy use discoverable "Join" ports, which may be the default ports.
 
 The {{fig-stateless}} depicts the message flow diagram:
 
@@ -266,9 +265,9 @@ Header and Contents fields togther are one cbor array of 5 elements:
 
    1. header field: containing a CBOR array {{RFC7049}} with the Pledge IPv6 Link Local address as a cbor byte string, the Pledge's UDP port number as a CBOR integer, the IP address family (IPv4/IPv6) as a cbor integer, and the proxy's ifindex or other identifier for the physical port as cbor integer. The header field is not DTLS encrypted.
 
-   2. Content field: containing the DTLS encrypted payload as a CBOR byte string.
+   2. Content field: containing the DTLS payload as a CBOR byte string.
 
-The join_proxy cannot decrypt the DTLS ecrypted payload and has no knowledge of the transported media type. 
+The join_proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type. 
 
 ~~~
     JPY_message =
@@ -286,7 +285,7 @@ The join_proxy cannot decrypt the DTLS ecrypted payload and has no knowledge of 
 The content fields are DTLS encrypted. In CBOR diagnostic notation the payload JPY[H(IP_P:p_P)], will look like:
 
 ~~~
-      [h'IP_p', p_P, family, ident, h'DTLS-content']
+      [h'IP_p', p_P, family, ident, h'DTLS-payload']
 ~~~
 
 Examples are shown in {{examples}}.
@@ -312,13 +311,12 @@ resources and network bandwidth.
 |Packet size  |The size of the forwarded   |Size of the forwarded   |
 |             |message is the same as the  |message is bigger than  |
 |             |original message.           |the original,it includes|
-|             |                            |additional source and   |
-|             |                            |destination addresses.  |
+|             |                            |additional IP-addresses |
 +-------------+----------------------------+------------------------+
 |Specification|The Join Proxy needs        |New JPY message to      |
-|complexity   |additional functionality    |encapsulate DTLS message|
+|complexity   |additional functionality    |encapsulate DTLS payload|
 |             |to maintain state           |The Registrar           |
-|             |information, and modify     |and the Join Proxy      |
+|             |information, and specify    |and the Join Proxy      |
 |             |the source and destination  |have to understand the  |
 |             |addresses of the DTLS       |JPY message in order    |
 |             |handshake messages          |to process it.          |
@@ -333,47 +331,58 @@ resources and network bandwidth.
 
 #Discovery {#jr-disc}
 
-It is assumed that Join Proxy seamlessly provides a coaps connection between Pledge and Registrar. In particular this section replaces section 4.1 of {{I-D.ietf-anima-bootstrapping-keyinfra}}.
+It is assumed that Join Proxy seamlessly provides a coaps connection between Pledge and Registrar. In particular this section replaces section 4.1 of {{RFC8995}}.
 
-The discovery follows two steps:
+The discovery follows two steps with two alternatives for step 1:
 
-   1. The Pledge is one hop away from the Registrar. The Pledge discovers the link-local address of the Registrar as described in {I-D.ietf-ace-coap-est}. From then on, it follows the BRSKI process as described in {I-D.ietf-ace-coap-est}, using link-local addresses.
-   2. The Pledge is more than one hop away from a relevant Registrar, and discovers the link-local address and join port of a Join Proxy. The Pledge then follows the BRSKI procedure using the link-local address of the Join Proxy.
-   3. once enrolled, the Join Proxy discovers the join port of the Registrar.
+   1. Two alternatives:
+ 
+   a. The Pledge is one hop away from the Registrar. The Pledge discovers
+   the link-local address of the Registrar as described in 
+   {{I-D.ietf-ace-coap-est}}. From then on, it follows the BRSKI process
+   as described in {{I-D.ietf-ace-coap-est}} and 
+   {{I-D.ietf-anima-constrained-voucher}}, using link-local addresses.
 
-Once a Pledge is enrolled, it may function as Join Proxy. The Join Proxy functions are advertised as descibed below. In principle, the Join Proxy functions are offered via a "join" port, and not the standard coaps port. Also the Registrar offers a "join" port to which the stateless join proxy sends the JPY message. The Join Proxy and Registrar MUST show the extra join port number when reponding to the .well-known/core request addressed to the standard coap/coaps port.
+   b. The Pledge is more than one hop away from a relevant Registrar, and
+   discovers the link-local address and join port of a Join Proxy. The
+   Pledge then follows the BRSKI procedure using the link-local address of
+   the Join Proxy.
 
-Three discovery cases are discussed: coap discovery, 6tisch discovery and GRASP discovery.
+   2. Once enrolled, the Join Proxy discovers the join port of the Registrar.
 
-## Pledge discovery of Registrar
+Once a Pledge is enrolled, it may function as Join Proxy. The Join Proxy functions are advertised as descibed below. In principle, the Join Proxy functions are offered via a "join" port, and not the standard coaps port. Also the Registrar offers a "join" port to which the stateless join proxy sends the JPY message. The Join Proxy and Registrar show the extra join port number when reponding to a /.well-known/core discovery request addressed to the standard coap/coaps port.
 
-The Pledge and Join Proxy are assumed to communicate via Link-Local addresses.
+Three discovery cases are discussed: Join_proxy discovers Registrar, Pledge discovers Registrar, and Pledge discovers Join-proxy. Each discovery case considers threa alternatives: coap discovery, 6tisch discovery and GRASP discovery.
+
+## Join-Proxy discovers Registrar
+
+In this section, the Pledge and Join Proxy are assumed to communicate via Link-Local addresses. This section describes the discovery of the Registrar by the Join-Proxy.
 
 ### CoAP discovery
 
-The discovery of the coaps Registrar, using coap discovery, by the Join Proxy follows section 6 of {{I-D.ietf-ace-coap-est}}. The extension to discover the additional port needed by the stateless proxy is described in {{jp-disc}}.
+The discovery of the coaps Registrar, using coap discovery, by the Join Proxy follows section 6 of {{I-D.ietf-ace-coap-est}}. 
 
 ### Autonomous Network
 
-In the context of autonomous networks, the Join Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{I-D.ietf-anima-bootstrapping-keyinfra}} discusses this in more detail.
+In the context of autonomous networks, the Join Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{RFC8995}} discusses this in more detail.
 The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
-Autonomous Network Join Proxies MUST support GRASP discovery of Registrar as decribed in section 4.3 of {{I-D.ietf-anima-bootstrapping-keyinfra}} .
+Autonomous Network Join Proxies MUST support GRASP discovery of Registrar as decribed in section 4.3 of {{RFC8995}} .
 
 ### 6tisch discovery
 
-The discovery of Registrar by the Pledge uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
+The discovery of Registrar by the Join-Proxy uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
 
 ## Pledge discovers Join Proxy
 
 ### Autonomous Network
 
 The Pledge MUST listen for GRASP M_FLOOD {{I-D.ietf-anima-grasp}} announcements of the objective: "AN_Proxy".
-See section Section 4.1.1 {{I-D.ietf-anima-bootstrapping-keyinfra}} for the details of the objective.
+See section Section 4.1.1 {{RFC8995}} for the details of the objective.
 
 ### CoAP discovery {#jp-disc}
 
 In the context of a coap network without Autonomous Network support, discovery follows the standard coap policy.
-The Pledge can discover a Join Proxy by sending a link-local multicast message to ALL CoAP Nodes with address FF02::FD. Multiple or no nodes may respond. The handling of multiple responses and the absence of responses follow section 4 of {{I-D.ietf-anima-bootstrapping-keyinfra}}.
+The Pledge can discover a Join Proxy by sending a link-local multicast message to ALL CoAP Nodes with address FF02::FD. Multiple or no nodes may respond. The handling of multiple responses and the absence of responses follow section 4 of {{RFC8995}}.
 
 The join port of the Join Proxy is discovered by
 sending a GET request to "/.well-known/core" including a resource type (rt)
@@ -392,6 +401,9 @@ The example below shows the discovery of the join port of the Join Proxy.
 Port numbers are assumed to be the default numbers 5683 and 5684 for coap and coaps respectively (sections 12.6 and 12.7 of {{RFC7252}} when not shown in the response.
 Discoverable port numbers are usually returned for Join Proxy resources in the &lt;href&gt; of the payload (see section 5.1 of {{I-D.ietf-ace-coap-est}}).
 
+### 6tisch discovery
+Not applicable.
+
 ## Join Proxy discovers Registrar join port
 
 ### CoAP discovery {#coap-disc}
@@ -401,7 +413,7 @@ parameter with the value "join-proxy" {{RFC6690}}.
 Upon success, the return payload will contain the join Port of the Registrar.
 
 ~~~~
-  REQ: GET coap://[IP_address]/.well-known/core?rt=brski-proxy
+  REQ: GET coap://[IP_address]/.well-known/core?rt=join-proxy
 
   RES: 2.05 Content
   <coaps://[IP_address]:join-port>; rt="join-proxy"
@@ -415,11 +427,11 @@ The discoverable port numbers are usually returned for Join Proxy resources in t
 It should be noted here that the contents of the CBOR map used to convey return address information is not protected.
 However, the communication is between the Proxy and a known registrar are over the already secured portion of the network, so are not visible to eavesdropping systems.
 
-All of the concerns in {{I-D.ietf-anima-bootstrapping-keyinfra}} section 4.1 apply.
-The Pledge can be deceived by malicious AN\_Proxy announcements.
-The Pledge will only join a network to which it receives a valid {{RFC8366}} voucher.
+All of the concerns in {{RFC8995}} section 4.1 apply.
+The Pledge can be deceived by malicious Join_Proxy announcements.
+The Pledge will only join a network to which it receives a valid {{RFC8366}} voucher {{I-D.ietf-anima-constrained-voucher}}.
 
-If the proxy/Registrar was not over a secure network, then an attacker could change the cbor array, causing the Pledge to send traffic to another node.
+If the communicatione between Join-Proxy and Registrar passed over an unsecure network, then an attacker could change the cbor array, causing the Pledge to send traffic to another node.
 If the such scenario needed to be supported, then it would be reasonable for the Proxy to encrypt the CBOR array using a locally generated symmetric key.
 The Registrar would not be able to examine the result, but it does not need to do so.
 This is a topic for future work.
@@ -452,6 +464,7 @@ Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of th
 
     * Terminology updated
     * Several clarifications on discovery and routability
+    * DTLS payload introduced
 
 ## 01 to 02
    
@@ -474,7 +487,7 @@ Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of th
 
 #Stateless Proxy payload examples {#examples}
 
-The examples show the get coaps://[192.168.1.200]:5965/est/crts to a Registrar. The header generated between Client and registrar and from registrar to client are shown in detail. The DTLS encrypted code is not shown.
+The examples show the request "GET coaps://192.168.1.200:5965/est/crts" to a Registrar. The header generated between Join-Proxy and Registrar and from Registrar to Join-Proxy are shown in detail. The DTLS payload is not shown.
 
 
 
@@ -484,7 +497,7 @@ The request from Join Proxy to Registrar looks like:
 ~~~
    85                                   # array(5)
       50                                # bytes(16)
-         00000000000000000000FFFFC0A801C8 # 
+         FE800000000000000000FFFFC0A801C8 # 
       19 BDA7                           # unsigned(48551)
       0A                                # unsigned(10)
       00                                # unsigned(0)
@@ -495,7 +508,7 @@ The request from Join Proxy to Registrar looks like:
 In CBOR Diagnostic:
 
 ~~~
-    [h'00000000000000000000FFFFC0A801C8', 48551, 10, 0, 
+    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0, 
      h'<cacrts DTLS encrypted request>']
 ~~~
 
@@ -504,7 +517,7 @@ The response is:
 ~~~
    85                                   # array(5)
       50                                # bytes(16)
-         00000000000000000000FFFFC0A801C8 # 
+         FE800000000000000000FFFFC0A801C8 # 
       19 BDA7                           # unsigned(48551)
       0A                                # unsigned(10)
       00                                # unsigned(0)
@@ -515,7 +528,7 @@ The response is:
 In CBOR diagnostic:
 
 ~~~
-    [h'00000000000000000000FFFFC0A801C8', 48551, 10, 0, 
+    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0, 
     h'<cacrts DTLS encrypted response>']
 ~~~
 
