@@ -3,7 +3,7 @@ title: Constrained Join Proxy for Bootstrapping Protocols
 abbrev: Join-Proxy
 docname: draft-ietf-anima-constrained-join-proxy-04
 
-# stand_alone: true
+stand_alone: true
 
 ipr: trust200902
 area: Internet
@@ -18,8 +18,6 @@ pi:    # can use array (if all yes) or hash here
   symrefs: yes
 
 author:
-
-
 - ins: M. Richardson
   name: Michael Richardson
   org: Sandelman Software Works
@@ -41,7 +39,7 @@ normative:
   RFC8366:
   RFC8995:
   I-D.ietf-ace-coap-est:
-  I-D.ietf-6tisch-enrollment-enhanced-beacon:
+  RFC9032:
   I-D.ietf-anima-constrained-voucher:
   RFC8990:
 informative:
@@ -370,7 +368,7 @@ Autonomous Network Join Proxies MUST support GRASP discovery of Registrar as dec
 
 ### 6tisch discovery
 
-The discovery of Registrar by the Join-Proxy uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
+The discovery of Registrar by the Join-Proxy uses the enhanced beacons as discussed in {{RFC9032}}.
 
 ## Pledge discovers Join Proxy
 
