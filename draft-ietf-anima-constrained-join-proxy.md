@@ -43,7 +43,7 @@ normative:
   I-D.ietf-ace-coap-est:
   I-D.ietf-6tisch-enrollment-enhanced-beacon:
   I-D.ietf-anima-constrained-voucher:
-  I-D.ietf-anima-grasp:
+  RFC8990:
 informative:
   RFC6763:
   I-D.richardson-anima-state-for-joinrouter:
@@ -376,7 +376,7 @@ The discovery of Registrar by the Join-Proxy uses the enhanced beacons as discus
 
 ### Autonomous Network
 
-The Pledge MUST listen for GRASP M_FLOOD {{I-D.ietf-anima-grasp}} announcements of the objective: "AN_Proxy".
+The Pledge MUST listen for GRASP M_FLOOD {{RFC8990}} announcements of the objective: "AN_Proxy".
 See section Section 4.1.1 {{RFC8995}} for the details of the objective.
 
 ### CoAP discovery {#jp-disc}
@@ -459,6 +459,10 @@ Many thanks for the comments by Brian Carpenter and Esko Dijk.
 Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of the draft-kumar-dice-dtls-relay-02. Their draft has served as a basis for this document. Much text from their draft is copied over to this draft.
 
 # Changelog
+
+## 03 to 04
+
+    * mail address and reference
 
 ## 02 to 03
 
