@@ -127,7 +127,7 @@ If the Pledge (P), knowing the IP-address of the Registrar, initiates a DTLS con
           ++++     \-----|  |        |  |
                          +--+        +--+
        Registrar       Join Proxy   Pledge
-                                   
+
 
 ~~~~
 {: #fig-net title='multi-hop enrolment.' align="left"}
@@ -267,7 +267,7 @@ Header and Contents fields togther are one cbor array of 5 elements:
 
    2. Content field: containing the DTLS payload as a CBOR byte string.
 
-The join_proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type. 
+The join_proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type.
 
 ~~~
     JPY_message =
@@ -336,11 +336,11 @@ It is assumed that Join Proxy seamlessly provides a coaps connection between Ple
 The discovery follows two steps with two alternatives for step 1:
 
    1. Two alternatives:
- 
+
    a. The Pledge is one hop away from the Registrar. The Pledge discovers
-   the link-local address of the Registrar as described in 
+   the link-local address of the Registrar as described in
    {{I-D.ietf-ace-coap-est}}. From then on, it follows the BRSKI process
-   as described in {{I-D.ietf-ace-coap-est}} and 
+   as described in {{I-D.ietf-ace-coap-est}} and
    {{I-D.ietf-anima-constrained-voucher}}, using link-local addresses.
 
    b. The Pledge is more than one hop away from a relevant Registrar, and
@@ -360,7 +360,7 @@ In this section, the Pledge and Join Proxy are assumed to communicate via Link-L
 
 ### CoAP discovery
 
-The discovery of the coaps Registrar, using coap discovery, by the Join Proxy follows section 6 of {{I-D.ietf-ace-coap-est}}. 
+The discovery of the coaps Registrar, using coap discovery, by the Join Proxy follows section 6 of {{I-D.ietf-ace-coap-est}}.
 
 ### Autonomous Network
 
@@ -471,7 +471,7 @@ Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of th
     * DTLS payload introduced
 
 ## 01 to 02
-   
+
    * Discovery of Join Proxy and Registrar ports
 
 ## 00 to 01
@@ -501,7 +501,7 @@ The request from Join Proxy to Registrar looks like:
 ~~~
    85                                   # array(5)
       50                                # bytes(16)
-         FE800000000000000000FFFFC0A801C8 # 
+         FE800000000000000000FFFFC0A801C8 #
       19 BDA7                           # unsigned(48551)
       0A                                # unsigned(10)
       00                                # unsigned(0)
@@ -512,7 +512,7 @@ The request from Join Proxy to Registrar looks like:
 In CBOR Diagnostic:
 
 ~~~
-    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0, 
+    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0,
      h'<cacrts DTLS encrypted request>']
 ~~~
 
@@ -521,7 +521,7 @@ The response is:
 ~~~
    85                                   # array(5)
       50                                # bytes(16)
-         FE800000000000000000FFFFC0A801C8 # 
+         FE800000000000000000FFFFC0A801C8 #
       19 BDA7                           # unsigned(48551)
       0A                                # unsigned(10)
       00                                # unsigned(0)
@@ -532,7 +532,7 @@ The response is:
 In CBOR diagnostic:
 
 ~~~
-    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0, 
+    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0,
     h'<cacrts DTLS encrypted response>']
 ~~~
 
