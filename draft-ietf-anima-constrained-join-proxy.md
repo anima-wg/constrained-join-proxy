@@ -44,6 +44,13 @@ normative:
   I-D.ietf-6tisch-enrollment-enhanced-beacon:
   I-D.ietf-anima-constrained-voucher:
   RFC8990:
+  ieee802-1AR:
+    target: "http://standards.ieee.org/findstds/standard/802.1AR-2009.html"
+    title: "IEEE 802.1AR Secure Device Identifier"
+    author:
+      ins: "IEEE Standard"
+    date: 2009
+
 informative:
   RFC6763:
   I-D.richardson-anima-state-for-joinrouter:
@@ -57,33 +64,38 @@ informative:
 
 --- abstract
 
-This document defines a protocol to securely assign a Pledge to a domain, represented by a Registrar, using an intermediary node between Pledge and Registrar. This intermediary node is known as a "constrained Join Proxy".
+This document defines a protocol to securely assign a Pledge to a domain, represented by a Registrar, using an intermediary node between Pledge and Registrar. This intermediary node is known as a "constrained Join Proxy". An enrolled Pledge can act as a Join Proxy.
 
-This document extends the work of {{RFC8995}} by replacing the Circuit-proxy between Pledge and Registrar by a stateless/stateful constrained (CoAP) Join Proxy.
+This document extends the work of Bootstrapping Remote Secure Key Infrastructures (BRSKI) by replacing the Circuit-proxy between Pledge and Registrar by a stateless/stateful constrained Join Proxy.
 It relays join traffic from the Pledge to the Registrar.
 
 --- middle
 
 # Introduction
 
-Enrolment of new nodes into networks with enrolled nodes present is described in
-{{RFC8995}} ("BRSKI") and makes use of Enrolment over Secure Transport (EST) {{RFC7030}}
-with {{RFC8366}} vouchers to securely enroll devices.
-BRSKI connects a new joining device (called Pledge) to "Registrars" via a Join Proxy.
+The Bootstrapping Remote Secure Key Infrastructure (BRSKI) protocol described in {{RFC8995}}
+provides a solution for a secure zero-touch (automated) bootstrap of new (unconfigured) devices.
+In the context of BRSKI, new devices, called "Pledges", are equipped with a factory-installed Initial Device Identifier (IDevID) (see {{ieee802-1AR}}), and are enrolled into a network.
+BRSKI makes use of Enrollment over Secure Transport (EST) {{RFC7030}}
+with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls. In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a Join Proxy. 
 
-The specified solutions use https and may be too large in terms of code space or bandwidth required for constrained devices.
-Constrained devices possibly part of constrained networks {{RFC7228}} typically implement the IPv6 over Low-Power Wireless personal Area Networks (6LoWPAN) {{RFC4944}} and Constrained Application Protocol (CoAP) {{RFC7252}}.
+A complete specification of the terminology is pointed at in {{Terminology}}.
+
+The specified solutions in {{RFC8995}} and {{RFC7030}} are based on POST or GET requests to the EST resources (/cacerts, /simpleenroll, /simplereenroll, /serverkeygen, and /csrattrs), and the brski resources (/requestvoucher, /voucher_status, and /enrollstatus). These requests use https and may be too large in terms of code space or bandwidth required for constrained devices.
+Constrained devices which may be part of constrained networks {{RFC7228}}, typically implement the IPv6 over Low-Power Wireless personal Area Networks (6LoWPAN) {{RFC4944}} and Constrained Application Protocol (CoAP) {{RFC7252}}.
 
 CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC6347}} as a security protocol for authenticity and confidentiality of the messages.
 This is known as the "coaps" scheme.
-A constrained version of EST, using Coap and DTLS, is described in {{I-D.ietf-ace-coap-est}}. The {{I-D.ietf-anima-constrained-voucher}} extends {{I-D.ietf-ace-coap-est}} with BRSKI artefacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
+A constrained version of EST, using Coap and DTLS, is described in {{I-D.ietf-ace-coap-est}}. The {{I-D.ietf-anima-constrained-voucher}} extends {{I-D.ietf-ace-coap-est}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
 
 DTLS is a client-server protocol relying on the underlying IP layer to perform the routing between the DTLS Client and the DTLS Server.
-However, the new Pledge will not be IP routable until it is authenticated to the network.
+However, the Pledge will not be IP routable until it is authenticated to the network.
 A new Pledge can only initially use a link-local IPv6 address to communicate with a neighbour on the same link {{RFC6775}} until it receives the necessary network configuration parameters.
 However, before the Pledge can receive these configuration parameters, it needs to authenticate itself to the network to which it connects.
 
 During enrollment, a DTLS connection is required between Pledge and Registrar.
+
+Once a Pledge is enrolled, it can act as Join Proxy between other Pledges and the enrolling Registrar.
 
 This document specifies a new form of Join Proxy and protocol to act as intermediary between Pledge and Registrar to relay DTLS messages between Pledge and Registrar. Two versions of the Join Proxy are specified:
 
@@ -130,7 +142,7 @@ If the Pledge (P), knowing the IP-address of the Registrar, initiates a DTLS con
                                    
 
 ~~~~
-{: #fig-net title='multi-hop enrolment.' align="left"}
+{: #fig-net title='multi-hop enrollment.' align="left"}
 
 Without routing the Pledge (P) cannot establish a secure connection to the Registrar (R) over multiple hops in the network.
 
@@ -203,7 +215,7 @@ This message is transmitted one-hop to a neighbouring (Join Proxy) node.
 Under normal circumstances, this message would be dropped at the neighbour node since the Pledge is not yet IP routable or is not yet authenticated to send messages through the network.
 However, if the neighbour device has the Join Proxy functionality enabled, it routes the DTLS message to its Registrar of choice.
 
-The Join Proxy sends a "new" JPY message which includes the DTLS data as payload.
+The Join Proxy transforms the DTLS message to a JPY message which includes the DTLS data as payload, and sends the JPY message.
 
 The JPY message payload consists of two parts:
 
@@ -335,20 +347,13 @@ It is assumed that Join Proxy seamlessly provides a coaps connection between Ple
 
 The discovery follows two steps with two alternatives for step 1:
 
-   Step 1. Two alternatives exist (near and remote):
+   * Step 1. Two alternatives exist (near and remote):
  
-    Near: the Pledge is one hop away from the Registrar. The Pledge 
-    discovers the link-local address of the Registrar as described in 
-    {{I-D.ietf-ace-coap-est}}. From then on, it follows the BRSKI process
-    as described in {{I-D.ietf-ace-coap-est}} and 
-    {{I-D.ietf-anima-constrained-voucher}}, using link-local addresses.
+     * Near: the Pledge is one hop away from the Registrar. The Pledge discovers the link-local address of the Registrar as described in {{I-D.ietf-ace-coap-est}}. From then on, it follows the BRSKI process as described in {{I-D.ietf-ace-coap-est}} and {{I-D.ietf-anima-constrained-voucher}}, using link-local addresses.
 
-    Remote: the Pledge is more than one hop away from a relevant Registrar, 
-    and discovers the link-local address and join-port of a Join Proxy. The
-    Pledge then follows the BRSKI procedure using the link-local address of
-    the Join Proxy.
+     * Remote: the Pledge is more than one hop away from a relevant Registrar, and discovers the link-local address and join-port of a Join Proxy. The Pledge then follows the BRSKI procedure using the link-local address of the Join Proxy.
 
-   Step 2. The enrolled Join Proxy discovers the join-port of the Registrar.
+   * Step 2. The enrolled Join Proxy discovers the join-port of the Registrar.
 
 The order in which the two alternatives of step 1 are tried is installation dependent. The trigger for discovery in Step 2 in implementation dependent. 
 
@@ -360,7 +365,7 @@ Three discovery cases are discussed: Join Proxy discovers Registrar, Pledge disc
 
 In this section, the Join Proxy and Registrar are assumed to communicate via Link-Local addresses. This section describes the discovery of the Registrar by the Join Proxy.
 
-### CoAP discovery{#coap-disc}
+### CoAP discovery {#coap-disc}
 
 The discovery of the coaps Registrar, using coap discovery, by the Join Proxy follows section 6 of {{I-D.ietf-ace-coap-est}}. 
 The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt)
