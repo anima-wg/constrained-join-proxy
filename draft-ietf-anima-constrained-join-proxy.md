@@ -461,6 +461,20 @@ Another possibility is to use level 2 protection between Registrar and Join Prox
 
 This document needs to create a registry for key indices in the CBOR map.  It should be given a name, and the amending formula should be IETF Specification.
 
+## Resource Type Attributes registry
+
+This specification registers new Resource Type (rt=) Link Target Attributes in the "Resource Type (rt=) Link Target Attribute Values" subregistry under the "Constrained RESTful Environments (CoRE)
+Parameters" registry per the {{RFC6690}} procedure.
+
+    Attribute Value: brski.jp
+    Description: This BRSKI resource type is used to query and return the supported BRSKI (CoAP over DTLS) port of the constrained Join Proxy.
+    Reference: [this document]
+
+    Attribute Value: brski.rjp
+    Description: This BRSKI resource type is used to query and return the supported BRSKI JPY protocol port of the Registrar.
+    Reference: [this document]
+
+
 ##Resource Type registry
 
 This specification registers a new Resource Type (rt=) Link Target Attributes in the "Resource Type (rt=) Link Target Attribute Values" subregistry under the "Constrained RESTful Environments (CoRE) Parameters" registry.
