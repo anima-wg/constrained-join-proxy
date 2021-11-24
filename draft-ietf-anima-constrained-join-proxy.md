@@ -77,7 +77,7 @@ The Bootstrapping Remote Secure Key Infrastructure (BRSKI) protocol described in
 provides a solution for a secure zero-touch (automated) bootstrap of new (unconfigured) devices.
 In the context of BRSKI, new devices, called "Pledges", are equipped with a factory-installed Initial Device Identifier (IDevID) (see {{ieee802-1AR}}), and are enrolled into a network.
 BRSKI makes use of Enrollment over Secure Transport (EST) {{RFC7030}}
-with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls. In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a Join Proxy. 
+with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls. In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a Join Proxy.
 
 A complete specification of the terminology is pointed at in {{Terminology}}.
 
@@ -139,7 +139,7 @@ If the Pledge (P), knowing the IP-address of the Registrar, initiates a DTLS con
           ++++     \-----|  |        |  |
                          +--+        +--+
        Registrar       Join Proxy   Pledge
-                                   
+
 
 ~~~~
 {: #fig-net title='multi-hop enrollment.' align="left"}
@@ -279,7 +279,7 @@ Header and Contents fields together are one CBOR array of 5 elements:
 
    2. Content field: containing the DTLS payload as a CBOR byte string.
 
-The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type. 
+The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type.
 
 ~~~
     JPY_message =
@@ -348,14 +348,14 @@ It is assumed that Join Proxy seamlessly provides a coaps connection between Ple
 The discovery follows two steps with two alternatives for step 1:
 
    * Step 1. Two alternatives exist (near and remote):
- 
+
      * Near: the Pledge is one hop away from the Registrar. The Pledge discovers the link-local address of the Registrar as described in {{I-D.ietf-ace-coap-est}}. From then on, it follows the BRSKI process as described in {{I-D.ietf-ace-coap-est}} and {{I-D.ietf-anima-constrained-voucher}}, using link-local addresses.
 
      * Remote: the Pledge is more than one hop away from a relevant Registrar, and discovers the link-local address and join-port of a Join Proxy. The Pledge then follows the BRSKI procedure using the link-local address of the Join Proxy.
 
    * Step 2. The enrolled Join Proxy discovers the join-port of the Registrar.
 
-The order in which the two alternatives of step 1 are tried is installation dependent. The trigger for discovery in Step 2 in implementation dependent. 
+The order in which the two alternatives of step 1 are tried is installation dependent. The trigger for discovery in Step 2 in implementation dependent.
 
 Once a Pledge is enrolled, it may function as Join Proxy. The Join Proxy functions are advertised as descibed below. In principle, the Join Proxy functions are offered via a join-port, and not the standard coaps port. Also the Registrar offers a join-port to which the stateless Join Proxy sends the JPY message. The Join Proxy and Registrar show the extra join-port number when reponding to a /.well-known/core discovery request addressed to the standard coap/coaps port.
 
@@ -367,7 +367,7 @@ In this section, the Join Proxy and Registrar are assumed to communicate via Lin
 
 ### CoAP discovery {#coap-disc}
 
-The discovery of the coaps Registrar, using coap discovery, by the Join Proxy follows section 6 of {{I-D.ietf-ace-coap-est}}. 
+The discovery of the coaps Registrar, using coap discovery, by the Join Proxy follows section 6 of {{I-D.ietf-ace-coap-est}}.
 The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt)
 parameter with the value "join-proxy" {{RFC6690}}.
 Upon success, the return payload will contain the join-port of the Registrar.
@@ -397,7 +397,7 @@ In this section, the Pledge and Registrar are assumed to communicate via Link-Lo
 
 ### CoAP discovery
 
-The discovery of the coaps Registrar, using coap discovery, by the Pledge follows section 6 of {{I-D.ietf-ace-coap-est}}. 
+The discovery of the coaps Registrar, using coap discovery, by the Pledge follows section 6 of {{I-D.ietf-ace-coap-est}}.
 
 ### GRASP discovery
 
@@ -471,6 +471,8 @@ This specification registers a new Resource Type (rt=) Link Target Attributes in
       rt="join-proxy". This BRSKI resource is used to query and return
       the supported BRSKI port of the Registrar.
 
+
+
 # Acknowledgements
 
 Many thanks for the comments by Brian Carpenter and Esko Dijk.
@@ -498,7 +500,7 @@ Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of th
     * DTLS payload introduced
 
 ## 01 to 02
-   
+
    * Discovery of Join Proxy and Registrar ports
 
 ## 00 to 01
@@ -528,7 +530,7 @@ The request from Join Proxy to Registrar looks like:
 ~~~
    85                                   # array(5)
       50                                # bytes(16)
-         FE800000000000000000FFFFC0A801C8 # 
+         FE800000000000000000FFFFC0A801C8 #
       19 BDA7                           # unsigned(48551)
       0A                                # unsigned(10)
       00                                # unsigned(0)
@@ -539,7 +541,7 @@ The request from Join Proxy to Registrar looks like:
 In CBOR Diagnostic:
 
 ~~~
-    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0, 
+    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0,
      h'<cacrts DTLS encrypted request>']
 ~~~
 
@@ -548,7 +550,7 @@ The response is:
 ~~~
    85                                   # array(5)
       50                                # bytes(16)
-         FE800000000000000000FFFFC0A801C8 # 
+         FE800000000000000000FFFFC0A801C8 #
       19 BDA7                           # unsigned(48551)
       0A                                # unsigned(10)
       00                                # unsigned(0)
@@ -559,7 +561,7 @@ The response is:
 In CBOR diagnostic:
 
 ~~~
-    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0, 
+    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0,
     h'<cacrts DTLS encrypted response>']
 ~~~
 
