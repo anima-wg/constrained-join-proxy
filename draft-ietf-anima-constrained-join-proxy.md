@@ -304,6 +304,8 @@ The contents are DTLS encrypted. In CBOR diagnostic notation the payload JPY[H(I
 
 Examples are shown in {{examples}}.
 
+When additions are added to the array in later versions of this protocol, any additional array elements (i.e., not specified by current document) MUST be ignored by a receiver if it doesn't know these elements. This approach allows evolution of the protocol while maintaining backwards-compatibility. A version number isn't needed; that number is defined by the length of the array.
+
 # Comparison of stateless and statefull modes {#jr-comp}
 
 The stateful and stateless mode of operation for the Join Proxy have
