@@ -1,7 +1,7 @@
 ---
 title: Constrained Join Proxy for Bootstrapping Protocols
 abbrev: Join Proxy
-docname: draft-ietf-anima-constrained-join-proxy-05
+docname: draft-ietf-anima-constrained-join-proxy-06
 
 # stand_alone: true
 
@@ -38,11 +38,13 @@ author:
 normative:
   RFC6347:
   RFC7049:
+  RFC8126:
   RFC8366:
   RFC8995:
   I-D.ietf-ace-coap-est:
   I-D.ietf-6tisch-enrollment-enhanced-beacon:
   I-D.ietf-anima-constrained-voucher:
+  RFC8949:
   RFC8990:
   ieee802-1AR:
     target: "http://standards.ieee.org/findstds/standard/802.1AR-2009.html"
@@ -369,14 +371,14 @@ In this section, the Join Proxy and Registrar are assumed to communicate via Lin
 
 The discovery of the coaps Registrar, using coap discovery, by the Join Proxy follows section 6 of {{I-D.ietf-ace-coap-est}}.
 The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt)
-parameter with the value "join-proxy" {{RFC6690}}.
+parameter with the value "brski.rjp" {{RFC6690}}.
 Upon success, the return payload will contain the join-port of the Registrar.
 
 ~~~~
-  REQ: GET coap://[IP_address]/.well-known/core?rt=join-proxy
+  REQ: GET coap://[IP_address]/.well-known/core?rt=brski.rjp
 
   RES: 2.05 Content
-  <coaps://[IP_address]:join-port>; rt="join-proxy"
+  <coaps://[IP_address]:join-port>; rt="brski.rjp"
 ~~~~
 
 The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reeference&gt; of the payload (see section 5.1 of {{I-D.ietf-ace-coap-est}}).
@@ -420,16 +422,16 @@ The Pledge can discover a Join Proxy by sending a link-local multicast message t
 
 The join-port of the Join Proxy is discovered by
 sending a GET request to "/.well-known/core" including a resource type (rt)
-parameter with the value "brski-proxy" {{RFC6690}}.
+parameter with the value "brski.jp" {{RFC6690}}.
 Upon success, the return payload will contain the join-port.
 
 The example below shows the discovery of the join-port of the Join Proxy.
 
 ~~~~
-  REQ: GET coap://[FF02::FD]/.well-known/core?rt=brski-proxy
+  REQ: GET coap://[FF02::FD]/.well-known/core?rt=brski.jp
 
   RES: 2.05 Content
-  <coaps://[IP_address]:join-port>; rt="brski-proxy"
+  <coaps://[IP_address]:join-port>; rt="brski.jp"
 ~~~~
 
 Port numbers are assumed to be the default numbers 5683 and 5684 for coap and coaps respectively (sections 12.6 and 12.7 of {{RFC7252}} when not shown in the response.
@@ -459,7 +461,27 @@ Another possibility is to use level 2 protection between Registrar and Join Prox
 
 # IANA Considerations
 
-This document needs to create a registry for key indices in the CBOR map.  It should be given a name, and the amending formula should be IETF Specification.
+## Registry for JPY protocol header fields
+
+This document defines a new IANA registry for array indices of the CBOR array used in the JPY  protocol.
+The IANA policy for registration of an entry in the registry is "IETF Review" as defined by
+{{RFC8126}}.
+A new registry entry MUST define the fields Array Index, Name, CBOR Type (referring to {{RFC8949}}
+defined types), and Description.
+
+The initial contents of the registry are as follows:
+
+    Array Index Name        CBOR Type   Description
+    =========== ==========  =========== ====================================
+    0           ip          byte string Pledge IPv4/IPv6 link-local address
+                                        (4 or 16 bytes)
+    1           port        integer     Pledge's UDP port number
+    2           family      integer     IP address family; IPv4 or IPv6
+                                        (value 4) or (value 6)
+    3           index       integer     Join Proxy network interface
+                                        index/identifier
+    4           payload     byte string DTLS message payload
+
 
 ## Resource Type Attributes registry
 
@@ -467,35 +489,29 @@ This specification registers new Resource Type (rt=) Link Target Attributes in t
 Parameters" registry per the {{RFC6690}} procedure.
 
     Attribute Value: brski.jp
-    Description: This BRSKI resource type is used to query and return the supported BRSKI (CoAP over DTLS) port of the constrained Join Proxy.
+    Description: This BRSKI resource type is used to query and return the
+                 supported BRSKI (CoAP over DTLS) port of the constrained 
+                 Join Proxy.
     Reference: [this document]
 
     Attribute Value: brski.rjp
-    Description: This BRSKI resource type is used to query and return the supported BRSKI JPY protocol port of the Registrar.
+    Description: This BRSKI resource type is used to query and return the
+                 supported BRSKI JPY protocol port of the Registrar.
     Reference: [this document]
-
-
-##Resource Type registry
-
-This specification registers a new Resource Type (rt=) Link Target Attributes in the "Resource Type (rt=) Link Target Attribute Values" subregistry under the "Constrained RESTful Environments (CoRE) Parameters" registry.
-
-      rt="brski-proxy". This BRSKI resource is used to query and return
-      the supported BRSKI port of the Join Proxy.
-
-      rt="join-proxy". This BRSKI resource is used to query and return
-      the supported BRSKI port of the Registrar.
-
-
 
 # Acknowledgements
 
-Many thanks for the comments by Brian Carpenter and Esko Dijk.
+Many thanks for the comments by Brian Carpenter, Esko Dijk, and Russ Housley.
 
 # Contributors
 
 Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of the draft-kumar-dice-dtls-relay-02. Their draft has served as a basis for this document. Much text from their draft is copied over to this draft.
 
 # Changelog
+
+## 05 to 06
+     * RT value change to brski.jp and brski.rjp
+     * new registry values for IANA
 
 ## 04 to 05
      * Join Proxy and join-port consistent spelling
