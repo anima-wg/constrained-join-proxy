@@ -37,12 +37,10 @@ author:
 
 normative:
   RFC6347:
-  RFC7049:
   RFC8126:
   RFC8366:
   RFC8995:
   I-D.ietf-ace-coap-est:
-  I-D.ietf-6tisch-enrollment-enhanced-beacon:
   I-D.ietf-anima-constrained-voucher:
   RFC8949:
   RFC8990:
@@ -56,6 +54,7 @@ normative:
 informative:
   RFC6763:
   I-D.richardson-anima-state-for-joinrouter:
+  I-D.ietf-6tisch-enrollment-enhanced-beacon:
   RFC6690:
   RFC7030:
   RFC7228:
@@ -159,12 +158,12 @@ The following {{jr-spec}} specifies the two Join Proxy modes. A comparison is pr
 
 A Join Proxy can operate in two modes:
 
-  * Statefull mode
+  * Stateful mode
   * Stateless mode
 
 A Join Proxy MUST implement one of the two modes. A Join Proxy MAY implement both, with an unspecified mechanism to switch between the two modes.
 
-## Statefull Join Proxy
+## Stateful Join Proxy
 
 In stateful mode, the Join Proxy forwards the DTLS messages to the Registrar.
 
@@ -203,7 +202,7 @@ IP_R:5684 = Routable IP address and coaps port of Registrar
 IP_Ja:P_J = Link-local IP address and join-port of Join Proxy
 IP_Jb:p_Rb = Routable IP address and client port of Join Proxy
 ~~~~
-{: #fig-statefull2 title='constrained statefull joining message flow with Registrar address known to Join Proxy.' align="left"}
+{: #fig-statefull2 title='constrained stateful joining message flow with Registrar address known to Join Proxy.' align="left"}
 
 ## Stateless Join Proxy
 
@@ -217,7 +216,7 @@ This message is transmitted one-hop to a neighbouring (Join Proxy) node.
 Under normal circumstances, this message would be dropped at the neighbour node since the Pledge is not yet IP routable or is not yet authenticated to send messages through the network.
 However, if the neighbour device has the Join Proxy functionality enabled, it routes the DTLS message to its Registrar of choice.
 
-The Join Proxy transforms the DTLS message to a JPY message which includes the DTLS data as payload, and sends the JPY message.
+The Join Proxy transforms the DTLS message to a JPY message which includes the DTLS data as payload, and sends the JPY message to the join-port of the Registrar.
 
 The JPY message payload consists of two parts:
 
@@ -235,7 +234,7 @@ The Header contains the original source link-local address and port of the Pledg
 On receiving the JPY message, the Join Proxy retrieves the two parts.
 It uses the Header field to route the DTLS message containing the DTLS payload retrieved from the Contents field to the Pledge.
 
-In this scenario, both the Registrar and the Join Proxy use discoverable join-ports, which may be the default ports.
+In this scenario, both the Registrar and the Join Proxy use discoverable join-ports, for the Join Proxy this may be a default CoAP port.
 
 The {{fig-stateless}} depicts the message flow diagram:
 
@@ -277,7 +276,7 @@ The JPY message is constructed as a payload with media-type aplication/cbor
 
 Header and Contents fields together are one CBOR array of 5 elements:
 
-   1. header field: containing a CBOR array {{RFC7049}} with the Pledge IPv6 Link Local address as a CBOR byte string, the Pledge's UDP port number as a CBOR integer, the IP address family (IPv4/IPv6) as a CBOR integer, and the proxy's ifindex or other identifier for the physical port as CBOR integer. The header field is not DTLS encrypted.
+   1. header field: containing a CBOR array {{RFC8949}} with the Pledge IPv6 Link Local address as a CBOR byte string, the Pledge's UDP port number as a CBOR integer, the IP address family (IPv4/IPv6) as a CBOR integer, and the proxy's ifindex or other identifier for the physical port as CBOR integer. The header field is not DTLS encrypted.
 
    2. Content field: containing the DTLS payload as a CBOR byte string.
 
@@ -290,7 +289,7 @@ The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the trans
        port    : int,
        family  : int,
        index   : int
-       payload : bstr
+       content : bstr
     ]
 
 ~~~
@@ -306,7 +305,7 @@ Examples are shown in {{examples}}.
 
 When additions are added to the array in later versions of this protocol, any additional array elements (i.e., not specified by current document) MUST be ignored by a receiver if it doesn't know these elements. This approach allows evolution of the protocol while maintaining backwards-compatibility. A version number isn't needed; that number is defined by the length of the array.
 
-# Comparison of stateless and statefull modes {#jr-comp}
+# Comparison of stateless and stateful modes {#jr-comp}
 
 The stateful and stateless mode of operation for the Join Proxy have
 their advantages and disadvantages.  This section should enable to
@@ -371,7 +370,7 @@ In this section, the Join Proxy and Registrar are assumed to communicate via Lin
 
 ### CoAP discovery {#coap-disc}
 
-The discovery of the coaps Registrar, using coap discovery, by the Join Proxy follows section 6 of {{I-D.ietf-ace-coap-est}}.
+The discovery of the coaps Registrar, using coap discovery, by the Join Proxy follows sections 6.3 and 6.5.1 of {{I-D.ietf-anima-constrained-voucher}}.
 The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt)
 parameter with the value "brski.rjp" {{RFC6690}}.
 Upon success, the return payload will contain the join-port of the Registrar.
@@ -401,7 +400,7 @@ In this section, the Pledge and Registrar are assumed to communicate via Link-Lo
 
 ### CoAP discovery
 
-The discovery of the coaps Registrar, using coap discovery, by the Pledge follows section 6 of {{I-D.ietf-ace-coap-est}}.
+The discovery of the coaps Registrar, using coap discovery, by the Pledge follows sections 6.3 and 6.5.1 of {{I-D.ietf-anima-constrained-voucher}}..
 
 ### GRASP discovery
 
@@ -508,21 +507,17 @@ number registry".
 
     Service Name: BRSKI-JP
     Transport Protocol(s): UDP
-    Assignee: Peter van der Stok
-    Contact: Peter van der Stok
-    Description: service name of Join Proxy
+    Assignee:  IESG <iesg@ietf.org>
+    Contact:  IESG <iesg@ietf.org>
+    Description: constrained Join Proxy
     Reference [this document]
-    Port Number: to be discovered.
-    Known Unauthorized: Uses BRSKI porotocol
 
     Service Name: BRSKI-RJP
     Transport Protocol(s): UDP
-    Assignee: Peter van der Stok
-    Contact: Peter van der Stok
-    Description: service name of Registrar server to Join Proxy
+    Assignee:  IESG <iesg@ietf.org>
+    Contact:  IESG <iesg@ietf.org>
+    Description: Registrar server used by constrained Join Proxy
     Reference [this document]
-    Port Number: to be discovered.
-    Known Unauthorized: Uses BRSKI porotocol
 
 
 # Acknowledgements
@@ -542,7 +537,8 @@ Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of th
 ## 04 to 05
      * Join Proxy and join-port consistent spelling
      * some nits removed
-     * restructured discovery section
+     * restructured discovery 
+     * section
      * rephrased parts of security section
 
 ## 03 to 04
