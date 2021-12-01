@@ -170,7 +170,7 @@ In stateful mode, the Join Proxy forwards the DTLS messages to the Registrar.
 
 Assume that the Pledge does not know the IP address of the Registrar it needs to contact.
 The Join Proxy has has been enrolled via the Registrar and learns the IP address and port of the Registrar, for example by using the discovery mechanism described in {{jr-disc}}. The Pledge first discovers (see {{jr-disc}}) and selects the most appropriate Join Proxy.
-(Discovery can also be based upon {{RFC8995}} section 4.1, or via DNS-SD service discovery {{RFC6763}}).
+(Discovery can also be based upon {{RFC8995}} section 4.1). For service discovery via DNS-SD {{RFC6763}}, this dosument specifies the service names in {{dns-sd-spec}}.
 The Pledge initiates its request as if the Join Proxy is the intended Registrar. The Join Proxy receives the message at a discoverable join-port.
 The Join Proxy constructs an IP packet by copying the DTLS payload from the message received from the Pledge, and provides source and destination addresses to forward the message to the intended Registrar.
 The Join Proxy maintains a 4-tuple array to translate the DTLS messages received from the Registrar and forward it back to the Pledge.
@@ -487,7 +487,7 @@ The initial contents of the registry are as follows:
 
 ## Resource Type Attributes registry
 
-This specification registers new Resource Type (rt=) Link Target Attributes in the "Resource Type (rt=) Link Target Attribute Values" subregistry under the "Constrained RESTful Environments (CoRE)
+This specification registers two new Resource Type (rt=) Link Target Attributes in the "Resource Type (rt=) Link Target Attribute Values" subregistry under the "Constrained RESTful Environments (CoRE)
 Parameters" registry per the {{RFC6690}} procedure.
 
     Attribute Value: brski.jp
@@ -500,6 +500,30 @@ Parameters" registry per the {{RFC6690}} procedure.
     Description: This BRSKI resource type is used to query and return the
                  supported BRSKI JPY protocol port of the Registrar.
     Reference: [this document]
+
+## service name and port number registry {#dns-sd-spec}
+
+This specification registers two service names under the "service name and port
+number registry".
+
+    Service Name: BRSKI-JP
+    Transport Protocol(s): UDP
+    Assignee: Peter van der Stok
+    Contact: Peter van der Stok
+    Description: service name of Join Proxy
+    Reference [this document]
+    Port Number: to be discovered.
+    Known Unauthorized: Uses BRSKI porotocol
+
+    Service Name: BRSKI-RJP
+    Transport Protocol(s): UDP
+    Assignee: Peter van der Stok
+    Contact: Peter van der Stok
+    Description: service name of Registrar server to Join Proxy
+    Reference [this document]
+    Port Number: to be discovered.
+    Known Unauthorized: Uses BRSKI porotocol
+
 
 # Acknowledgements
 
