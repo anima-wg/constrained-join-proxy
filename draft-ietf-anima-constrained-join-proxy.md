@@ -502,22 +502,22 @@ Parameters" registry per the {{RFC6690}} procedure.
 
 ## service name and port number registry {#dns-sd-spec}
 
-This specification registers two service names under the "service name and port
-number registry".
+This specification registers two service names under the "Service Name and Transport Protocol Port 
+Number" registry.
 
-    Service Name: BRSKI-JP
-    Transport Protocol(s): UDP
+    Service Name: brski-jp
+    Transport Protocol(s): udp
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
-    Description: constrained Join Proxy
-    Reference [this document]
+    Description: Bootstrapping Remote Secure Key Infrastructure constrained Join Proxy
+    Reference: [this document]
 
-    Service Name: BRSKI-RJP
-    Transport Protocol(s): UDP
+    Service Name: brski-rjp
+    Transport Protocol(s): udp
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
-    Description: Registrar server used by constrained Join Proxy
-    Reference [this document]
+    Description: Bootstrapping Remote Secure Key Infrastructure Registrar join-port used by stateless constrained Join Proxy
+    Reference: [this document]
 
 
 # Acknowledgements
