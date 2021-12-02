@@ -509,16 +509,17 @@ Number" registry.
     Transport Protocol(s): udp
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
-    Description: Bootstrapping Remote Secure Key Infrastructure constrained 
-                 Join Proxy
+    Description: Bootstrapping Remote Secure Key Infrastructure 
+                  constrained Join Proxy
     Reference: [this document]
 
     Service Name: brski-rjp
     Transport Protocol(s): udp
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
-    Description: Bootstrapping Remote Secure Key Infrastructure Registrar 
-                 join-port used by stateless constrained Join Proxy
+    Description: Bootstrapping Remote Secure Key Infrastructure  
+                 Registrar join-port used by stateless constrained 
+                 Join Proxy
     Reference: [this document]
 
 
