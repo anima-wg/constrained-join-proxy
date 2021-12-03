@@ -232,8 +232,8 @@ On receiving the JPY message, the Registrar (or proxy) retrieves the two parts.
 
 The Registrar transiently stores the Header field information.
 The Registrar uses the Contents field to execute the Registrar functionality.
-However, when the Registrar replies, it also extends its DTLS message with the header field in a JPY message and sends it back to the Join Proxy.
-The Registrar SHOULD NOT assume that it can decode the Header Field, it should simply repeat it when responding.
+However, when the Registrar replies, it inserts its DTLS message into the Contents field of a JPY message and sends it back to the Join Proxy.
+The Registrar SHOULD NOT assume that it can decode the Header field. In the response JPY message the Registrar repeats all Header elements that were in the incoming JPY message.
 The Header contains the original source link-local address and port of the Pledge from the transient state stored earlier and the Contents field contains the DTLS payload.
 
 On receiving the JPY message, the Join Proxy retrieves the two parts.
@@ -281,9 +281,9 @@ The JPY message is constructed as a payload with media-type aplication/cbor
 
 Header and Contents fields together are one CBOR array of 5 elements:
 
-   1. header field: containing a CBOR array {{RFC8949}} with the Pledge IPv6 Link Local address as a CBOR byte string, the Pledge's UDP port number as a CBOR integer, the IP address family (IPv4/IPv6) as a CBOR integer, and the proxy's ifindex or other identifier for the physical port as CBOR integer. The header field is not DTLS encrypted.
+   1. Header field: containing a CBOR array {{RFC8949}} with the Pledge IPv6 Link Local address as a CBOR byte string, the Pledge's UDP port number as a CBOR integer, the IP address family (IPv4/IPv6) as a CBOR integer, and the proxy's ifindex or other identifier for the physical port as CBOR integer. The header field is not DTLS encrypted.
 
-   2. Content field: containing the DTLS payload as a CBOR byte string.
+   2. Contents field: containing the DTLS payload as a CBOR byte string.
 
 The address family integer is defined in {{family}} with:
 
@@ -312,11 +312,11 @@ The contents are DTLS encrypted. In CBOR diagnostic notation the payload JPY[H(I
 ~~~
 
 On reception by the Registrar, the Registrar MUST verify that the number of array elements is larger than or equal to 5, and reject the message when the number of array elements is smaller than 5.
-The Registrar replaces the 5th "content" element with the DTLS payload of the response message and leaves all other array elements unchanged.
+The Registrar replaces the 5th "content" element with the DTLS payload of the response message and MUST leave all other array elements unchanged.
 
 Examples are shown in {{examples}}.
 
-When additions are added to the array in later versions of this protocol, any additional array elements (i.e., not specified by current document) MUST be ignored by a receiver if it doesn't know these elements. This approach allows evolution of the protocol while maintaining backwards-compatibility. A version number isn't needed; that number is defined by the length of the array.
+When elements are added to the array in later versions of this protocol, any additional array elements (i.e., not specified by the current document) MUST be ignored by a receiver if it doesn't know these elements. This approach allows evolution of the protocol while maintaining backwards-compatibility. A version number isn't needed; that number is defined by the length of the array.
 
 # Comparison of stateless and stateful modes {#jr-comp}
 
@@ -392,7 +392,7 @@ Upon success, the return payload will contain the join-port of the Registrar.
   REQ: GET coap://[IP_address]/.well-known/core?rt=brski.rjp
 
   RES: 2.05 Content
-  <coaps://[IP_address]:join-port>; rt="brski.rjp"
+  <coaps://[IP_address]:join-port>;rt="brski.rjp"
 ~~~~
 
 The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{I-D.ietf-ace-coap-est}}).
@@ -445,7 +445,7 @@ The example below shows the discovery of the join-port of the Join Proxy.
   REQ: GET coap://[FF02::FD]/.well-known/core?rt=brski.jp
 
   RES: 2.05 Content
-  <coaps://[IP_address]:join-port>; rt="brski.jp"
+  <coaps://[IP_address]:join-port>;rt="brski.jp"
 ~~~~
 
 Port numbers are assumed to be the default numbers 5683 and 5684 for coap and coaps respectively (sections 12.6 and 12.7 of {{RFC7252}} when not shown in the response.
@@ -464,14 +464,18 @@ The discovery of the Join Proxy by the Pledge uses the enhanced beacons as discu
 
 All of the concerns in {{RFC8995}} section 4.1 apply.
 The Pledge can be deceived by malicious Join Proxy announcements.
-The Pledge will only join a network to which it receives a valid {{RFC8366}} voucher {{I-D.ietf-anima-constrained-voucher}}. Once the Pledge joined, the payload between Pledge and Registrar is protected by DTLS.
+The Pledge will only join a network for which it receives a valid {{RFC8366}} voucher {{I-D.ietf-anima-constrained-voucher}}. The communication between Pledge and Registrar is always protected by DTLS, 
+prior to joining a network as well as after joining that network. In the latter case, the Join Proxy is not used anymore.
 
-It should be noted here that the contents of the CBOR map used to convey return address information is not DTLS protected. When the communication between JOIN Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge.
+It should be noted here that the contents of the CBOR array used in the JPY protocol (including Pledge IP address information) is not DTLS-protected. 
+When the communication between stateless Join Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array,
+potentially causing the Join Proxy to divert DTLS traffic away from the intended Pledge.
+
 If such scenario needs to be avoided, then it is reasonable for the Join Proxy to encrypt the CBOR array using a locally generated symmetric key.
 The Registrar would not be able to examine the result, but it does not need to do so.
 This is a topic for future work.
 
-Another possibility is to use level 2 protection between Registrar and Join Proxy.
+Another possibility is to use link-layer (L2) security between Registrar and Join Proxy.
 
 # IANA Considerations
 
