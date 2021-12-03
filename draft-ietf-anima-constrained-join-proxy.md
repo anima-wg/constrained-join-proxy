@@ -49,7 +49,13 @@ normative:
     author:
       ins: "IEEE Standard"
     date: 2009
-
+  family:
+    target: "https://www.iana.org/assignments/address-family-numbers/address-family-numbers.xhtml"
+    title: "Address Family Numbers"
+    author:
+    ins: "IANA"
+    date: 2021-10-19
+     
 informative:
   RFC6763:
   I-D.richardson-anima-state-for-joinrouter:
@@ -279,6 +285,11 @@ Header and Contents fields together are one CBOR array of 5 elements:
 
    2. Content field: containing the DTLS payload as a CBOR byte string.
 
+The address family integer is defined in {{family}} with:
+
+    1   IP (IP version 4)		
+    2   IP6 (IP version 6)
+
 The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type.
 
 ~~~
@@ -299,6 +310,9 @@ The contents are DTLS encrypted. In CBOR diagnostic notation the payload JPY[H(I
 ~~~
       [h'IP_p', p_P, family, ident, h'DTLS-payload']
 ~~~
+
+On reception by the Registrar, the Registrar MUST verify that the number of array elements is larger than or equal to 5, and reject the message when the number of array elements is smaller than 5.
+The Registrar replaces the 5th "content" element with the DTLS payload of the response message and leaves all other array elements unchanged.
 
 Examples are shown in {{examples}}.
 
@@ -565,7 +579,7 @@ The request from Join Proxy to Registrar looks like:
       50                                # bytes(16)
          FE800000000000000000FFFFC0A801C8 #
       19 BDA7                           # unsigned(48551)
-      0A                                # unsigned(10)
+      01                                # unsigned(1) IP
       00                                # unsigned(0)
       58 2D                             # bytes(45)
    <cacrts DTLS encrypted request>
@@ -574,7 +588,7 @@ The request from Join Proxy to Registrar looks like:
 In CBOR Diagnostic:
 
 ~~~
-    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0,
+    [h'FE800000000000000000FFFFC0A801C8', 48551, 1, 0,
      h'<cacrts DTLS encrypted request>']
 ~~~
 
@@ -585,7 +599,7 @@ The response is:
       50                                # bytes(16)
          FE800000000000000000FFFFC0A801C8 #
       19 BDA7                           # unsigned(48551)
-      0A                                # unsigned(10)
+      01                                # unsigned(1) IP
       00                                # unsigned(0)
    59 026A                              # bytes(618)
       <cacrts DTLS encrypted response>
@@ -594,7 +608,7 @@ The response is:
 In CBOR diagnostic:
 
 ~~~
-    [h'FE800000000000000000FFFFC0A801C8', 48551, 10, 0,
+    [h'FE800000000000000000FFFFC0A801C8', 48551, 1, 0,
     h'<cacrts DTLS encrypted response>']
 ~~~
 
