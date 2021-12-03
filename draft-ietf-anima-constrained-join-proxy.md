@@ -37,7 +37,6 @@ author:
 
 normative:
   RFC6347:
-  RFC8126:
   RFC8366:
   RFC8995:
   I-D.ietf-ace-coap-est:
@@ -462,28 +461,6 @@ Another possibility is to use level 2 protection between Registrar and Join Prox
 
 # IANA Considerations
 
-## Registry for JPY protocol header fields
-
-This document defines a new IANA registry for array indices of the CBOR array used in the JPY  protocol.
-The IANA policy for registration of an entry in the registry is "IETF Review" as defined by
-{{RFC8126}}.
-A new registry entry MUST define the fields Array Index, Name, CBOR Type (referring to {{RFC8949}}
-defined types), and Description.
-
-The initial contents of the registry are as follows:
-
-    Array Index Name        CBOR Type   Description
-    =========== ==========  =========== ====================================
-    0           ip          byte string Pledge IPv4/IPv6 link-local address
-                                        (4 or 16 bytes)
-    1           port        integer     Pledge's UDP port number
-    2           family      integer     IP address family; IPv4 or IPv6
-                                        (value 4) or (value 6)
-    3           index       integer     Join Proxy network interface
-                                        index/identifier
-    4           payload     byte string DTLS message payload
-
-
 ## Resource Type Attributes registry
 
 This specification registers two new Resource Type (rt=) Link Target Attributes in the "Resource Type (rt=) Link Target Attribute Values" subregistry under the "Constrained RESTful Environments (CoRE)
@@ -536,6 +513,7 @@ Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of th
 ## 05 to 06
      * RT value change to brski.jp and brski.rjp
      * new registry values for IANA
+     * improved handling of jpy header array
 
 ## 04 to 05
      * Join Proxy and join-port consistent spelling
