@@ -122,7 +122,7 @@ identically as in that document: artifact, imprint, domain, Join
 Registrar/Coordinator (JRC), Manufacturer Authorized Signing Authority
 (MASA), Pledge, Trust of First Use (TOFU), and Voucher.
 
-The term "installation network" refers to all devices in the installation and the network connections between them. The term "installation IP_address" refers to the set of adresses which are routable over the whole installation network.
+The term "installation network" refers to all devices in the installation and the network connections between them. The term "installation IP_address" refers to the set of addresses which are routable over the whole installation network.
 
 # Requirements Language {#reqlang}
 
@@ -173,8 +173,8 @@ A Join Proxy MUST implement one of the two modes. A Join Proxy MAY implement bot
 In stateful mode, the Join Proxy forwards the DTLS messages to the Registrar.
 
 Assume that the Pledge does not know the IP address of the Registrar it needs to contact.
-The Join Proxy has has been enrolled via the Registrar and learns the IP address and port of the Registrar, for example by using the discovery mechanism described in {{jr-disc}}. The Pledge first discovers (see {{jr-disc}}) and selects the most appropriate Join Proxy.
-(Discovery can also be based upon {{RFC8995}} section 4.1). For service discovery via DNS-SD {{RFC6763}}, this dosument specifies the service names in {{dns-sd-spec}}.
+The Join Proxy has been enrolled via the Registrar and learns the IP address and port of the Registrar, for example by using the discovery mechanism described in {{jr-disc}}. The Pledge first discovers (see {{jr-disc}}) and selects the most appropriate Join Proxy.
+(Discovery can also be based upon {{RFC8995}} section 4.1). For service discovery via DNS-SD {{RFC6763}}, this document specifies the service names in {{dns-sd-spec}}.
 The Pledge initiates its request as if the Join Proxy is the intended Registrar. The Join Proxy receives the message at a discoverable join-port.
 The Join Proxy constructs an IP packet by copying the DTLS payload from the message received from the Pledge, and provides source and destination addresses to forward the message to the intended Registrar.
 The Join Proxy maintains a 4-tuple array to translate the DTLS messages received from the Registrar and forward it back to the Pledge.
@@ -219,7 +219,7 @@ If an untrusted Pledge that can only use link-local addressing wants to contact 
 When a Pledge attempts a DTLS connection to the Join Proxy, it uses its link-local IP address as its IP source address.
 This message is transmitted one-hop to a neighbouring (Join Proxy) node.
 Under normal circumstances, this message would be dropped at the neighbour node since the Pledge is not yet IP routable or is not yet authenticated to send messages through the network.
-However, if the neighbour device has the Join Proxy functionality enabled, it routes the DTLS message to its Registrar of choice.
+However, if the neighbour device has the Join Proxy functionality enabled; it routes the DTLS message to its Registrar of choice.
 
 The Join Proxy transforms the DTLS message to a JPY message which includes the DTLS data as payload, and sends the JPY message to the join-port of the Registrar.
 
@@ -373,7 +373,7 @@ The discovery follows two steps with two alternatives for step 1:
 
 The order in which the two alternatives of step 1 are tried is installation dependent. The trigger for discovery in Step 2 in implementation dependent.
 
-Once a Pledge is enrolled, it may function as Join Proxy. The Join Proxy functions are advertised as descibed below. In principle, the Join Proxy functions are offered via a join-port, and not the standard coaps port. Also the Registrar offers a join-port to which the stateless Join Proxy sends the JPY message. The Join Proxy and Registrar show the extra join-port number when reponding to a /.well-known/core discovery request addressed to the standard coap/coaps port.
+Once a Pledge is enrolled, it may function as Join Proxy. The Join Proxy functions are advertised as described below. In principle, the Join Proxy functions are offered via a join-port, and not the standard coaps port. Also, the Registrar offers a join-port to which the stateless Join Proxy sends the JPY message. The Join Proxy and Registrar show the extra join-port number when responding to a /.well-known/core discovery request addressed to the standard coap/coaps port.
 
 Three discovery cases are discussed: Join Proxy discovers Registrar, Pledge discovers Registrar, and Pledge discovers Join Proxy. Each discovery case considers three alternatives: CoAP discovery, GRASP discovery, and 6tisch discovery.
 
@@ -395,13 +395,13 @@ Upon success, the return payload will contain the join-port of the Registrar.
   <coaps://[IP_address]:join-port>; rt="brski.rjp"
 ~~~~
 
-The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reeference&gt; of the payload (see section 5.1 of {{I-D.ietf-ace-coap-est}}).
+The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{I-D.ietf-ace-coap-est}}).
 
 ### GRASP discovery
 
 This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the Join Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{RFC8995}} discusses this in more detail.
 The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
-Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as decribed in section 4.3 of {{RFC8995}} .
+Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
 
 ### 6tisch discovery
 
@@ -419,11 +419,11 @@ The discovery of the coaps Registrar, using coap discovery, by the Pledge follow
 
 This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the Pledge uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{RFC8995}} discusses this in more detail.
 The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
-Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as decribed in section 4.3 of {{RFC8995}} .
+Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
 
 ### 6tisch discovery
 
-The discovery of Registrar by the PLedge uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
+The discovery of Registrar by the Pledge uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
 
 ## Pledge discovers Join Proxy
 
@@ -454,7 +454,7 @@ Discoverable port numbers are usually returned for Join Proxy resources in the &
 ### GRASP discovery
 
 This section is normative for uses with an ANIMA ACP. The Pledge MUST listen for GRASP M_FLOOD {{RFC8990}} announcements of the objective: "AN_Proxy".
-See section Section 4.1.1 {{RFC8995}} for the details of the objective.
+See section 4.1.1 {{RFC8995}} for the details of the objective.
 
 ### 6tisch discovery
 
