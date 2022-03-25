@@ -1,7 +1,7 @@
 ---
 title: Constrained Join Proxy for Bootstrapping Protocols
 abbrev: Join Proxy
-docname: draft-ietf-anima-constrained-join-proxy-08
+docname: draft-ietf-anima-constrained-join-proxy-09
 
 # stand_alone: true
 
@@ -43,10 +43,10 @@ normative:
   RFC8949:
   RFC8990:
   ieee802-1AR:
-    target: "http://standards.ieee.org/findstds/standard/802.1AR-2009.html"
+    target: "https://standards.ieee.org/standard/802.1AR-2009.html"
     title: "IEEE 802.1AR Secure Device Identifier"
     author:
-      ins: "IEEE Standard"
+    ins: "IEEE Standard"
     date: 2009
   family:
     target: "https://www.iana.org/assignments/address-family-numbers/address-family-numbers.xhtml"
@@ -54,7 +54,7 @@ normative:
     author:
     ins: "IANA"
     date: 2021-10-19
-
+     
 informative:
   RFC6763:
   I-D.richardson-anima-state-for-joinrouter:
@@ -287,7 +287,7 @@ Header and Contents fields together are one CBOR array of 5 elements:
 
 The address family integer is defined in {{family}} with:
 
-    1   IP (IP version 4)
+    1   IP (IP version 4)		
     2   IP6 (IP version 6)
 
 The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type.
@@ -482,7 +482,7 @@ Parameters" registry per the {{RFC6690}} procedure.
 
     Attribute Value: brski.jp
     Description: This BRSKI resource type is used to query and return the
-                 supported BRSKI (CoAP over DTLS) port of the constrained
+                 supported BRSKI (CoAP over DTLS) port of the constrained 
                  Join Proxy.
     Reference: [this document]
 
@@ -493,14 +493,14 @@ Parameters" registry per the {{RFC6690}} procedure.
 
 ## service name and port number registry {#dns-sd-spec}
 
-This specification registers two service names under the "Service Name and Transport Protocol Port
+This specification registers two service names under the "Service Name and Transport Protocol Port 
 Number" registry.
 
     Service Name: brski-jp
     Transport Protocol(s): udp
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
-    Description: Bootstrapping Remote Secure Key Infrastructure
+    Description: Bootstrapping Remote Secure Key Infrastructure 
                   constrained Join Proxy
     Reference: [this document]
 
@@ -508,8 +508,8 @@ Number" registry.
     Transport Protocol(s): udp
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
-    Description: Bootstrapping Remote Secure Key Infrastructure
-                 Registrar join-port used by stateless constrained
+    Description: Bootstrapping Remote Secure Key Infrastructure  
+                 Registrar join-port used by stateless constrained 
                  Join Proxy
     Reference: [this document]
 
@@ -535,7 +535,7 @@ Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of th
 ## 04 to 05
      * Join Proxy and join-port consistent spelling
      * some nits removed
-     * restructured discovery
+     * restructured discovery 
      * section
      * rephrased parts of security section
 
