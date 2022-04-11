@@ -65,8 +65,10 @@ informative:
   RFC7228:
   I-D.kumar-dice-dtls-relay:
   RFC4944:
+  RFC3610:
   RFC7252:
   RFC6775:
+  RFC8974:
 
 --- abstract
 This document extends the work of Bootstrapping Remote Secure Key
@@ -333,7 +335,7 @@ After replacing the 5th "content" element with the DTLS payload of the response 
 
 Examples are shown in {{examples}}.
 
-When additions are added to the array in later versions of this protocol, any additional array elements (i.e., not specified by current document) MUST be ignored by a receiver if it doesn't know these elements. This approach allows evolution of the protocol while maintaining backwards-compatibility. A version number isn't needed; that number is defined by the length of the array. However, this means that message elements are consistently added to earlier defined elements to avoid ambiguities.
+The header field is completely opaque to the receiver. A Registrar MUST copy the header and return it unmodified in the return message.
 
 #Discovery {#jr-disc}
 
@@ -492,9 +494,10 @@ A malicious constrained Join Proxy has a number of routing possibilities:
     * A malicious node can construct an invalid Join Proxy message. Suppose, the destination port is the coaps port. In that case, a Join Proxy can accept the message and add the routing addresses without checking the payload. The Join Proxy then routes it to the Registrar. In all cases, the Registrar needs to receive the message at the join-port, checks that the message consists of two parts and uses the DTLS payload to start the BRSKI procedure. It is highly unlikely that this malicious payload will lead to node acceptance.
     * A malicious node can sniff the messages routed by the constrained Join Proxy. It is very unlikely that the malicious node can decrypt the DTLS payload. A malicious node can read the header field of the message sent by the stateless Join Proxy. This ability does not yield much more information than the visible addresses transported in the network packets.
 
-It should be noted here that the contents of the CBOR array used to convey return address information is not DTLS protected. When the communication between JOIN Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge.
+It should be noted here that the contents of the CBOR array used to convey return address information is not DTLS protected. When the communication between JOIN Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge. These concerns are also expressed in {{RFC8974}}. It is also pointed out that the encryption in the source is a local matter. Similarly to {{RFC8974}}, the use of AES-CCM {{RFC3610}} with a 64-bit tag is recommended, combined with a sequence number and a replay window.  
+
 If such scenario needs to be avoided, the constrained Join
-Proxy MAY encrypt the CBOR array using a locally generated symmetric
+Proxy MUST encrypt the CBOR array using a locally generated symmetric
 key. The Registrar is not able to examine the encrypted result, but
 does not need to. The Registrar stores the encrypted header in the return packet without modifications. The constrained Join Proxy can decrypt the contents to route the message to the right destination.
 
@@ -532,7 +535,7 @@ Number" registry.
     Transport Protocol(s): udp
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
-    Description: Bootstrapping Remote Secure Key Infrastructure  
+    Description: Bootstrapping Remote Secure Key Infrastructure**** 
                  Registrar join-port used by stateless constrained 
                  Join Proxy
     Reference: [this document]
@@ -540,13 +543,22 @@ Number" registry.
 
 # Acknowledgements
 
-Many thanks for the comments by Brian Carpenter, Esko Dijk, Russ Housley, and Rob Wilton.
+Many thanks for the comments by Cartsen, Bormann, Brian Carpenter, Esko Dijk, Toerless Eckert, Russ Housley, Ines Robles, Jürgen Schönwälder, Mališa Vučinić, and Rob Wilton.
 
 # Contributors
 
 Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of the draft-kumar-dice-dtls-relay-02. Their draft has served as a basis for this document. Much text from their draft is copied over to this draft.
 
 # Changelog
+
+## 10 to 09
+    * OPSDIR review
+    * IANA review
+    * SECDIR review
+    * GENART review
+
+## 09 to 07
+     * typos
 
 ## 06 to 07
      * AD review changes
