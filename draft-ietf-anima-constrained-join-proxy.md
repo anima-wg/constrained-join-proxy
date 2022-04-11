@@ -508,14 +508,11 @@ This specification registers two new Resource Type (rt=) Link Target Attributes 
 Parameters" registry per the {{RFC6690}} procedure.
 
     Attribute Value: brski.jp
-    Description: This BRSKI resource type is used to query and return the
-                 supported BRSKI (CoAP over DTLS) port of the constrained 
-                 Join Proxy.
+    Description: This BRSKI resource type is used to query and return the supported BRSKI resources of the constrained Join Proxy.
     Reference: [this document]
 
     Attribute Value: brski.rjp
-    Description: This BRSKI resource type is used to query and return the
-                 supported BRSKI JPY protocol port of the Registrar.
+    Description: This BRSKI resource type is used for the constrained Join Proxy to query and return Join Proxy specific BRSKI resources of a Registrar.
     Reference: [this document]
 
 ## service name and port number registry {#dns-sd-spec}
