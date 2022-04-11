@@ -69,6 +69,7 @@ informative:
   RFC7252:
   RFC6775:
   RFC8974:
+  RFC6550:
 
 --- abstract
 This document extends the work of Bootstrapping Remote Secure Key
@@ -118,7 +119,7 @@ During enrollment, a DTLS connection is required between Pledge and Registrar.
 
 Once a Pledge is enrolled, it can act as constrained Join Proxy between other Pledges and the enrolling Registrar.
 
-This document specifies a new form of constrained Join Proxy and protocol to act as intermediary between Pledge and Registrar to relay DTLS messages between Pledge and Registrar. Two versions of the constrained Join Proxy are specified:
+This document specifies a new form of constrained Join Proxy and protocol to act as intermediary between Pledge and Registrar to relay DTLS messages between Pledge and Registrar. Two modes of the constrained Join Proxy are specified:
 
     1 A stateful Join Proxy that locally stores IP addresses
       during the connection.
@@ -128,16 +129,21 @@ This document specifies a new form of constrained Join Proxy and protocol to act
 This document is very much inspired by text published earlier in {{I-D.kumar-dice-dtls-relay}}.
 {{I-D.richardson-anima-state-for-joinrouter}} outlined the various options for building a constrained Join Proxy.
 {{RFC8995}} adopted only the Circuit Proxy method (1), leaving the other methods as future work.
-This document standardizes the CoAP/DTLS (method 4).
+
+This document standardizes the CoAP/DTLS (method 4). The specified constrained Join Proxy extends the circuit proxy by using coaps DTLS ports, by choosing the DTLS destination address and by specifying a stateful and a stateless mode. The stateful and stateless modes have the same meaning as the storing and non_storing modes of Operations (MOP) of RPL {{RFC6550}}.
 
 # Terminology          {#Terminology}
 
 The following terms are defined in {{RFC8366}}, and are used
 identically as in that document: artifact, imprint, domain, Join
-Registrar/Coordinator (JRC), Manufacturer Authorized Signing Authority
-(MASA), Pledge, Trust of First Use (TOFU), and Voucher.
+Registrar/Coordinator (JRC), Pledge, and Voucher.
+
+In this document, the term "Registrar" is used instead of "Join
+Registrar/Coordinator (JRC)".
 
 The term "installation network" refers to all devices in the installation and the network connections between them. The term "installation IP_address" refers to an address out of the set of addresses which are routable over the whole installation network.
+
+The "Constrained Join Proxy" enables a pledge that is multiple hops away from the Registrar, to securely execute the BRSKI protocol {{RFC8995}} over a secure channel.
 
 The term "join Proxy" is used interchangeably with the term "constrained Join Proxy" throughout this document.
 
@@ -185,7 +191,7 @@ A Join Proxy can operate in two modes:
   * Stateful mode
   * Stateless mode
 
-A Join Proxy MUST implement one of the two modes. A Join Proxy MAY implement both, with an unspecified mechanism to switch between the two modes.
+A Join Proxy MAY implement both. A mechanism to switch between modes is out of scope of this document. It is recommended that a Join Proxy uses only one of these modes at any given moment during its lifetime.
 
 ## Stateful Join Proxy
 
@@ -196,7 +202,7 @@ The Join Proxy has been enrolled via the Registrar and learns the IP address and
 (Discovery can also be based upon {{RFC8995}} section 4.1). For service discovery via DNS-SD {{RFC6763}}, this document specifies the service names in {{dns-sd-spec}}.
 The Pledge initiates its request as if the Join Proxy is the intended Registrar. The Join Proxy receives the message at a discoverable join-port.
 The Join Proxy constructs an IP packet by copying the DTLS payload from the message received from the Pledge, and provides source and destination addresses to forward the message to the intended Registrar.
-The Join Proxy maintains a 4-tuple array to translate the DTLS messages received from the Registrar and forwards it back to the Pledge.
+The Join Proxy stores the 4-tuple array of the messages received from the Registrar and copies it back to the header of the message returned to the Pledge.
 
 In {{fig-statefull2}} the various steps of the message flow are shown, with 5684 being the standard coaps port:
 
@@ -351,7 +357,7 @@ The discovery follows two steps with two alternatives for step 1:
 
    * Step 2. The enrolled Join Proxy discovers the join-port of the Registrar.
 
-The order in which the two alternatives of step 1 are tried is installation dependent. The trigger for discovery in Step 2 in implementation dependent.
+The order in which the two alternatives of step 1 are tried is installation dependent. The trigger for discovery in Step 2 is implementation dependent.
 
 Once a Pledge is enrolled, it may function as Join Proxy. The Join Proxy functions are advertised as described below. In principle, the Join Proxy functions are offered via a join-port, and not the standard coaps port. Also, the Registrar offers a join-port to which the stateless Join Proxy sends the JPY message. The Join Proxy and Registrar show the extra join-port number when responding to a /.well-known/core discovery request addressed to the standard coap/coaps port.
 
@@ -487,12 +493,17 @@ The Pledge will only join a network to which it receives a valid {{RFC8366}} vou
 
 A malicious constrained Join Proxy has a number of routing possibilities:
 
-    * It sends the message on to a malicious Registrar. This is the same case as the presence of a malicious Registrar discussed in RFC 8995.
-    * It does not send on the request or does not return the response from the Registrar. This is the case of the not responding or crashing Registrar discussed in RFC 8995.
-    * It uses the returned response of the Registrar to enroll itself in the network. With very low probability it can decrypt the response. Successful enrollment is deemed too unlikely.
-    * It uses the request from the pledge to appropriate the pledge certificate, but then it still needs to acquire the private key of the pledge. Also this is assumed to be highly unlikely.
-    * A malicious node can construct an invalid Join Proxy message. Suppose, the destination port is the coaps port. In that case, a Join Proxy can accept the message and add the routing addresses without checking the payload. The Join Proxy then routes it to the Registrar. In all cases, the Registrar needs to receive the message at the join-port, checks that the message consists of two parts and uses the DTLS payload to start the BRSKI procedure. It is highly unlikely that this malicious payload will lead to node acceptance.
-    * A malicious node can sniff the messages routed by the constrained Join Proxy. It is very unlikely that the malicious node can decrypt the DTLS payload. A malicious node can read the header field of the message sent by the stateless Join Proxy. This ability does not yield much more information than the visible addresses transported in the network packets.
+   * It sends the message on to a malicious Registrar. This is the same case as the presence of a malicious Registrar discussed in RFC 8995.
+    
+   * It does not send on the request or does not return the response from the Registrar. This is the case of the not responding or crashing Registrar discussed in RFC 8995.
+     
+   * It uses the returned response of the Registrar to enroll itself in the network. With very low probability it can decrypt the response. Successful enrollment is deemed too unlikely.
+    
+   * It uses the request from the pledge to appropriate the pledge certificate, but then it still needs to acquire the private key of the pledge. Also this is assumed to be highly unlikely.
+
+   * A malicious node can construct an invalid Join Proxy message. Suppose, the destination port is the coaps port. In that case, a Join Proxy can accept the message and add the routing addresses without checking the payload. The Join Proxy then routes it to the Registrar. In all cases, the Registrar needs to receive the message at the join-port, checks that the message consists of two parts and uses the DTLS payload to start the BRSKI procedure. It is highly unlikely that this malicious payload will lead to node acceptance.
+
+  * A malicious node can sniff the messages routed by the constrained Join Proxy. It is very unlikely that the malicious node can decrypt the DTLS payload. A malicious node can read the header field of the message sent by the stateless Join Proxy. This ability does not yield much more information than the visible addresses transported in the network packets.
 
 It should be noted here that the contents of the CBOR array used to convey return address information is not DTLS protected. When the communication between JOIN Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge. These concerns are also expressed in {{RFC8974}}. It is also pointed out that the encryption in the source is a local matter. Similarly to {{RFC8974}}, the use of AES-CCM {{RFC3610}} with a 64-bit tag is recommended, combined with a sequence number and a replay window.  
 
@@ -511,11 +522,15 @@ This specification registers two new Resource Type (rt=) Link Target Attributes 
 Parameters" registry per the {{RFC6690}} procedure.
 
     Attribute Value: brski.jp
-    Description: This BRSKI resource type is used to query and return the supported BRSKI resources of the constrained Join Proxy.
+    Description: This BRSKI resource type is used to query and return
+                 the supported BRSKI resources of the constrained 
+                 Join Proxy.
     Reference: [this document]
 
     Attribute Value: brski.rjp
-    Description: This BRSKI resource type is used for the constrained Join Proxy to query and return Join Proxy specific BRSKI resources of a Registrar.
+    Description: This BRSKI resource type is used for the constrained
+                 Join Proxy to query and return Join Proxy specific 
+                 BRSKI resources of a Registrar.
     Reference: [this document]
 
 ## service name and port number registry {#dns-sd-spec}
