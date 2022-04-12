@@ -130,7 +130,12 @@ This document is very much inspired by text published earlier in {{I-D.kumar-dic
 {{I-D.richardson-anima-state-for-joinrouter}} outlined the various options for building a constrained Join Proxy.
 {{RFC8995}} adopted only the Circuit Proxy method (1), leaving the other methods as future work.
 
-This document standardizes the CoAP/DTLS (method 4). The specified constrained Join Proxy extends the circuit proxy by using coaps DTLS ports, by choosing the DTLS destination address and by specifying a stateful and a stateless mode. The stateful and stateless modes have the same meaning as the storing and non_storing modes of Operations (MOP) of RPL {{RFC6550}}.
+The stateful and stateless modes differ in the way that they store
+the state required to forward the return packet to the pledge.
+Similar to the difference between storing and non_storing Modes of
+Operations (MOP) in RPL {{RFC6550}}. In the stateful method, the
+return forward state is stored in the join proxy.  In the stateless
+method, the return forward state is stored in the network.
 
 # Terminology          {#Terminology}
 
@@ -138,7 +143,7 @@ The following terms are defined in {{RFC8366}}, and are used
 identically as in that document: artifact, imprint, domain, Join
 Registrar/Coordinator (JRC), Pledge, and Voucher.
 
-In this document, the term "Registrar" is used instead of "Join
+In this document, the term "Registrar" is used throughout instead of "Join
 Registrar/Coordinator (JRC)".
 
 The term "installation network" refers to all devices in the installation and the network connections between them. The term "installation IP_address" refers to an address out of the set of addresses which are routable over the whole installation network.
@@ -191,7 +196,7 @@ A Join Proxy can operate in two modes:
   * Stateful mode
   * Stateless mode
 
-A Join Proxy MAY implement both. A mechanism to switch between modes is out of scope of this document. It is recommended that a Join Proxy uses only one of these modes at any given moment during its lifetime.
+A Join Proxy MAY implement both. A mechanism to switch between modes is out of scope of this document. It is recommended that a Join Proxy uses only one of these modes at any given moment during an installation lifetime.
 
 ## Stateful Join Proxy
 
