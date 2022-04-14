@@ -18,7 +18,6 @@ pi:    # can use array (if all yes) or hash here
 
 author:
 
-
 - ins: M. Richardson
   name: Michael Richardson
   org: Sandelman Software Works
@@ -555,7 +554,7 @@ Number" registry.
     Transport Protocol(s): udp
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
-    Description: Bootstrapping Remote Secure Key Infrastructure**** 
+    Description: Bootstrapping Remote Secure Key Infrastructure
                  Registrar join-port used by stateless constrained 
                  Join Proxy
     Reference: [this document]
