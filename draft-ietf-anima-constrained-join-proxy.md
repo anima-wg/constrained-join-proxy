@@ -53,7 +53,7 @@ normative:
     author:
     ins: "IANA"
     date: 2021-10-19
-     
+
 informative:
   RFC6763:
   I-D.richardson-anima-state-for-joinrouter:
@@ -316,7 +316,7 @@ Header and Contents fields together are one CBOR array of 5 elements:
 
 The address family integer is defined in {{family}} with:
 
-    1   IP (IP version 4)		
+    1   IP (IP version 4)
     2   IP6 (IP version 6)
 
 The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type.
@@ -406,7 +406,7 @@ Here is an example M_FLOOD announcing the Registrar on example port 5685.
 ~~~
 {: #fig-grasp-rgj title='Example of Registrar announcement message' align="left"}
 
-The Registrar uses a routable address that can be used by enrolled constrained Join Proxies.  
+The Registrar uses a routable address that can be used by enrolled constrained Join Proxies.
 
 ### 6tisch discovery
 
@@ -422,7 +422,7 @@ The discovery of the coaps Registrar, using coap discovery, by the Pledge follow
 
 ### GRASP discovery
 
-This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the Registrar uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{RFC8995}} discusses this in more detail. 
+This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the Registrar uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{RFC8995}} discusses this in more detail.
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
    * The transport-proto is IPPROTO_UDP
    * the objective is AN_REGISTRAR
@@ -472,7 +472,7 @@ Discoverable port numbers are usually returned for Join Proxy resources in the &
 
 ### GRASP discovery
 
-This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the constrained Join Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{RFC8995}} discusses this in more detail. 
+This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the constrained Join Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{RFC8995}} discusses this in more detail.
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
    * The transport-proto is IPPROTO_UDP
    * the objective is AN_JOIN_PROXY
@@ -543,18 +543,18 @@ The Pledge will only join a network to which it receives a valid {{RFC8366}} vou
 A malicious constrained Join Proxy has a number of routing possibilities:
 
    * It sends the message on to a malicious Registrar. This is the same case as the presence of a malicious Registrar discussed in RFC 8995.
-    
+
    * It does not send on the request or does not return the response from the Registrar. This is the case of the not responding or crashing Registrar discussed in RFC 8995.
-     
+
    * It uses the returned response of the Registrar to enroll itself in the network. With very low probability it can decrypt the response. Successful enrollment is deemed too unlikely.
-    
+
    * It uses the request from the pledge to appropriate the pledge certificate, but then it still needs to acquire the private key of the pledge. Also this is assumed to be highly unlikely.
 
    * A malicious node can construct an invalid Join Proxy message. Suppose, the destination port is the coaps port. In that case, a Join Proxy can accept the message and add the routing addresses without checking the payload. The Join Proxy then routes it to the Registrar. In all cases, the Registrar needs to receive the message at the join-port, checks that the message consists of two parts and uses the DTLS payload to start the BRSKI procedure. It is highly unlikely that this malicious payload will lead to node acceptance.
 
   * A malicious node can sniff the messages routed by the constrained Join Proxy. It is very unlikely that the malicious node can decrypt the DTLS payload. A malicious node can read the header field of the message sent by the stateless Join Proxy. This ability does not yield much more information than the visible addresses transported in the network packets.
 
-It should be noted here that the contents of the CBOR array used to convey return address information is not DTLS protected. When the communication between JOIN Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge. These concerns are also expressed in {{RFC8974}}. It is also pointed out that the encryption in the source is a local matter. Similarly to {{RFC8974}}, the use of AES-CCM {{RFC3610}} with a 64-bit tag is recommended, combined with a sequence number and a replay window.  
+It should be noted here that the contents of the CBOR array used to convey return address information is not DTLS protected. When the communication between JOIN Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge. These concerns are also expressed in {{RFC8974}}. It is also pointed out that the encryption in the source is a local matter. Similarly to {{RFC8974}}, the use of AES-CCM {{RFC3610}} with a 64-bit tag is recommended, combined with a sequence number and a replay window.
 
 If such scenario needs to be avoided, the constrained Join
 Proxy MUST encrypt the CBOR array using a locally generated symmetric
@@ -572,26 +572,26 @@ Parameters" registry per the {{RFC6690}} procedure.
 
     Attribute Value: brski.jp
     Description: This BRSKI resource type is used to query and return
-                 the supported BRSKI resources of the constrained 
+                 the supported BRSKI resources of the constrained
                  Join Proxy.
     Reference: [this document]
 
     Attribute Value: brski.rjp
     Description: This BRSKI resource type is used for the constrained
-                 Join Proxy to query and return Join Proxy specific 
+                 Join Proxy to query and return Join Proxy specific
                  BRSKI resources of a Registrar.
     Reference: [this document]
 
 ## service name and port number registry {#dns-sd-spec}
 
-This specification registers two service names under the "Service Name and Transport Protocol Port 
+This specification registers two service names under the "Service Name and Transport Protocol Port
 Number" registry.
 
     Service Name: brski-jp
     Transport Protocol(s): udp
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
-    Description: Bootstrapping Remote Secure Key Infrastructure 
+    Description: Bootstrapping Remote Secure Key Infrastructure
                   constrained Join Proxy
     Reference: [this document]
 
@@ -600,7 +600,7 @@ Number" registry.
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
     Description: Bootstrapping Remote Secure Key Infrastructure
-                 Registrar join-port used by stateless constrained 
+                 Registrar join-port used by stateless constrained
                  Join Proxy
     Reference: [this document]
 
@@ -635,7 +635,7 @@ Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of th
 ## 04 to 05
      * Join Proxy and join-port consistent spelling
      * some nits removed
-     * restructured discovery 
+     * restructured discovery
      * section
      * rephrased parts of security section
 
