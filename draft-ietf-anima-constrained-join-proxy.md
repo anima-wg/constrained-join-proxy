@@ -166,12 +166,12 @@ If the Pledge (P), knowing the IP-address of the Registrar, initiates a DTLS con
 
 ~~~~
 
-          ++++ multi-hop
-          |R |---- mesh  +--+        +--+
-          |  |    \      |J |........|P |
-          ++++     \-----|  |        |  |
-                         +--+        +--+
-       Registrar       Join Proxy   Pledge
+          ++++ multi-hop mesh
+          |R |----    +---+    +--+        +--+
+          |  |    \   |6  |----|J |........|P |
+          ++++     \--+ LR|    |  |        |  |
+                      +---+    +--+        +--+
+       Registrar             Join Proxy   Pledge
 
 
 ~~~~
