@@ -1,7 +1,7 @@
 ---
 title: Constrained Join Proxy for Bootstrapping Protocols
 abbrev: Join Proxy
-docname: draft-ietf-anima-constrained-join-proxy-10
+docname: draft-ietf-anima-constrained-join-proxy-11
 
 # stand_alone: true
 
@@ -392,15 +392,15 @@ The discoverable port numbers are usually returned for Join Proxy resources in t
 This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the Registrar announces itself to a stateless Join Proxy using ACP instance of GRASP using M_FLOOD messages. Section 4.3 of {{RFC8995}} discusses this in more detail.
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
    * The transport-proto is IPPROTO_UDP
-   * the objective is AN_REGISTRAR
-   * the objective name is "BRSKI_RJP".
+   * the objective is AN_join_registrar
+   * the objective value is "BRSKI_RJP".
 The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
 Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
 Here is an example M_FLOOD announcing the Registrar on example port 5685.
 
 ~~~
    [M_FLOOD, 51804321, h'fda379a6f6ee00000200000064000001', 180000,
-   [["AN_registrar", 4, 255, "BRSKI_RJP"],
+   [["AN_join_registrar", 4, 255, "BRSKI_RJP"],
    [O_IPv6_LOCATOR,
    h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5685]]]
 ~~~
@@ -425,8 +425,8 @@ The discovery of the coaps Registrar, using coap discovery, by the Pledge follow
 This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the Registrar uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{RFC8995}} discusses this in more detail.
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
    * The transport-proto is IPPROTO_UDP
-   * the objective is AN_REGISTRAR
-   * the objective name is "BRSKI_JP"
+   * the objective is AN_join-registrar
+   * the objective value is "BRSKI_JP"
 The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
 Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
 
@@ -434,7 +434,7 @@ Here is an example M_FLOOD announcing the Registrar at fe80::1, on standard coap
 
 ~~~
      [M_FLOOD, 12340815, h'fe800000000000000000000000000001', 180000,
-     [["AN_Registrar", 4, 1, "BRSKI_JP"],
+     [["AN_join_registrar", 4, 1, "BRSKI_JP"],
      [O_IPv6_LOCATOR,
      h'fe800000000000000000000000000001', IPPROTO_UDP, 5684]]]
 ~~~
@@ -475,8 +475,8 @@ Discoverable port numbers are usually returned for Join Proxy resources in the &
 This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the constrained Join Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{RFC8995}} discusses this in more detail.
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
    * The transport-proto is IPPROTO_UDP
-   * the objective is AN_JOIN_PROXY
-   * the objective name is empty
+   * the objective is AN_join_registrar
+   * the objective value is empty
 The constrained Join Proxy announces itself using ACP instance of GRASP using M_FLOOD messages.
 Autonomic Network Registrars MUST support GRASP discovery of constrained Join Proxies as described in section 4.3 of {{RFC8995}} .
 
@@ -484,7 +484,7 @@ Here is an example M_FLOOD announcing the constrained Join Proxy at fe80::2, on 
 
 ~~~
      [M_FLOOD, 12340815, h'fe800000000000000000000000000002', 180000,
-     [["AN_JOIN_PROXY", 4, 1, ""],
+     [["AN_join_registrar", 4, 1, ""],
      [O_IPv6_LOCATOR,
      h'fe800000000000000000000000000002', IPPROTO_UDP, 5684]]]
 ~~~
@@ -614,6 +614,9 @@ Many thanks for the comments by Cartsen, Bormann, Brian Carpenter, Esko Dijk, To
 Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of the draft-kumar-dice-dtls-relay-02. Their draft has served as a basis for this document. Much text from their draft is copied over to this draft.
 
 # Changelog
+
+## 11 to 10
+    * Grasp discovery
 
 ## 10 to 09
     * OPSDIR review
