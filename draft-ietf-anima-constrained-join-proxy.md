@@ -67,6 +67,7 @@ informative:
   RFC3610:
   RFC7252:
   RFC6775:
+  RFC7959:
   RFC8974:
   RFC6550:
 
@@ -347,6 +348,8 @@ Examples are shown in {{examples}}.
 
 The header field is completely opaque to the receiver. A Registrar MUST copy the header and return it unmodified in the return message.
 
+It is recommended to use the block option {{RFC7959}} and make sure that the block size allows the addition of the JPY header without violating MTU sizes.
+
 #Discovery {#jr-disc}
 
 It is assumed that Join Proxy seamlessly provides a coaps connection between Pledge and Registrar. In particular this section extends section 4.1 of {{RFC8995}} for the constrained case.
@@ -607,7 +610,7 @@ Number" registry.
 
 # Acknowledgements
 
-Many thanks for the comments by Cartsen, Bormann, Brian Carpenter, Esko Dijk, Toerless Eckert, Russ Housley, Ines Robles, Jürgen Schönwälder, Mališa Vučinić, and Rob Wilton.
+Many thanks for the comments by Cartsen, Bormann, Brian Carpenter, Spencer Dawkins, Esko Dijk, Toerless Eckert, Russ Housley, Ines Robles, Jürgen Schönwälder, Mališa Vučinić, and Rob Wilton.
 
 # Contributors
 
