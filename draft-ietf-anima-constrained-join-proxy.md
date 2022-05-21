@@ -89,7 +89,7 @@ The Bootstrapping Remote Secure Key Infrastructure (BRSKI) protocol described in
 provides a solution for a secure zero-touch (automated) bootstrap of new (unconfigured) devices.
 In the context of BRSKI, new devices, called "Pledges", are equipped with a factory-installed Initial Device Identifier (IDevID) (see {{ieee802-1AR}}), and are enrolled into a network.
 BRSKI makes use of Enrollment over Secure Transport (EST) {{RFC7030}}
-with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls. In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a constrained Join Proxy. In particular, the underlying IP network is assumed to be a mesh newtork as described in {{RFC4944}}, although other IP-over-foo networks are not excluded.
+with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls. In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a constrained Join Proxy. In particular, the underlying IP network is assumed to be a mesh newtork as described in {{RFC4944}}, although other IP-over-foo networks are not excluded. An example network is shown in {{fig-net}}.
 
 A complete specification of the terminology is pointed at in {{Terminology}}.
 
@@ -117,23 +117,23 @@ one or more hops.
 
 During enrollment, a DTLS connection is required between Pledge and Registrar.
 
-Once a Pledge is enrolled, it can act as constrained Join Proxy between other Pledges and the enrolling Registrar.
+An enrolled Pledge can act as constrained Join Proxy between other Pledges and the enrolling Registrar.
 
 This document specifies a new form of constrained Join Proxy and protocol to act as intermediary between Pledge and Registrar to relay DTLS messages between Pledge and Registrar. Two modes of the constrained Join Proxy are specified:
 
     1 A stateful Join Proxy that locally stores IP addresses
       during the connection.
-    2 A stateless Join Proxy that where the connection state
+    2 A stateless Join Proxy where the connection state
      is stored in the messages.
 
 This document is very much inspired by text published earlier in {{I-D.kumar-dice-dtls-relay}}.
 {{I-D.richardson-anima-state-for-joinrouter}} outlined the various options for building a constrained Join Proxy.
 {{RFC8995}} adopted only the Circuit Proxy method (1), leaving the other methods as future work.
 
-The stateful and stateless modes differ in the way that they store
-the state required to forward the return packet to the pledge.
 Similar to the difference between storing and non_storing Modes of
-Operations (MOP) in RPL {{RFC6550}}. In the stateful method, the
+Operations (MOP) in RPL {{RFC6550}}, the stateful and stateless modes differ in the way that they store
+the state required to forward the return packet to the pledge.
+In the stateful method, the
 return forward state is stored in the join proxy.  In the stateless
 method, the return forward state is stored in the network.
 
@@ -162,8 +162,8 @@ As depicted in the {{fig-net}}, the Pledge (P), in a Low-Power and Lossy Network
  {{RFC7102}} can be more than one hop away from the Registrar (R) and not yet authenticated into the network.
 
 In this situation, the Pledge can only communicate one-hop to its nearest neighbor, the constrained Join Proxy (J) using their link-local  IPv6 addresses.
-However, the Pledge (P) needs to communicate with end-to-end security with a Registrar to authenticate and get the relevant system/network parameters.
-If the Pledge (P), knowing the IP-address of the Registrar, initiates a DTLS connection to the Registrar, then the packets are dropped at the constrained Join Proxy (J) since the Pledge (P) is not yet admitted to the network or there is no IP routability to Pledge (P) for any returned messages from the Registrar.
+However, the Pledge needs to communicate with end-to-end security with a Registrar to authenticate and get the relevant system/network parameters.
+If the Pledge, knowing the IP-address of the Registrar, initiates a DTLS connection to the Registrar, then the packets are dropped at the constrained Join Proxy since the Pledge is not yet admitted to the network or there is no IP routability to Pledge for any returned messages from the Registrar.
 
 ~~~~
 
@@ -178,16 +178,16 @@ If the Pledge (P), knowing the IP-address of the Registrar, initiates a DTLS con
 ~~~~
 {: #fig-net title='multi-hop enrollment.' align="left"}
 
-Without routing the Pledge (P) cannot establish a secure connection to the Registrar (R) over multiple hops in the network.
+Without routing the Pledge cannot establish a secure connection to the Registrar over multiple hops in the network.
 
-Furthermore, the Pledge (P) cannot discover the IP address of the Registrar (R) over multiple hops to initiate a DTLS connection and perform authentication.
+Furthermore, the Pledge cannot discover the IP address of the Registrar over multiple hops to initiate a DTLS connection and perform authentication.
 
 To overcome the problems with non-routability of DTLS packets and/or discovery of the destination address of the Registrar, the constrained Join Proxy is introduced.
 This constrained Join Proxy functionality is configured into all authenticated devices in the network which may act as a constrained Join Proxy for Pledges.
 The constrained Join Proxy allows for routing of the packets from the Pledge using IP routing to the intended Registrar. An authenticated constrained Join Proxy can discover the routable IP address of the Registrar over multiple hops.
 The following {{jr-spec}} specifies the two constrained Join Proxy modes. A comparison is presented in {{jr-comp}}.
 
-When a mesh network is set up, it consists of a Registrar and a set of connected pledges. No constrained Join Proxies are present. The wanted end-state is a network with a Registrar and a set of enrolled devices. Some of these enrolled devices can act as constrained Join Proxies. Pledges can only employ link-local communication untill they are enrolled. A Pledge will regularly try to discover a constrained Join Proxy or a Registrar with link-local discovery requests. The Pledges which are neigbors of the Registrar will discover the Registrar and be enrolled following the BRSKI protocol. An enrolled device can act as constrained Join Proxy. The Pledges which are not a neighbor of the Registrar will eventually discover a constrained Join Proxy and follow the BRSKI protocol to be enrolled. While this goes on, more and more constrained Join Proxies with a larger hop distance to the Registrar will emerge. The network should be configured such that at the end of the enrollment process, all pledges have discovered a neigboring constrained Join Proxy or the Registrar, and all "legal" Pledges are enrolled.
+When a mesh network is set up, it consists of a Registrar and a set of connected pledges. No constrained Join Proxies are present. The wanted end-state is a network with a Registrar and a set of enrolled devices. Some of these enrolled devices can act as constrained Join Proxies. Pledges can only employ link-local communication untill they are enrolled. A Pledge will regularly try to discover a constrained Join Proxy or a Registrar with link-local discovery requests. The Pledges which are neigbors of the Registrar will discover the Registrar and be enrolled following the BRSKI protocol. An enrolled device can act as constrained Join Proxy. The Pledges which are not a neighbor of the Registrar will eventually discover a constrained Join Proxy and follow the BRSKI protocol to be enrolled. While this goes on, more and more constrained Join Proxies with a larger hop distance to the Registrar will emerge. The network should be configured such that at the end of the enrollment process, all pledges have discovered a neigboring constrained Join Proxy or the Registrar, and all Pledges are enrolled.
 
 # constrained Join Proxy specification {#jr-spec}
 
@@ -198,18 +198,20 @@ A Join Proxy can operate in two modes:
 
 A Join Proxy MAY implement both. A mechanism to switch between modes is out of scope of this document. It is recommended that a Join Proxy uses only one of these modes at any given moment during an installation lifetime.
 
+The advantages and disadvantages of the two modes are presented in {{jr-comp}}.
+
 ## Stateful Join Proxy
 
 In stateful mode, the Join Proxy forwards the DTLS messages to the Registrar.
 
 Assume that the Pledge does not know the IP address of the Registrar it needs to contact.
-The Join Proxy has been enrolled via the Registrar and learns the IP address and port of the Registrar, for example by using the discovery mechanism described in {{jr-disc}}. The Pledge first discovers (see {{jr-disc}}) and selects the most appropriate Join Proxy.
-(Discovery can also be based upon {{RFC8995}} section 4.1). For service discovery via DNS-SD {{RFC6763}}, this document specifies the service names in {{dns-sd-spec}}.
+The Join Proxy has been enrolled via the Registrar and learns the IP address and port of the Registrar, by using a discovery mechanism such as described in {{jr-disc}}. The Pledge first discovers (see {{jr-disc}}) and selects the most appropriate Join Proxy.
+(Discovery can also be based upon {{RFC8995}} section 4.1). 
 The Pledge initiates its request as if the Join Proxy is the intended Registrar. The Join Proxy receives the message at a discoverable join-port.
 The Join Proxy constructs an IP packet by copying the DTLS payload from the message received from the Pledge, and provides source and destination addresses to forward the message to the intended Registrar.
 The Join Proxy stores the 4-tuple array of the messages received from the Registrar and copies it back to the header of the message returned to the Pledge.
 
-In {{fig-statefull2}} the various steps of the message flow are shown, with 5684 being the standard coaps port:
+In {{fig-statefull2}} the various steps of the message flow are shown, with 5684 being the standard coaps port. The columns "SRc_IP:port" and "Dst_IP:port" show the IP address and port values for the source and destination of the message.
 
 ~~~~
 +------------+------------+-------------+--------------------------+
@@ -242,7 +244,7 @@ IP_Jr:p_Jr = Routable IP address and client port of Join Proxy
 ## Stateless Join Proxy
 
 The stateless Join Proxy aims to minimize the requirements on the constrained Join Proxy device.
-Stateless operation requires no memory in the Join Proxy device, but may also reduce the CPU impact as the device does not need to search through a state table.
+Stateless operation requires no memory in the Join Proxy device, and may also reduce the CPU impact as the device does not need to search through a state table.
 
 If an untrusted Pledge that can only use link-local addressing wants to contact a trusted Registrar, and the Registrar is more than one hop away, it sends its DTLS messages to the Join Proxy.
 
@@ -325,11 +327,11 @@ The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the trans
 ~~~
     JPY_message =
     [
-       ip      : bstr,
-       port    : int,
-       family  : int,
-       index   : int
-       content : bstr
+       ip        : bstr,
+       port      : int,
+       family    : int,
+       ifindex   : int
+       content   : bstr
     ]
 
 ~~~
@@ -356,17 +358,17 @@ It is assumed that Join Proxy seamlessly provides a coaps connection between Ple
 
 The discovery follows two steps with two alternatives for step 1:
 
-   * Step 1. Two alternatives exist (near and remote):
+   * Step 1. Two alternatives exist (near and far):
 
      * Near: the Pledge is one hop away from the Registrar. The Pledge discovers the link-local address of the Registrar as described in {{I-D.ietf-ace-coap-est}}. From then on, it follows the BRSKI process as described in {{I-D.ietf-ace-coap-est}} and {{I-D.ietf-anima-constrained-voucher}}, using link-local addresses.
 
-     * Remote: the Pledge is more than one hop away from a relevant Registrar, and discovers the link-local address and join-port of a Join Proxy. The Pledge then follows the BRSKI procedure using the link-local address of the Join Proxy.
+     * Far: the Pledge is more than one hop away from a relevant Registrar, and discovers the link-local address and join-port of a Join Proxy. The Pledge then follows the BRSKI procedure using the link-local address of the Join Proxy.
 
    * Step 2. The enrolled Join Proxy discovers the join-port of the Registrar.
 
 The order in which the two alternatives of step 1 are tried is installation dependent. The trigger for discovery in Step 2 is implementation dependent.
 
-Once a Pledge is enrolled, it may function as Join Proxy. The Join Proxy functions are advertised as described below. In principle, the Join Proxy functions are offered via a join-port, and not the standard coaps port. Also, the Registrar offers a join-port to which the stateless Join Proxy sends the JPY message. The Join Proxy and Registrar show the extra join-port number when responding to a /.well-known/core discovery request addressed to the standard coap/coaps port.
+An enrolled Pledge may function as Join Proxy. The Join Proxy functions are advertised as described below. In principle, the Join Proxy functions are offered via a join-port, and not the standard coaps port. Also, the Registrar offers a join-port to which the stateless Join Proxy sends the JPY message. The Join Proxy and Registrar show the extra join-port number when responding to a /.well-known/core discovery request addressed to the standard coap/coaps port.
 
 Three discovery cases are discussed: Join Proxy discovers Registrar, Pledge discovers Registrar, and Pledge discovers Join Proxy.  Each discovery case considers three alternatives: CoAP based discovery, GRASP Based discovery, and 6tisch based discovery.  The choice of discovery mechanism depends on the type of installation, and manufacturers can provide the pledge/Join Proxy with support for more than one discovery mechanism.  The pledge/Join Proxy can be designed to dynamically try different discovery mechanisms until a successful discovery mechanism is found, or the choice of discovery mechanism could be configured during device installation.
 
@@ -549,9 +551,9 @@ A malicious constrained Join Proxy has a number of routing possibilities:
 
    * It does not send on the request or does not return the response from the Registrar. This is the case of the not responding or crashing Registrar discussed in RFC 8995.
 
-   * It uses the returned response of the Registrar to enroll itself in the network. With very low probability it can decrypt the response. Successful enrollment is deemed too unlikely.
+   * It uses the returned response of the Registrar to enroll itself in the network. With very low probability it can decrypt the response because successful enrollment is deemed  unlikely.
 
-   * It uses the request from the pledge to appropriate the pledge certificate, but then it still needs to acquire the private key of the pledge. Also this is assumed to be highly unlikely.
+   * It uses the request from the pledge to appropriate the pledge certificate, but then it still needs to acquire the private key of the pledge. This, too, is assumed to be highly unlikely.
 
    * A malicious node can construct an invalid Join Proxy message. Suppose, the destination port is the coaps port. In that case, a Join Proxy can accept the message and add the routing addresses without checking the payload. The Join Proxy then routes it to the Registrar. In all cases, the Registrar needs to receive the message at the join-port, checks that the message consists of two parts and uses the DTLS payload to start the BRSKI procedure. It is highly unlikely that this malicious payload will lead to node acceptance.
 
@@ -610,7 +612,7 @@ Number" registry.
 
 # Acknowledgements
 
-Many thanks for the comments by Cartsen, Bormann, Brian Carpenter, Spencer Dawkins, Esko Dijk, Toerless Eckert, Russ Housley, Ines Robles, Jürgen Schönwälder, Mališa Vučinić, and Rob Wilton.
+Many thanks for the comments by Cartsen, Bormann, Brian Carpenter, Spencer Dawkins, Esko Dijk, Toerless Eckert, Russ Housley, Ines Robles, Rich Salz, Jürgen Schönwälder, Mališa Vučinić, and Rob Wilton.
 
 # Contributors
 
@@ -620,6 +622,8 @@ Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of th
 
 ## 11 to 10
     * Grasp discovery
+    * ARTART review
+    * TSVART review
 
 ## 10 to 09
     * OPSDIR review
