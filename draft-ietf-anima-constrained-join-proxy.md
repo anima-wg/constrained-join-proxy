@@ -395,10 +395,16 @@ The discoverable port numbers are usually returned for Join Proxy resources in t
 ### GRASP discovery
 
 This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the Registrar announces itself to a stateless Join Proxy using ACP instance of GRASP using M_FLOOD messages. Section 4.3 of {{RFC8995}} discusses this in more detail.
+
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
-   * The transport-proto is IPPROTO_UDP
-   * the objective is AN_join_registrar
-   * the objective value is "BRSKI_RJP".
+
+* The transport-proto is IPPROTO_UDP
+
+* the objective is AN_registrar, identical to {{RFC8995}}.
+
+* the objective name is "BRSKI_RJP".
+
+
 The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
 Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
 Here is an example M_FLOOD announcing the Registrar on example port 5685.
@@ -417,41 +423,11 @@ The Registrar uses a routable address that can be used by enrolled constrained J
 
 The discovery of the Registrar by the Join Proxy uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
 
-## Pledge discovers Registrar
+## Pledge discovers Join-Proxy
 
-In this section, the Pledge and Registrar are assumed to communicate via Link-Local addresses. This section describes the discovery of the Registrar by the Pledge. Once the Pledge is enrolled and functions as a stateful Join Proxy, it continues with the same Registrar port and address.
-
-### CoAP discovery
-
-The discovery of the coaps Registrar, using coap discovery, by the Pledge follows sections 6.3 and 6.5.1 of {{I-D.ietf-anima-constrained-voucher}}.
-
-### GRASP discovery
-
-This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the Registrar uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{RFC8995}} discusses this in more detail.
-The following changes are necessary with respect to figure 10 of {{RFC8995}}:
-   * The transport-proto is IPPROTO_UDP
-   * the objective is AN_join-registrar
-   * the objective value is "BRSKI_JP"
-The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
-Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
-
-Here is an example M_FLOOD announcing the Registrar at fe80::1, on standard coaps port 5684.
-
-~~~
-     [M_FLOOD, 12340815, h'fe800000000000000000000000000001', 180000,
-     [["AN_join_registrar", 4, 1, "BRSKI_JP"],
-     [O_IPv6_LOCATOR,
-     h'fe800000000000000000000000000001', IPPROTO_UDP, 5684]]]
-~~~
-{: #fig-grasp-rg title='Example of Registrar announcement message' align="left"}
-
-### 6tisch discovery
-
-The discovery of Registrar by the Pledge uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
-
-## Pledge discovers Join Proxy
-
-In this section, the Pledge and Join Proxy are assumed to communicate via Link-Local addresses. This section describes the discovery of the Join Proxy by the Pledge.
+In this section, the Pledge and Join-Proxy are assumed to communicate via Link-Local addresses, possibly on a special network devoted to onboarding.
+The onboarding network usually has either no encryption, or may be encrypted with a well known key.
+This section describes the discovery of the Join-Proxy by the Pledge.
 
 ### CoAP discovery {#jp-disc}
 
@@ -477,28 +453,34 @@ Discoverable port numbers are usually returned for Join Proxy resources in the &
 
 ### GRASP discovery
 
-This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the constrained Join Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself. Section 4.1.1 of {{RFC8995}} discusses this in more detail.
+This section is normative for uses with an ANIMA ACP.
+In the context of autonomic networks, the Join-Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself.
+Section 4.1.1 of {{RFC8995}} discusses this in more detail.
+
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
-   * The transport-proto is IPPROTO_UDP
-   * the objective is AN_join_registrar
-   * the objective value is empty
-The constrained Join Proxy announces itself using ACP instance of GRASP using M_FLOOD messages.
-Autonomic Network Registrars MUST support GRASP discovery of constrained Join Proxies as described in section 4.3 of {{RFC8995}} .
 
-Here is an example M_FLOOD announcing the constrained Join Proxy at fe80::2, on standard coaps port 5684.
+* The transport-proto is IPPROTO_UDP
+
+* the objective is AN_Proxy
+
+The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
+Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
+
+Here is an example M_FLOOD announcing the Join-Proxy at fe80::1, on standard coaps port 5684.
 
 ~~~
-     [M_FLOOD, 12340815, h'fe800000000000000000000000000002', 180000,
-     [["AN_join_registrar", 4, 1, ""],
+     [M_FLOOD, 12340815, h'fe800000000000000000000000000001', 180000,
+     [["AN_Proxy", 4, 1, ""],
+
      [O_IPv6_LOCATOR,
-     h'fe800000000000000000000000000002', IPPROTO_UDP, 5684]]]
+     h'fe800000000000000000000000000001', IPPROTO_UDP, 5684]]]
 ~~~
-{: #fig-grasp-jp title='Example of Join Proxy announcement message' align="left"}
-
+{: #fig-grasp-rg title='Example of Registrar announcement message' align="left"}
 
 ### 6tisch discovery
 
-The discovery of the Join Proxy by the Pledge uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
+The discovery of Join-Proxy by the Pledge uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
+6tisch does not use DTLS and so this specification does not apply to it.
 
 # Comparison of stateless and stateful modes {#jr-comp}
 
