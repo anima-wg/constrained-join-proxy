@@ -55,7 +55,6 @@ normative:
     date: 2021-10-19
 
 informative:
-  RFC6763:
   I-D.richardson-anima-state-for-joinrouter:
   I-D.ietf-6tisch-enrollment-enhanced-beacon:
   RFC6690:
@@ -89,7 +88,7 @@ The Bootstrapping Remote Secure Key Infrastructure (BRSKI) protocol described in
 provides a solution for a secure zero-touch (automated) bootstrap of new (unconfigured) devices.
 In the context of BRSKI, new devices, called "Pledges", are equipped with a factory-installed Initial Device Identifier (IDevID) (see {{ieee802-1AR}}), and are enrolled into a network.
 BRSKI makes use of Enrollment over Secure Transport (EST) {{RFC7030}}
-with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls. In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a constrained Join Proxy. In particular, the underlying IP network is assumed to be a mesh newtork as described in {{RFC4944}}, although other IP-over-foo networks are not excluded. An example network is shown in {{fig-net}}.
+with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls. In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a constrained Join Proxy. In particular, the underlying IP network is assumed to be a mesh network as described in {{RFC4944}}, although other IP-over-foo networks are not excluded. An example network is shown in {{fig-net}}.
 
 A complete specification of the terminology is pointed at in {{Terminology}}.
 
@@ -196,7 +195,9 @@ A Join Proxy can operate in two modes:
   * Stateful mode
   * Stateless mode
 
-A Join Proxy MAY implement both. A mechanism to switch between modes is out of scope of this document. It is recommended that a Join Proxy uses only one of these modes at any given moment during an installation lifetime.
+A Join Proxy MUST implement both. A Registrar MUST implement the stateful mode and SHOULD implement the Stateless mode.
+
+A mechanism to switch between modes is out of scope of this document. It is recommended that a Join Proxy uses only one of these modes at any given moment during an installation lifetime.
 
 The advantages and disadvantages of the two modes are presented in {{jr-comp}}.
 
@@ -368,13 +369,13 @@ The discovery follows two steps with two alternatives for step 1:
 
 The order in which the two alternatives of step 1 are tried is installation dependent. The trigger for discovery in Step 2 is implementation dependent.
 
-An enrolled Pledge may function as Join Proxy. The Join Proxy functions are advertised as described below. In principle, the Join Proxy functions are offered via a join-port, and not the standard coaps port. Also, the Registrar offers a join-port to which the stateless Join Proxy sends the JPY message. The Join Proxy and Registrar show the extra join-port number when responding to a /.well-known/core discovery request addressed to the standard coap/coaps port.
+An enrolled Pledge may function as a Join Proxy. The Join Proxy functions are advertised as described below. In principle, the Join Proxy functions are offered via a join-port, and not the standard coaps port. Also, the Registrar offers a join-port to which the stateless Join Proxy sends the JPY message. The Join Proxy and Registrar show the extra join-port number when responding to a /.well-known/core discovery request addressed to the standard coap/coaps port.
 
-Three discovery cases are discussed: Join Proxy discovers Registrar, Pledge discovers Registrar, and Pledge discovers Join Proxy.  Each discovery case considers three alternatives: CoAP based discovery, GRASP Based discovery, and 6tisch based discovery.  The choice of discovery mechanism depends on the type of installation, and manufacturers can provide the pledge/Join Proxy with support for more than one discovery mechanism.  The pledge/Join Proxy can be designed to dynamically try different discovery mechanisms until a successful discovery mechanism is found, or the choice of discovery mechanism could be configured during device installation.
+Two discovery cases are discussed: Join Proxy discovers Registrar and Pledge discovers Join Proxy.  Each discovery case considers three alternatives: CoAP based discovery, GRASP Based discovery {{RFC8990}}, and 6tisch based discovery.  The choice of discovery mechanism depends on the type of installation, and manufacturers can provide the pledge/Join Proxy with support for more than one discovery mechanism.  The pledge/Join Proxy can be designed to dynamically try different discovery mechanisms until a successful discovery mechanism is found, or the choice of discovery mechanism could be configured during device installation.
 
 ## Join Proxy discovers Registrar
 
-In this section, the Join Proxy and Registrar are assumed to communicate via Link-Local addresses. This section describes the discovery of the Registrar by the stateless Join Proxy. The statefull Join Proxy discovers the Registrar as a Pledge.
+This section describes the discovery of the Registrar by the stateless Join Proxy. The statefull Join Proxy discovers the Registrar as a Pledge.
 
 ### CoAP discovery {#coap-disc}
 
@@ -399,11 +400,8 @@ This section is normative for uses with an ANIMA ACP. In the context of autonomi
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
 
 * The transport-proto is IPPROTO_UDP
-
 * the objective is AN_registrar, identical to {{RFC8995}}.
-
 * the objective name is "BRSKI_RJP".
-
 
 The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
 Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
@@ -425,9 +423,7 @@ The discovery of the Registrar by the Join Proxy uses the enhanced beacons as di
 
 ## Pledge discovers Join-Proxy
 
-In this section, the Pledge and Join-Proxy are assumed to communicate via Link-Local addresses, possibly on a special network devoted to onboarding.
-The onboarding network usually has either no encryption, or may be encrypted with a well known key.
-This section describes the discovery of the Join-Proxy by the Pledge.
+This section describes the discovery of the Join-Proxy by the Pledge. The Registrar presents itself as a Join-Proxy for discocery purposes. The Pledge and Join-Proxy are assumed to communicate via Link-Local addresses, possibly on a special network devoted to onboarding. The onboarding network usually has either no encryption, or may be encrypted with a well known key.
 
 ### CoAP discovery {#jp-disc}
 
@@ -460,7 +456,6 @@ Section 4.1.1 of {{RFC8995}} discusses this in more detail.
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
 
 * The transport-proto is IPPROTO_UDP
-
 * the objective is AN_Proxy
 
 The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
@@ -471,7 +466,6 @@ Here is an example M_FLOOD announcing the Join-Proxy at fe80::1, on standard coa
 ~~~
      [M_FLOOD, 12340815, h'fe800000000000000000000000000001', 180000,
      [["AN_Proxy", 4, 1, ""],
-
      [O_IPv6_LOCATOR,
      h'fe800000000000000000000000000001', IPPROTO_UDP, 5684]]]
 ~~~
@@ -603,7 +597,8 @@ Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of th
 # Changelog
 
 ## 11 to 10
-    * Grasp discovery
+    * Join-Proxy and Registrar discovery merged
+    * GRASP discovery updated
     * ARTART review
     * TSVART review
 
