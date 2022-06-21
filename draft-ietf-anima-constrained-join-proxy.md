@@ -354,29 +354,9 @@ The header field is completely opaque to the receiver. A Registrar MUST copy the
 
 It is recommended to use the block option {{RFC7959}} and make sure that the block size allows the addition of the JPY header without violating MTU sizes.
 
-#Discovery {#jr-disc}
-
-It is assumed that Join Proxy seamlessly provides a coaps connection between Pledge and Registrar. In particular this section extends section 4.1 of {{RFC8995}} for the constrained case.
-
-The discovery follows two steps with two alternatives for step 1:
-
-   * Step 1. Two alternatives exist (near and far):
-
-     * Near: the Pledge is one hop away from the Registrar. The Pledge discovers the link-local address of the Registrar as described in {{I-D.ietf-ace-coap-est}}. From then on, it follows the BRSKI process as described in {{I-D.ietf-ace-coap-est}} and {{I-D.ietf-anima-constrained-voucher}}, using link-local addresses.
-
-     * Far: the Pledge is more than one hop away from a relevant Registrar, and discovers the link-local address and join-port of a Join Proxy. The Pledge then follows the BRSKI procedure using the link-local address of the Join Proxy.
-
-   * Step 2. The enrolled Join Proxy discovers the join-port of the Registrar.
+# Discovery {#jr-disc}
 
 The order in which the two alternatives of step 1 are tried is installation dependent. The trigger for discovery in Step 2 is implementation dependent.
-
-An enrolled Pledge may function as a Join Proxy. The Join Proxy functions are advertised as described below. In principle, the Join Proxy functions are offered via a join-port, and not the standard coaps port. Also, the Registrar offers a join-port to which the stateless Join Proxy sends the JPY message. The Join Proxy and Registrar show the extra join-port number when responding to a /.well-known/core discovery request addressed to the standard coap/coaps port.
-
-Two discovery cases are discussed: Join Proxy discovers Registrar and Pledge discovers Join Proxy.  Each discovery case considers three alternatives: CoAP based discovery, GRASP Based discovery {{RFC8990}}, and 6tisch based discovery.  The choice of discovery mechanism depends on the type of installation, and manufacturers can provide the pledge/Join Proxy with support for more than one discovery mechanism.  The pledge/Join Proxy can be designed to dynamically try different discovery mechanisms until a successful discovery mechanism is found, or the choice of discovery mechanism could be configured during device installation.
-
-## Join Proxy discovers Registrar
-
-This section describes the discovery of the Registrar by the stateless Join Proxy. The statefull Join Proxy discovers the Registrar as a Pledge.
 
 ### CoAP discovery {#coap-disc}
 
