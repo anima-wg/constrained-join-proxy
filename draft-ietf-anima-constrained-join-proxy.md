@@ -356,13 +356,17 @@ It is recommended to use the block option {{RFC7959}} and make sure that the blo
 
 # Discovery {#jr-disc}
 
-The order in which the two alternatives of step 1 are tried is installation dependent. The trigger for discovery in Step 2 is implementation dependent.
+## Discovery operations by Join-Proxy
+
+In order to accomodate automatic configuration of the Join-Proxy, it must discover the location and a capabilities of the Registar.
+{{Section 10.2 of I-D.ietf-anima-constrained-voucher}} explains the basic mechanism, and this section explains the extensions required to discover if stateless operation is supported.
 
 ### CoAP discovery {#coap-disc}
 
-The discovery of the coaps Registrar, using coap discovery, by the stateless Join Proxy follows sections 6.3 and 6.5.1 of {{I-D.ietf-anima-constrained-voucher}}.
-The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt)
-parameter with the value "brski.rjp" {{RFC6690}}.
+{{Section 10.2.2 of I-D.ietf-anima-constrained-voucher}} describes how to use CoAP Discovery.
+The stateless Join Proxy requires a different end point that can accept the JPY encapsulation.
+
+The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt) parameter with the value "brski.rjp" {{RFC6690}}.
 Upon success, the return payload will contain the join-port of the Registrar.
 
 ~~~~
@@ -372,31 +376,9 @@ Upon success, the return payload will contain the join-port of the Registrar.
   <coaps://[IP_address]:join-port>; rt="brski.rjp"
 ~~~~
 
-The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{I-D.ietf-ace-coap-est}}).
-
 ### GRASP discovery
 
-This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the Registrar announces itself to a stateless Join Proxy using ACP instance of GRASP using M_FLOOD messages. Section 4.3 of {{RFC8995}} discusses this in more detail.
 
-The following changes are necessary with respect to figure 10 of {{RFC8995}}:
-
-* The transport-proto is IPPROTO_UDP
-* the objective is AN_registrar, identical to {{RFC8995}}.
-* the objective name is "BRSKI_RJP".
-
-The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
-Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
-Here is an example M_FLOOD announcing the Registrar on example port 5685.
-
-~~~
-   [M_FLOOD, 51804321, h'fda379a6f6ee00000200000064000001', 180000,
-   [["AN_join_registrar", 4, 255, "BRSKI_RJP"],
-   [O_IPv6_LOCATOR,
-   h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5685]]]
-~~~
-{: #fig-grasp-rgj title='Example of Registrar announcement message' align="left"}
-
-The Registrar uses a routable address that can be used by enrolled constrained Join Proxies.
 
 ### 6tisch discovery
 
@@ -428,29 +410,6 @@ The example below shows the discovery of the join-port of the Join Proxy.
 Port numbers are assumed to be the default numbers 5683 and 5684 for coap and coaps respectively (sections 12.6 and 12.7 of {{RFC7252}}) when not shown in the response.
 Discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{I-D.ietf-ace-coap-est}}).
 
-### GRASP discovery
-
-This section is normative for uses with an ANIMA ACP.
-In the context of autonomic networks, the Join-Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself.
-Section 4.1.1 of {{RFC8995}} discusses this in more detail.
-
-The following changes are necessary with respect to figure 10 of {{RFC8995}}:
-
-* The transport-proto is IPPROTO_UDP
-* the objective is AN_Proxy
-
-The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
-Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
-
-Here is an example M_FLOOD announcing the Join-Proxy at fe80::1, on standard coaps port 5684.
-
-~~~
-     [M_FLOOD, 12340815, h'fe800000000000000000000000000001', 180000,
-     [["AN_Proxy", 4, 1, ""],
-     [O_IPv6_LOCATOR,
-     h'fe800000000000000000000000000001', IPPROTO_UDP, 5684]]]
-~~~
-{: #fig-grasp-rg title='Example of Registrar announcement message' align="left"}
 
 ### 6tisch discovery
 
