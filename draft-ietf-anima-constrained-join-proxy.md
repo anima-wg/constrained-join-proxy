@@ -316,48 +316,78 @@ JPY[H(),C()] = Join Proxy message with header H and content C
 
 ## Stateless Message structure {#stateless-jpy}
 
-The JPY message is constructed as a payload with media-type application/cbor
+The JPY message is constructed as a payload directly above UDP.
+There is no CoAP or DTLS layer as both are within the relayed payload.
 
-Header and Contents fields together are one CBOR array of 5 elements:
+Header and Contents fields together are consist of one CBOR {{RFC8949}} array of 2 elements, explained in CDDL {{RFC8610}}:
 
-   1. header field: containing a CBOR array {{RFC8949}} with the Pledge IPv6 Link Local address as a CBOR byte string, the Pledge's UDP port number as a CBOR integer, the IP address family (IPv4/IPv6) as a CBOR integer, and the proxy's ifindex or other identifier for the physical port as CBOR integer. The header field is not DTLS encrypted.
-
+   1. The context payload.  This is a CBOR byte string. It SHOULD be between 8 and 32 bytes in size.
    2. Content field: containing the DTLS payload as a CBOR byte string.
-
-The address family integer is defined in {{family}} with:
-
-    1   IP (IP version 4)
-    2   IP6 (IP version 6)
-
-The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type.
 
 ~~~
     JPY_message =
     [
-       ip        : bstr,
-       port      : int,
-       family    : int,
-       ifindex   : int
+       context   : bstr,
        content   : bstr
     ]
 
 ~~~
 {: #fig-cddl title='CDDL representation of JPY message' align="left"}
 
-The contents are DTLS encrypted. In CBOR diagnostic notation the payload JPY[H(IP_P:p_P)], will look like:
+The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type.
+The contents are DTLS encrypted.
 
-~~~
-      [h'IP_p', p_P, family, ident, h'DTLS-payload']
-~~~
+The context payload is to be reflected by the Registrar when sending reply packets to the Join Proxy.
+The context payload is not standardized.
+It is to be used by the Join Proxy to record which pledge the traffic came from.
 
-On reception by the Registrar, the Registrar MUST verify that the number of array elements is larger than or equal to 5, and reject the message when the number of array elements is smaller than 5.
-After replacing the 5th "content" element with the DTLS payload of the response message and leaving all other array elements unchanged, the Registrar returns the response message.
+The Join Proxy SHOULD encrypt this context with a symmetric key known only to the Join Proxy.
+This key need not persist on a long term basis, and MAY be changed periodically.
+The considerations of  {{Section 5.2 of RFC8974}} apply.
+
+This is intended to be identical to the mechanism described in {{Section 7.1 of RFC9031}}.
+However, since the CoAP layer is inside of the DTLS layer (which is between the Pledge and the Registrar), it is not possible for the Join Proxy to act as a CoAP proxy.
+
+A typical context parameter might be constructed with the following structure.
+(This is illustrative only: the contents are not subject to standardization)
+
+~~~~
+    context_message = [
+      family:  uint .bits 1,
+      ifindex: uint .bits 8,
+      srcport: uint .bits 16,
+      iid:     bstr .bits 64,
+    ]
+~~~~
+
+This results in a total of 96 bits, or 12 bytes.
+This fits nicely into a single AES128 CBC block for instance, resulting in a 16 byte context message.
+The Join Proxy MUST maintain the same context block for all communications from the same pledge.
+This implies that any encryption key either does not change during the communication, or that when it does, it is acceptable to break any onboarding connections which have not yet completed.
+If using a construct like above, this should not be a problem to do without maintaining state.
+
+Note: only the lower 64-bits of the origin IP need to be recorded, because they are all IPv6 Link-Local addresses, so the upper 64-bits are just "fe80::"
+On media where the IID is not 64-bits, a different arrangement will be necessary.
+
+The Join Proxy SHOULD use the same UDP source port for all traffic from all Pledges.
+A Join Proxy MAY change the UDP source port, but doing so creates more local state.
+A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible in the future) could, for instance, use different source port numbers to demultiplex connections across CPUs.
+
+### Processing by Registrar
+
+On reception by the Registrar, the Registrar MUST verify that the number of array elements is 2 or more.
+The content field must be provided as input to a DTLS library {{RFC9147}}.
+The origin IP address and UDP port number also needs to be recorded, or a connected socket may be created.
+Note that the socket will need to be used for multiple DTLS flows, which is atypical for how DTLS usually uses sockets.
+The context can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of equivalent to an IPsec SPI number.
+(This can usually be done in an OpenSSL by use of a custom "BIO" driver)
+
+The context needs to be stored within the DTLS context, and when DTLS records need to be sent, then the context needs to be prepended.
 
 Examples are shown in {{examples}}.
 
-The header field is completely opaque to the receiver. A Registrar MUST copy the header and return it unmodified in the return message.
-
-It is recommended to use the block option {{RFC7959}} and make sure that the block size allows the addition of the JPY header without violating MTU sizes.
+At the CoAP level, within the Constrained BRSKI and the EST-COAP {{RFC9148}} level, the block option {{RFC7959}} is often used.
+The selected block size should allow the addition of the JPY\_message header without violating MTU sizes.
 
 # Discovery {#jr-disc}
 
