@@ -38,7 +38,9 @@ normative:
   RFC6347:
   RFC8366:
   RFC8995:
-  I-D.ietf-ace-coap-est:
+  RFC9032:
+  RFC9147:
+  RFC9148:
   I-D.ietf-anima-constrained-voucher:
   RFC8949:
   RFC8990:
@@ -57,11 +59,11 @@ normative:
 
 informative:
   I-D.richardson-anima-state-for-joinrouter:
-  I-D.ietf-6tisch-enrollment-enhanced-beacon:
   RFC6690:
   RFC7030:
   RFC7102:
   RFC7228:
+  RFC9031:
   I-D.kumar-dice-dtls-relay:
   RFC4944:
   RFC3610:
@@ -70,6 +72,7 @@ informative:
   RFC7959:
   RFC8974:
   RFC6550:
+  RFC8610:
 
 --- abstract
 This document extends the work of Bootstrapping Remote Secure Key
@@ -98,7 +101,9 @@ Constrained devices which may be part of constrained networks {{RFC7228}}, typic
 
 CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC6347}} as a security protocol for authenticity and confidentiality of the messages.
 This is known as the "coaps" scheme.
-A constrained version of EST, using CoAP and DTLS, is described in {{I-D.ietf-ace-coap-est}}. The {{I-D.ietf-anima-constrained-voucher}} extends {{I-D.ietf-ace-coap-est}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
+A constrained version of EST, using Coap and DTLS, is described in {{RFC9148}}.
+The {{I-D.ietf-anima-constrained-voucher}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
+some references
 
 DTLS is a client-server protocol relying on the underlying IP layer to perform the routing between the DTLS Client and the DTLS Server.
 However, the Pledge will not be IP routable over the mesh network
@@ -356,6 +361,7 @@ It is recommended to use the block option {{RFC7959}} and make sure that the blo
 
 # Discovery {#jr-disc}
 
+
 ## Discovery operations by Join-Proxy
 
 In order to accomodate automatic configuration of the Join-Proxy, it must discover the location and a capabilities of the Registar.
@@ -375,6 +381,8 @@ Upon success, the return payload will contain the join-port of the Registrar.
   RES: 2.05 Content
   <coaps://[IP_address]:join-port>; rt="brski.rjp"
 ~~~~
+
+The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{RFC9148}}).
 
 ### GRASP discovery
 
@@ -415,16 +423,61 @@ Most Registrars will announce both a JPY-stateless and stateful ports, and may a
 ~~~
 {: #fig-grasp-many title='Example of Registrar announcing two services' align="left"}
 
-
 ## Pledge discovers Join-Proxy
 
 Regardless of whether the Join Proxy operates in stateful or stateless mode, the Join Proxy is discovered by the Pledge identically.
 When doing constrained onboarding with DTLS as security, the Pledge will always see an IPv6 Link-Local destination, with a single UDP port to which DTLS messages are to be sent.
 
+### CoAP discovery {#jp-disc}
+
+In the context of a coap network without Autonomic Network support, discovery follows the standard coap policy.
+The Pledge can discover a Join Proxy by sending a link-local multicast message to ALL CoAP Nodes with address FF02::FD. Multiple or no nodes may respond. The handling of multiple responses and the absence of responses follow section 4 of {{RFC8995}}.
+
+The join-port of the Join Proxy is discovered by
+sending a GET request to "/.well-known/core" including a resource type (rt)
+parameter with the value "brski.jp" {{RFC6690}}.
+Upon success, the return payload will contain the join-port.
+
+The example below shows the discovery of the join-port of the Join Proxy.
+
+~~~~
+  REQ: GET coap://[FF02::FD]/.well-known/core?rt=brski.jp
+
+  RES: 2.05 Content
+  <coaps://[IP_address]:join-port>; rt="brski.jp"
+~~~~
+
+Port numbers are assumed to be the default numbers 5683 and 5684 for coap and coaps respectively (sections 12.6 and 12.7 of {{RFC7252}}) when not shown in the response.
+Discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{RFC9148}}).
+
+### GRASP discovery
+
+This section is normative for uses with an ANIMA ACP.
+In the context of autonomic networks, the Join-Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself.
+Section 4.1.1 of {{RFC8995}} discusses this in more detail.
+
+The following changes are necessary with respect to figure 10 of {{RFC8995}}:
+
+* The transport-proto is IPPROTO_UDP
+* the objective is AN_Proxy
+
+The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
+Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
+
+Here is an example M_FLOOD announcing the Join-Proxy at fe80::1, on standard coaps port 5684.
+
+~~~
+     [M_FLOOD, 12340815, h'fe800000000000000000000000000001', 180000,
+     [["AN_Proxy", 4, 1, ""],
+     [O_IPv6_LOCATOR,
+     h'fe800000000000000000000000000001', IPPROTO_UDP, 5684]]]
+~~~
+{: #fig-grasp-rg title='Example of Registrar announcement message' align="left"}
+
 ### 6tisch discovery
 
-The discovery of Join-Proxy by the Pledge uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
-However, 6tisch does not use DTLS and so this specification does not apply to it.
+The discovery of Join-Proxy by the Pledge uses the enhanced beacons as discussed in {{RFC9032}}.
+6tisch does not use DTLS and so this specification does not apply to it.
 
 # Comparison of stateless and stateful modes {#jr-comp}
 
