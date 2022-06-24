@@ -418,35 +418,13 @@ Most Registrars will announce both a JPY-stateless and stateful ports, and may a
 
 ## Pledge discovers Join-Proxy
 
-This section describes the discovery of the Join-Proxy by the Pledge. The Registrar presents itself as a Join-Proxy for discovery purposes. The Pledge and Join-Proxy are assumed to communicate via Link-Local addresses, possibly on a special network devoted to onboarding. The onboarding network usually has either no encryption, or may be encrypted with a well known key.
-
-### CoAP discovery {#jp-disc}
-
-In the context of a coap network without Autonomic Network support, discovery follows the standard coap policy.
-The Pledge can discover a Join Proxy by sending a link-local multicast message to ALL CoAP Nodes with address FF02::FD. Multiple or no nodes may respond. The handling of multiple responses and the absence of responses follow section 4 of {{RFC8995}}.
-
-The join-port of the Join Proxy is discovered by
-sending a GET request to "/.well-known/core" including a resource type (rt)
-parameter with the value "brski.jp" {{RFC6690}}.
-Upon success, the return payload will contain the join-port.
-
-The example below shows the discovery of the join-port of the Join Proxy.
-
-~~~~
-  REQ: GET coap://[FF02::FD]/.well-known/core?rt=brski.jp
-
-  RES: 2.05 Content
-  <coaps://[IP_address]:join-port>; rt="brski.jp"
-~~~~
-
-Port numbers are assumed to be the default numbers 5683 and 5684 for coap and coaps respectively (sections 12.6 and 12.7 of {{RFC7252}}) when not shown in the response.
-Discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{I-D.ietf-ace-coap-est}}).
-
+Regardless of whether the Join Proxy operates in stateful or stateless mode, the Join Proxy is discovered by the Pledge identically.
+When doing constrained onboarding with DTLS as security, the Pledge will always see an IPv6 Link-Local destination, with a single UDP port to which DTLS messages are to be sent.
 
 ### 6tisch discovery
 
 The discovery of Join-Proxy by the Pledge uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
-6tisch does not use DTLS and so this specification does not apply to it.
+However, 6tisch does not use DTLS and so this specification does not apply to it.
 
 # Comparison of stateless and stateful modes {#jr-comp}
 
