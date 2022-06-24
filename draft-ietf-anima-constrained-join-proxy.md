@@ -309,7 +309,7 @@ JPY[H(),C()] = Join Proxy message with header H and content C
 ~~~~
 {: #fig-stateless title='constrained stateless joining message flow.' align="left"}
 
-## Stateless Message structure
+## Stateless Message structure {#stateless-jpy}
 
 The JPY message is constructed as a payload with media-type application/cbor
 
@@ -378,11 +378,43 @@ Upon success, the return payload will contain the join-port of the Registrar.
 
 ### GRASP discovery
 
+{{Section 10.2.1 of I-D.ietf-anima-constrained-voucher}} describes how to use GRASP {{RFC8990}} discovery within the ACP to locate the stateful port of the Registrar.
 
+A join proxy which supports a stateless mode of operation using the mechanism described in {{stateless-jpy}} must know where to send the encoded content from the pledge.
+The Registrar announces its willingness to use the stateless mechanism by including an additional objective in it's M\_FLOOD'ed ```AN\_join\_registrar``` announcements, but with a different objective value.
 
-### 6tisch discovery
+The following changes are necessary with respect to figure 10 of {{RFC8995}}:
 
-The discovery of the Registrar by the Join Proxy uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
+* The transport-proto is IPPROTO_UDP
+* the objective is AN\_join\_registrar, identical to {{RFC8995}}.
+* the objective name is "BRSKI_RJP".
+
+Here is an example M\_FLOOD announcing the Registrar on example port 5685, which is a port number chosen by the Registrar.
+
+~~~
+   [M_FLOOD, 51804231, h'fda379a6f6ee00000200000064000001', 180000,
+   [["AN_join_registrar", 4, 255, "BRSKI_RJP"],
+    [O_IPv6_LOCATOR,
+     h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5685]]]
+~~~
+{: #fig-grasp-rgj title='Example of Registrar announcement message' align="left"}
+
+Most Registrars will announce both a JPY-stateless and stateful ports, and may also announce an HTTPS/TLS service:
+
+~~~
+   [M_FLOOD, 51840231, h'fda379a6f6ee00000200000064000001', 180000,
+   [["AN_join_registrar", 4, 255, ""],
+    [O_IPv6_LOCATOR,
+     h'fda379a6f6ee00000200000064000001', IPPROTO_TCP, 8443]]]
+    ["AN_join_registrar", 4, 255, "BRSKI_JP"],
+    [O_IPv6_LOCATOR,
+     h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5684]]]
+    ["AN_join_registrar", 4, 255, "BRSKI_RJP"],
+    [O_IPv6_LOCATOR,
+     h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5685]]]
+~~~
+{: #fig-grasp-many title='Example of Registrar announcing two services' align="left"}
+
 
 ## Pledge discovers Join-Proxy
 
