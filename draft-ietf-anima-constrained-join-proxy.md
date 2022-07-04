@@ -1,20 +1,16 @@
 ---
+v: 3
+
 title: Constrained Join Proxy for Bootstrapping Protocols
 abbrev: Join Proxy
 docname: draft-ietf-anima-constrained-join-proxy-11
 
 # stand_alone: true
 
-ipr: trust200902
 area: Internet
 wg: anima Working Group
 kw: Internet-Draft
 cat: std
-
-pi:    # can use array (if all yes) or hash here
-  toc: yes
-  sortrefs:   # defaults to yes
-  symrefs: yes
 
 author:
 
@@ -33,6 +29,11 @@ author:
   org: Cisco Systems
   email: pkampana@cisco.com
 
+venue:
+  group: anima
+  mail: anima@ietf.org
+  github: anima-wg/constrained-join-proxy
+
 normative:
   RFC6347:
   RFC8366:
@@ -45,13 +46,13 @@ normative:
     target: "https://standards.ieee.org/standard/802.1AR-2009.html"
     title: "IEEE 802.1AR Secure Device Identifier"
     author:
-    ins: "IEEE Standard"
+    rc: "IEEE Standard"
     date: 2009
-  family:
+  family: # this really should be IANA.address-family-numbers
     target: "https://www.iana.org/assignments/address-family-numbers/address-family-numbers.xhtml"
     title: "Address Family Numbers"
     author:
-    ins: "IANA"
+    rc: "IANA"
     date: 2021-10-19
 
 informative:
@@ -97,7 +98,7 @@ Constrained devices which may be part of constrained networks {{RFC7228}}, typic
 
 CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC6347}} as a security protocol for authenticity and confidentiality of the messages.
 This is known as the "coaps" scheme.
-A constrained version of EST, using Coap and DTLS, is described in {{I-D.ietf-ace-coap-est}}. The {{I-D.ietf-anima-constrained-voucher}} extends {{I-D.ietf-ace-coap-est}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
+A constrained version of EST, using CoAP and DTLS, is described in {{I-D.ietf-ace-coap-est}}. The {{I-D.ietf-anima-constrained-voucher}} extends {{I-D.ietf-ace-coap-est}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
 
 DTLS is a client-server protocol relying on the underlying IP layer to perform the routing between the DTLS Client and the DTLS Server.
 However, the Pledge will not be IP routable over the mesh network
@@ -160,7 +161,7 @@ The term "join Proxy" is used interchangeably with the term "constrained Join Pr
 As depicted in the {{fig-net}}, the Pledge (P), in a Low-Power and Lossy Network (LLN) mesh
  {{RFC7102}} can be more than one hop away from the Registrar (R) and not yet authenticated into the network.
 
-In this situation, the Pledge can only communicate one-hop to its nearest neighbor, the constrained Join Proxy (J) using their link-local  IPv6 addresses.
+In this situation, the Pledge can only communicate one-hop to its nearest neighbor, the constrained Join Proxy (J) using their link-local IPv6 addresses.
 However, the Pledge needs to communicate with end-to-end security with a Registrar to authenticate and get the relevant system/network parameters.
 If the Pledge, knowing the IP-address of the Registrar, initiates a DTLS connection to the Registrar, then the packets are dropped at the constrained Join Proxy since the Pledge is not yet admitted to the network or there is no IP routability to Pledge for any returned messages from the Registrar.
 
@@ -186,7 +187,7 @@ This constrained Join Proxy functionality is configured into all authenticated d
 The constrained Join Proxy allows for routing of the packets from the Pledge using IP routing to the intended Registrar. An authenticated constrained Join Proxy can discover the routable IP address of the Registrar over multiple hops.
 The following {{jr-spec}} specifies the two constrained Join Proxy modes. A comparison is presented in {{jr-comp}}.
 
-When a mesh network is set up, it consists of a Registrar and a set of connected pledges. No constrained Join Proxies are present. The wanted end-state is a network with a Registrar and a set of enrolled devices. Some of these enrolled devices can act as constrained Join Proxies. Pledges can only employ link-local communication untill they are enrolled. A Pledge will regularly try to discover a constrained Join Proxy or a Registrar with link-local discovery requests. The Pledges which are neigbors of the Registrar will discover the Registrar and be enrolled following the BRSKI protocol. An enrolled device can act as constrained Join Proxy. The Pledges which are not a neighbor of the Registrar will eventually discover a constrained Join Proxy and follow the BRSKI protocol to be enrolled. While this goes on, more and more constrained Join Proxies with a larger hop distance to the Registrar will emerge. The network should be configured such that at the end of the enrollment process, all pledges have discovered a neigboring constrained Join Proxy or the Registrar, and all Pledges are enrolled.
+When a mesh network is set up, it consists of a Registrar and a set of connected pledges. No constrained Join Proxies are present. The wanted end-state is a network with a Registrar and a set of enrolled devices. Some of these enrolled devices can act as constrained Join Proxies. Pledges can only employ link-local communication until they are enrolled. A Pledge will regularly try to discover a constrained Join Proxy or a Registrar with link-local discovery requests. The Pledges which are neighbors of the Registrar will discover the Registrar and be enrolled following the BRSKI protocol. An enrolled device can act as constrained Join Proxy. The Pledges which are not a neighbor of the Registrar will eventually discover a constrained Join Proxy and follow the BRSKI protocol to be enrolled. While this goes on, more and more constrained Join Proxies with a larger hop distance to the Registrar will emerge. The network should be configured such that at the end of the enrollment process, all pledges have discovered a neighboring constrained Join Proxy or the Registrar, and all Pledges are enrolled.
 
 # constrained Join Proxy specification {#jr-spec}
 
@@ -423,7 +424,7 @@ The discovery of the Registrar by the Join Proxy uses the enhanced beacons as di
 
 ## Pledge discovers Join-Proxy
 
-This section describes the discovery of the Join-Proxy by the Pledge. The Registrar presents itself as a Join-Proxy for discocery purposes. The Pledge and Join-Proxy are assumed to communicate via Link-Local addresses, possibly on a special network devoted to onboarding. The onboarding network usually has either no encryption, or may be encrypted with a well known key.
+This section describes the discovery of the Join-Proxy by the Pledge. The Registrar presents itself as a Join-Proxy for discovery purposes. The Pledge and Join-Proxy are assumed to communicate via Link-Local addresses, possibly on a special network devoted to onboarding. The onboarding network usually has either no encryption, or may be encrypted with a well known key.
 
 ### CoAP discovery {#jp-disc}
 
@@ -542,7 +543,7 @@ Proxy MUST encrypt the CBOR array using a locally generated symmetric
 key. The Registrar is not able to examine the encrypted result, but
 does not need to. The Registrar stores the encrypted header in the return packet without modifications. The constrained Join Proxy can decrypt the contents to route the message to the right destination.
 
-In some installations, layer 2 protection is provided between all member pairs of the mesh. In such an enviroment encryption of the CBOR array is unnecessay because the layer 2 protection already provide it.
+In some installations, layer 2 protection is provided between all member pairs of the mesh. In such an environment encryption of the CBOR array is unnecessary because the layer 2 protection already provide it.
 
 # IANA Considerations
 
@@ -588,11 +589,11 @@ Number" registry.
 
 # Acknowledgements
 
-Many thanks for the comments by Cartsen, Bormann, Brian Carpenter, Spencer Dawkins, Esko Dijk, Toerless Eckert, Russ Housley, Ines Robles, Rich Salz, Jürgen Schönwälder, Mališa Vučinić, and Rob Wilton.
+Many thanks for the comments by {{{Carsten Bormann}}}, {{{Brian Carpenter}}}, {{{Spencer Dawkins}}}, {{{Esko Dijk}}}, {{{Toerless Eckert}}}, {{{Russ Housley}}}, {{{Ines Robles}}}, {{{Rich Salz}}}, {{{Jürgen Schönwälder}}}, {{{Mališa Vučinić}}}, and {{{Rob Wilton}}}.
 
 # Contributors
 
-Sandeep Kumar, Sye loong Keoh, and Oscar Garcia-Morchon are the co-authors of the draft-kumar-dice-dtls-relay-02. Their draft has served as a basis for this document. Much text from their draft is copied over to this draft.
+{{{Sandeep Kumar}}}, {{{Sye loong Keoh}}}, and {{{Oscar Garcia-Morchon}}} are the co-authors of the draft-kumar-dice-dtls-relay-02. Their draft has served as a basis for this document. Much text from their draft is copied over to this draft.
 
 # Changelog
 
@@ -664,7 +665,7 @@ The examples show the request "GET coaps://192.168.1.200:5965/est/crts" to a Reg
 
 The request from Join Proxy to Registrar looks like:
 
-~~~
+~~~ cbor-pretty
    85                                   # array(5)
       50                                # bytes(16)
          FE800000000000000000FFFFC0A801C8 #
@@ -677,14 +678,14 @@ The request from Join Proxy to Registrar looks like:
 
 In CBOR Diagnostic:
 
-~~~
+~~~ cbor-diag
     [h'FE800000000000000000FFFFC0A801C8', 48551, 1, 0,
      h'<cacrts DTLS encrypted request>']
 ~~~
 
 The response is:
 
-~~~
+~~~ cbor-pretty
    85                                   # array(5)
       50                                # bytes(16)
          FE800000000000000000FFFFC0A801C8 #
@@ -697,7 +698,7 @@ The response is:
 
 In CBOR diagnostic:
 
-~~~
+~~~ cbor-diag
     [h'FE800000000000000000FFFFC0A801C8', 48551, 1, 0,
     h'<cacrts DTLS encrypted response>']
 ~~~
