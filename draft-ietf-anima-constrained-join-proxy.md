@@ -376,7 +376,7 @@ A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible 
 ### Processing by Registrar
 
 On reception by the Registrar, the Registrar MUST verify that the number of array elements is 2 or more.
-The content field must be provided as input to a DTLS library {{RFC9147}}.
+The pledge_content field must be provided as input to a DTLS library {{RFC9147}}, which along with the 5-tuple of the UDP connection provides enough context for the Registrar to pick an appropriate context.
 The origin IP address and UDP port number also needs to be recorded, or a connected socket may be created.
 Note that the socket will need to be used for multiple DTLS flows, which is atypical for how DTLS usually uses sockets.
 The context can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of equivalent to an IPsec SPI number.
