@@ -480,7 +480,7 @@ The discovery of Join-Proxy by the Pledge uses the enhanced beacons as discussed
 
 The stateful and stateless mode of operation for the Join Proxy have
 their advantages and disadvantages.
-This details in this section should enable operators to make a choice between the two modes based  on the available device resources and network bandwidth.
+This section should enable operators to make a choice between the two modes based  on the available device resources and network bandwidth.
 
 ~~~~
 +-------------+----------------------------+------------------------+
