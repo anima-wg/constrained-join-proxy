@@ -309,7 +309,7 @@ JPY[H(),C()] = Join Proxy message with header H and content C
 ~~~~
 {: #fig-stateless title='constrained stateless joining message flow.' align="left"}
 
-## Stateless Message structure
+## Stateless Message structure {#stateless-jpy}
 
 The JPY message is constructed as a payload with media-type application/cbor
 
@@ -354,35 +354,19 @@ The header field is completely opaque to the receiver. A Registrar MUST copy the
 
 It is recommended to use the block option {{RFC7959}} and make sure that the block size allows the addition of the JPY header without violating MTU sizes.
 
-#Discovery {#jr-disc}
+# Discovery {#jr-disc}
 
-It is assumed that Join Proxy seamlessly provides a coaps connection between Pledge and Registrar. In particular this section extends section 4.1 of {{RFC8995}} for the constrained case.
+## Discovery operations by Join-Proxy
 
-The discovery follows two steps with two alternatives for step 1:
-
-   * Step 1. Two alternatives exist (near and far):
-
-     * Near: the Pledge is one hop away from the Registrar. The Pledge discovers the link-local address of the Registrar as described in {{I-D.ietf-ace-coap-est}}. From then on, it follows the BRSKI process as described in {{I-D.ietf-ace-coap-est}} and {{I-D.ietf-anima-constrained-voucher}}, using link-local addresses.
-
-     * Far: the Pledge is more than one hop away from a relevant Registrar, and discovers the link-local address and join-port of a Join Proxy. The Pledge then follows the BRSKI procedure using the link-local address of the Join Proxy.
-
-   * Step 2. The enrolled Join Proxy discovers the join-port of the Registrar.
-
-The order in which the two alternatives of step 1 are tried is installation dependent. The trigger for discovery in Step 2 is implementation dependent.
-
-An enrolled Pledge may function as a Join Proxy. The Join Proxy functions are advertised as described below. In principle, the Join Proxy functions are offered via a join-port, and not the standard coaps port. Also, the Registrar offers a join-port to which the stateless Join Proxy sends the JPY message. The Join Proxy and Registrar show the extra join-port number when responding to a /.well-known/core discovery request addressed to the standard coap/coaps port.
-
-Two discovery cases are discussed: Join Proxy discovers Registrar and Pledge discovers Join Proxy.  Each discovery case considers three alternatives: CoAP based discovery, GRASP Based discovery {{RFC8990}}, and 6tisch based discovery.  The choice of discovery mechanism depends on the type of installation, and manufacturers can provide the pledge/Join Proxy with support for more than one discovery mechanism.  The pledge/Join Proxy can be designed to dynamically try different discovery mechanisms until a successful discovery mechanism is found, or the choice of discovery mechanism could be configured during device installation.
-
-## Join Proxy discovers Registrar
-
-This section describes the discovery of the Registrar by the stateless Join Proxy. The statefull Join Proxy discovers the Registrar as a Pledge.
+In order to accomodate automatic configuration of the Join-Proxy, it must discover the location and a capabilities of the Registar.
+{{Section 10.2 of I-D.ietf-anima-constrained-voucher}} explains the basic mechanism, and this section explains the extensions required to discover if stateless operation is supported.
 
 ### CoAP discovery {#coap-disc}
 
-The discovery of the coaps Registrar, using coap discovery, by the stateless Join Proxy follows sections 6.3 and 6.5.1 of {{I-D.ietf-anima-constrained-voucher}}.
-The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt)
-parameter with the value "brski.rjp" {{RFC6690}}.
+{{Section 10.2.2 of I-D.ietf-anima-constrained-voucher}} describes how to use CoAP Discovery.
+The stateless Join Proxy requires a different end point that can accept the JPY encapsulation.
+
+The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt) parameter with the value "brski.rjp" {{RFC6690}}.
 Upon success, the return payload will contain the join-port of the Registrar.
 
 ~~~~
@@ -392,90 +376,55 @@ Upon success, the return payload will contain the join-port of the Registrar.
   <coaps://[IP_address]:join-port>; rt="brski.rjp"
 ~~~~
 
-The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{I-D.ietf-ace-coap-est}}).
-
 ### GRASP discovery
 
-This section is normative for uses with an ANIMA ACP. In the context of autonomic networks, the Registrar announces itself to a stateless Join Proxy using ACP instance of GRASP using M_FLOOD messages. Section 4.3 of {{RFC8995}} discusses this in more detail.
+{{Section 10.2.1 of I-D.ietf-anima-constrained-voucher}} describes how to use GRASP {{RFC8990}} discovery within the ACP to locate the stateful port of the Registrar.
+
+A join proxy which supports a stateless mode of operation using the mechanism described in {{stateless-jpy}} must know where to send the encoded content from the pledge.
+The Registrar announces its willingness to use the stateless mechanism by including an additional objective in it's M\_FLOOD'ed ```AN\_join\_registrar``` announcements, but with a different objective value.
 
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
 
 * The transport-proto is IPPROTO_UDP
-* the objective is AN_registrar, identical to {{RFC8995}}.
+* the objective is AN\_join\_registrar, identical to {{RFC8995}}.
 * the objective name is "BRSKI_RJP".
 
-The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
-Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
-Here is an example M_FLOOD announcing the Registrar on example port 5685.
+Here is an example M\_FLOOD announcing the Registrar on example port 5685, which is a port number chosen by the Registrar.
 
 ~~~
-   [M_FLOOD, 51804321, h'fda379a6f6ee00000200000064000001', 180000,
+   [M_FLOOD, 51804231, h'fda379a6f6ee00000200000064000001', 180000,
    [["AN_join_registrar", 4, 255, "BRSKI_RJP"],
-   [O_IPv6_LOCATOR,
-   h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5685]]]
+    [O_IPv6_LOCATOR,
+     h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5685]]]
 ~~~
 {: #fig-grasp-rgj title='Example of Registrar announcement message' align="left"}
 
-The Registrar uses a routable address that can be used by enrolled constrained Join Proxies.
+Most Registrars will announce both a JPY-stateless and stateful ports, and may also announce an HTTPS/TLS service:
 
-### 6tisch discovery
+~~~
+   [M_FLOOD, 51840231, h'fda379a6f6ee00000200000064000001', 180000,
+   [["AN_join_registrar", 4, 255, ""],
+    [O_IPv6_LOCATOR,
+     h'fda379a6f6ee00000200000064000001', IPPROTO_TCP, 8443]]]
+    ["AN_join_registrar", 4, 255, "BRSKI_JP"],
+    [O_IPv6_LOCATOR,
+     h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5684]]]
+    ["AN_join_registrar", 4, 255, "BRSKI_RJP"],
+    [O_IPv6_LOCATOR,
+     h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5685]]]
+~~~
+{: #fig-grasp-many title='Example of Registrar announcing two services' align="left"}
 
-The discovery of the Registrar by the Join Proxy uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
 
 ## Pledge discovers Join-Proxy
 
-This section describes the discovery of the Join-Proxy by the Pledge. The Registrar presents itself as a Join-Proxy for discovery purposes. The Pledge and Join-Proxy are assumed to communicate via Link-Local addresses, possibly on a special network devoted to onboarding. The onboarding network usually has either no encryption, or may be encrypted with a well known key.
-
-### CoAP discovery {#jp-disc}
-
-In the context of a coap network without Autonomic Network support, discovery follows the standard coap policy.
-The Pledge can discover a Join Proxy by sending a link-local multicast message to ALL CoAP Nodes with address FF02::FD. Multiple or no nodes may respond. The handling of multiple responses and the absence of responses follow section 4 of {{RFC8995}}.
-
-The join-port of the Join Proxy is discovered by
-sending a GET request to "/.well-known/core" including a resource type (rt)
-parameter with the value "brski.jp" {{RFC6690}}.
-Upon success, the return payload will contain the join-port.
-
-The example below shows the discovery of the join-port of the Join Proxy.
-
-~~~~
-  REQ: GET coap://[FF02::FD]/.well-known/core?rt=brski.jp
-
-  RES: 2.05 Content
-  <coaps://[IP_address]:join-port>; rt="brski.jp"
-~~~~
-
-Port numbers are assumed to be the default numbers 5683 and 5684 for coap and coaps respectively (sections 12.6 and 12.7 of {{RFC7252}}) when not shown in the response.
-Discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{I-D.ietf-ace-coap-est}}).
-
-### GRASP discovery
-
-This section is normative for uses with an ANIMA ACP.
-In the context of autonomic networks, the Join-Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself.
-Section 4.1.1 of {{RFC8995}} discusses this in more detail.
-
-The following changes are necessary with respect to figure 10 of {{RFC8995}}:
-
-* The transport-proto is IPPROTO_UDP
-* the objective is AN_Proxy
-
-The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
-Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
-
-Here is an example M_FLOOD announcing the Join-Proxy at fe80::1, on standard coaps port 5684.
-
-~~~
-     [M_FLOOD, 12340815, h'fe800000000000000000000000000001', 180000,
-     [["AN_Proxy", 4, 1, ""],
-     [O_IPv6_LOCATOR,
-     h'fe800000000000000000000000000001', IPPROTO_UDP, 5684]]]
-~~~
-{: #fig-grasp-rg title='Example of Registrar announcement message' align="left"}
+Regardless of whether the Join Proxy operates in stateful or stateless mode, the Join Proxy is discovered by the Pledge identically.
+When doing constrained onboarding with DTLS as security, the Pledge will always see an IPv6 Link-Local destination, with a single UDP port to which DTLS messages are to be sent.
 
 ### 6tisch discovery
 
 The discovery of Join-Proxy by the Pledge uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
-6tisch does not use DTLS and so this specification does not apply to it.
+However, 6tisch does not use DTLS and so this specification does not apply to it.
 
 # Comparison of stateless and stateful modes {#jr-comp}
 
