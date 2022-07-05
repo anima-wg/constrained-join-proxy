@@ -352,7 +352,7 @@ A typical context parameter might be constructed with the following structure.
 (This is illustrative only: the contents are not subject to standardization)
 
 ~~~~
-    context_message = [
+    pledge_context_message = [
       family:  uint .bits 1,
       ifindex: uint .bits 8,
       srcport: uint .bits 16,
