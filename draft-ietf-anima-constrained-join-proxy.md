@@ -429,9 +429,8 @@ However, 6tisch does not use DTLS and so this specification does not apply to it
 # Comparison of stateless and stateful modes {#jr-comp}
 
 The stateful and stateless mode of operation for the Join Proxy have
-their advantages and disadvantages.  This section should enable to
-make a choice between the two modes based on the available device
-resources and network bandwidth.
+their advantages and disadvantages.
+This section should enable operators to make a choice between the two modes based  on the available device resources and network bandwidth.
 
 ~~~~
 +-------------+----------------------------+------------------------+
