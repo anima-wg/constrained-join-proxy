@@ -327,7 +327,7 @@ Header and Contents fields together are consist of one CBOR {{RFC8949}} array of
 ~~~
     JPY_message =
     [
-       context   : bstr,
+       pledge_context   : bstr,
        content   : bstr
     ]
 
