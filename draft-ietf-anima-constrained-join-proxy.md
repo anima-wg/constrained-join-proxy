@@ -348,7 +348,7 @@ The considerations of  {{Section 5.2 of RFC8974}} apply.
 This is intended to be identical to the mechanism described in {{Section 7.1 of RFC9031}}.
 However, since the CoAP layer is inside of the DTLS layer (which is between the Pledge and the Registrar), it is not possible for the Join Proxy to act as a CoAP proxy.
 
-A typical context parameter might be constructed with the following structure.
+A typical context parameter might be constructed with the following CDDL structure.
 (This is illustrative only: the contents are not subject to standardization)
 
 ~~~~
