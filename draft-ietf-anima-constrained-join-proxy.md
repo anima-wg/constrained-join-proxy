@@ -348,7 +348,7 @@ The considerations of  {{Section 5.2 of RFC8974}} apply.
 This is intended to be identical to the mechanism described in {{Section 7.1 of RFC9031}}.
 However, since the CoAP layer is inside of the DTLS layer (which is between the Pledge and the Registrar), it is not possible for the Join Proxy to act as a CoAP proxy.
 
-A typical context parameter might be constructed with the following CDDL structure.
+A typical context parameter might be constructed with the following CDDL grammar:
 (This is illustrative only: the contents are not subject to standardization)
 
 ~~~~
@@ -361,32 +361,31 @@ A typical context parameter might be constructed with the following CDDL structu
 ~~~~
 
 This results in a total of 96 bits, or 12 bytes.
+The structure stores the srcport, the originating IPv6 Link-Local address, the IPv4/IPv6 family (as a single bit) and an ifindex to provide the link-local scope.
 This fits nicely into a single AES128 CBC block for instance, resulting in a 16 byte context message.
 The Join Proxy MUST maintain the same context block for all communications from the same pledge.
 This implies that any encryption key either does not change during the communication, or that when it does, it is acceptable to break any onboarding connections which have not yet completed.
-If using a construct like above, this should not be a problem to do without maintaining state.
+If using a context parameter like defined above, it should be easy for the Join Proxy to meet this requirement without maintaining any local state about the pledge.
 
-Note: only the lower 64-bits of the origin IP need to be recorded, because they are all IPv6 Link-Local addresses, so the upper 64-bits are just "fe80::"
+Note: when IPv6 is used only the lower 64-bits of the origin IP need to be recorded, because they are all IPv6 Link-Local addresses, so the upper 64-bits are just "fe80::". For IPv4, a Link-Local IPv4 address {{?RFC3927}} would be used, and it would fit into 64-bits.
 On media where the IID is not 64-bits, a different arrangement will be necessary.
 
-The Join Proxy SHOULD use the same UDP source port for all traffic from all Pledges.
+For the JPY messages relayed to the Registrar, the Join Proxy SHOULD use the same UDP source port for the JPY messages related to all pledges.
 A Join Proxy MAY change the UDP source port, but doing so creates more local state.
 A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible in the future) could, for instance, use different source port numbers to demultiplex connections across CPUs.
 
 ### Processing by Registrar
 
-On reception by the Registrar, the Registrar MUST verify that the number of array elements is 2 or more.
+On reception of a JPY message by the Registrar, the Registrar MUST verify that the number of array elements is 2 or more.
 The pledge_content field must be provided as input to a DTLS library {{RFC9147}}, which along with the 5-tuple of the UDP connection provides enough context for the Registrar to pick an appropriate context.
 Note that the socket will need to be used for multiple DTLS flows, which is atypical for how DTLS usually uses sockets.
-The context can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of equivalent to an IPsec SPI number.
-(This can usually be done in an OpenSSL by use of a custom "BIO" driver)
-
-The context needs to be stored within the DTLS context, and when DTLS records need to be sent, then the context needs to be prepended.
+The pledge\_context\_message can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of of per session context.
+The pledge\_context\_message needs to be linked to the DTLS context, and when DTLS records need to be sent, then the pledge\_context\_message needs to be prepended to the data that is sent.
 
 Examples are shown in {{examples}}.
 
 At the CoAP level, within the Constrained BRSKI and the EST-COAP {{RFC9148}} level, the block option {{RFC7959}} is often used.
-The selected block size should allow the addition of the JPY\_message header without violating MTU sizes.
+The Registrar and the Pledge MUST select a block size that would allow the addition of the JPY\_message header without violating MTU sizes.
 
 # Discovery {#jr-disc}
 
