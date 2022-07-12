@@ -102,8 +102,8 @@ Constrained devices which may be part of constrained networks {{RFC7228}}, typic
 CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC6347}} as a security protocol for authenticity and confidentiality of the messages.
 This is known as the "coaps" scheme.
 A constrained version of EST, using Coap and DTLS, is described in {{RFC9148}}.
+
 The {{I-D.ietf-anima-constrained-voucher}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
-some references
 
 DTLS is a client-server protocol relying on the underlying IP layer to perform the routing between the DTLS Client and the DTLS Server.
 However, the Pledge will not be IP routable over the mesh network
