@@ -417,7 +417,7 @@ The discoverable port numbers are usually returned for Join Proxy resources in t
 {{Section 10.2.1 of I-D.ietf-anima-constrained-voucher}} describes how to use GRASP {{RFC8990}} discovery within the ACP to locate the stateful port of the Registrar.
 
 A join proxy which supports a stateless mode of operation using the mechanism described in {{stateless-jpy}} must know where to send the encoded content from the pledge.
-The Registrar announces its willingness to use the stateless mechanism by including an additional objective in it's M\_FLOOD'ed ```AN\_join\_registrar``` announcements, but with a different objective value.
+The Registrar announces its willingness to use the stateless mechanism by including an additional objective in it's M\_FLOOD'ed ```AN_join_registrar``` announcements, but with a different objective value.
 
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
 
