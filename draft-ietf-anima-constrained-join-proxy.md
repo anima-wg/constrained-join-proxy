@@ -626,6 +626,13 @@ Many thanks for the comments by {{{Carsten Bormann}}}, {{{Brian Carpenter}}}, {{
 
 # Changelog
 
+## 13 to 12
+    * jpy message encrypted and no longer standardized
+
+## 12 to 11
+    * many typos fixes and text re-organized
+    * core of GRASP and CoAP discovery moved to contrained-voucher document, only stateless extensions remain
+
 ## 11 to 10
     * Join-Proxy and Registrar discovery merged
     * GRASP discovery updated
