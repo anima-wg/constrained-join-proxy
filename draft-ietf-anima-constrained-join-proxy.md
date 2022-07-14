@@ -38,7 +38,9 @@ normative:
   RFC6347:
   RFC8366:
   RFC8995:
-  I-D.ietf-ace-coap-est:
+  RFC9032:
+  RFC9147:
+  RFC9148:
   I-D.ietf-anima-constrained-voucher:
   RFC8949:
   RFC8990:
@@ -57,11 +59,11 @@ normative:
 
 informative:
   I-D.richardson-anima-state-for-joinrouter:
-  I-D.ietf-6tisch-enrollment-enhanced-beacon:
   RFC6690:
   RFC7030:
   RFC7102:
   RFC7228:
+  RFC9031:
   I-D.kumar-dice-dtls-relay:
   RFC4944:
   RFC3610:
@@ -70,6 +72,7 @@ informative:
   RFC7959:
   RFC8974:
   RFC6550:
+  RFC8610:
 
 --- abstract
 This document extends the work of Bootstrapping Remote Secure Key
@@ -98,7 +101,9 @@ Constrained devices which may be part of constrained networks {{RFC7228}}, typic
 
 CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC6347}} as a security protocol for authenticity and confidentiality of the messages.
 This is known as the "coaps" scheme.
-A constrained version of EST, using CoAP and DTLS, is described in {{I-D.ietf-ace-coap-est}}. The {{I-D.ietf-anima-constrained-voucher}} extends {{I-D.ietf-ace-coap-est}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
+A constrained version of EST, using Coap and DTLS, is described in {{RFC9148}}.
+
+The {{I-D.ietf-anima-constrained-voucher}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
 
 DTLS is a client-server protocol relying on the underlying IP layer to perform the routing between the DTLS Client and the DTLS Server.
 However, the Pledge will not be IP routable over the mesh network
@@ -311,50 +316,79 @@ JPY[H(),C()] = Join Proxy message with header H and content C
 
 ## Stateless Message structure {#stateless-jpy}
 
-The JPY message is constructed as a payload with media-type application/cbor
+The JPY message is constructed as a payload directly above UDP.
+There is no CoAP or DTLS layer as both are within the relayed payload.
 
-Header and Contents fields together are one CBOR array of 5 elements:
+Header and Contents fields together are consist of one CBOR {{RFC8949}} array of 2 elements, explained in CDDL {{RFC8610}}:
 
-   1. header field: containing a CBOR array {{RFC8949}} with the Pledge IPv6 Link Local address as a CBOR byte string, the Pledge's UDP port number as a CBOR integer, the IP address family (IPv4/IPv6) as a CBOR integer, and the proxy's ifindex or other identifier for the physical port as CBOR integer. The header field is not DTLS encrypted.
-
+   1. The context payload.  This is a CBOR byte string. It SHOULD be between 8 and 32 bytes in size.
    2. Content field: containing the DTLS payload as a CBOR byte string.
-
-The address family integer is defined in {{family}} with:
-
-    1   IP (IP version 4)
-    2   IP6 (IP version 6)
-
-The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type.
 
 ~~~
     JPY_message =
     [
-       ip        : bstr,
-       port      : int,
-       family    : int,
-       ifindex   : int
+       pledge_context   : bstr,
        content   : bstr
     ]
 
 ~~~
 {: #fig-cddl title='CDDL representation of JPY message' align="left"}
 
-The contents are DTLS encrypted. In CBOR diagnostic notation the payload JPY[H(IP_P:p_P)], will look like:
+The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type.
+The contents are DTLS encrypted.
 
-~~~
-      [h'IP_p', p_P, family, ident, h'DTLS-payload']
-~~~
+The context payload is to be reflected by the Registrar when sending reply packets to the Join Proxy.
+The context payload is not standardized.
+It is to be used by the Join Proxy to record which pledge the traffic came from.
 
-On reception by the Registrar, the Registrar MUST verify that the number of array elements is larger than or equal to 5, and reject the message when the number of array elements is smaller than 5.
-After replacing the 5th "content" element with the DTLS payload of the response message and leaving all other array elements unchanged, the Registrar returns the response message.
+The Join Proxy SHOULD encrypt this context with a symmetric key known only to the Join Proxy.
+This key need not persist on a long term basis, and MAY be changed periodically.
+The considerations of  {{Section 5.2 of RFC8974}} apply.
+
+This is intended to be identical to the mechanism described in {{Section 7.1 of RFC9031}}.
+However, since the CoAP layer is inside of the DTLS layer (which is between the Pledge and the Registrar), it is not possible for the Join Proxy to act as a CoAP proxy.
+
+A typical context parameter might be constructed with the following CDDL grammar:
+(This is illustrative only: the contents are not subject to standardization)
+
+~~~~
+    pledge_context_message = [
+      family:  uint .bits 1,
+      ifindex: uint .bits 8,
+      srcport: uint .bits 16,
+      iid:     bstr .bits 64,
+    ]
+~~~~
+
+This results in a total of 96 bits, or 12 bytes.
+The structure stores the srcport, the originating IPv6 Link-Local address, the IPv4/IPv6 family (as a single bit) and an ifindex to provide the link-local scope.
+This fits nicely into a single AES128 CBC block for instance, resulting in a 16 byte context message.
+The Join Proxy MUST maintain the same context block for all communications from the same pledge.
+This implies that any encryption key either does not change during the communication, or that when it does, it is acceptable to break any onboarding connections which have not yet completed.
+If using a context parameter like defined above, it should be easy for the Join Proxy to meet this requirement without maintaining any local state about the pledge.
+
+Note: when IPv6 is used only the lower 64-bits of the origin IP need to be recorded, because they are all IPv6 Link-Local addresses, so the upper 64-bits are just "fe80::". For IPv4, a Link-Local IPv4 address {{?RFC3927}} would be used, and it would fit into 64-bits.
+On media where the IID is not 64-bits, a different arrangement will be necessary.
+
+For the JPY messages relayed to the Registrar, the Join Proxy SHOULD use the same UDP source port for the JPY messages related to all pledges.
+A Join Proxy MAY change the UDP source port, but doing so creates more local state.
+A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible in the future) could, for instance, use different source port numbers to demultiplex connections across CPUs.
+
+### Processing by Registrar
+
+On reception of a JPY message by the Registrar, the Registrar MUST verify that the number of array elements is 2 or more.
+The pledge_content field must be provided as input to a DTLS library {{RFC9147}}, which along with the 5-tuple of the UDP connection provides enough context for the Registrar to pick an appropriate context.
+Note that the socket will need to be used for multiple DTLS flows, which is atypical for how DTLS usually uses sockets.
+The pledge\_context\_message can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of of per session context.
+The pledge\_context\_message needs to be linked to the DTLS context, and when DTLS records need to be sent, then the pledge\_context\_message needs to be prepended to the data that is sent.
 
 Examples are shown in {{examples}}.
 
-The header field is completely opaque to the receiver. A Registrar MUST copy the header and return it unmodified in the return message.
-
-It is recommended to use the block option {{RFC7959}} and make sure that the block size allows the addition of the JPY header without violating MTU sizes.
+At the CoAP level, within the Constrained BRSKI and the EST-COAP {{RFC9148}} level, the block option {{RFC7959}} is often used.
+The Registrar and the Pledge MUST select a block size that would allow the addition of the JPY\_message header without violating MTU sizes.
 
 # Discovery {#jr-disc}
+
 
 ## Discovery operations by Join-Proxy
 
@@ -375,6 +409,8 @@ Upon success, the return payload will contain the join-port of the Registrar.
   RES: 2.05 Content
   <coaps://[IP_address]:join-port>; rt="brski.rjp"
 ~~~~
+
+The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{RFC9148}}).
 
 ### GRASP discovery
 
@@ -415,16 +451,61 @@ Most Registrars will announce both a JPY-stateless and stateful ports, and may a
 ~~~
 {: #fig-grasp-many title='Example of Registrar announcing two services' align="left"}
 
-
 ## Pledge discovers Join-Proxy
 
 Regardless of whether the Join Proxy operates in stateful or stateless mode, the Join Proxy is discovered by the Pledge identically.
 When doing constrained onboarding with DTLS as security, the Pledge will always see an IPv6 Link-Local destination, with a single UDP port to which DTLS messages are to be sent.
 
+### CoAP discovery {#jp-disc}
+
+In the context of a coap network without Autonomic Network support, discovery follows the standard coap policy.
+The Pledge can discover a Join Proxy by sending a link-local multicast message to ALL CoAP Nodes with address FF02::FD. Multiple or no nodes may respond. The handling of multiple responses and the absence of responses follow section 4 of {{RFC8995}}.
+
+The join-port of the Join Proxy is discovered by
+sending a GET request to "/.well-known/core" including a resource type (rt)
+parameter with the value "brski.jp" {{RFC6690}}.
+Upon success, the return payload will contain the join-port.
+
+The example below shows the discovery of the join-port of the Join Proxy.
+
+~~~~
+  REQ: GET coap://[FF02::FD]/.well-known/core?rt=brski.jp
+
+  RES: 2.05 Content
+  <coaps://[IP_address]:join-port>; rt="brski.jp"
+~~~~
+
+Port numbers are assumed to be the default numbers 5683 and 5684 for coap and coaps respectively (sections 12.6 and 12.7 of {{RFC7252}}) when not shown in the response.
+Discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{RFC9148}}).
+
+### GRASP discovery
+
+This section is normative for uses with an ANIMA ACP.
+In the context of autonomic networks, the Join-Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself.
+Section 4.1.1 of {{RFC8995}} discusses this in more detail.
+
+The following changes are necessary with respect to figure 10 of {{RFC8995}}:
+
+* The transport-proto is IPPROTO_UDP
+* the objective is AN_Proxy
+
+The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
+Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
+
+Here is an example M_FLOOD announcing the Join-Proxy at fe80::1, on standard coaps port 5684.
+
+~~~
+     [M_FLOOD, 12340815, h'fe800000000000000000000000000001', 180000,
+     [["AN_Proxy", 4, 1, ""],
+     [O_IPv6_LOCATOR,
+     h'fe800000000000000000000000000001', IPPROTO_UDP, 5684]]]
+~~~
+{: #fig-grasp-rg title='Example of Registrar announcement message' align="left"}
+
 ### 6tisch discovery
 
-The discovery of Join-Proxy by the Pledge uses the enhanced beacons as discussed in {{I-D.ietf-6tisch-enrollment-enhanced-beacon}}.
-However, 6tisch does not use DTLS and so this specification does not apply to it.
+The discovery of Join-Proxy by the Pledge uses the enhanced beacons as discussed in {{RFC9032}}.
+6tisch does not use DTLS and so this specification does not apply to it.
 
 # Comparison of stateless and stateful modes {#jr-comp}
 
