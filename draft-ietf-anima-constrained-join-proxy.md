@@ -170,14 +170,14 @@ In this situation, the Pledge can only communicate one-hop to its nearest neighb
 However, the Pledge needs to communicate with end-to-end security with a Registrar to authenticate and get the relevant system/network parameters.
 If the Pledge, knowing the IP-address of the Registrar, initiates a DTLS connection to the Registrar, then the packets are dropped at the constrained Join Proxy since the Pledge is not yet admitted to the network or there is no IP routability to Pledge for any returned messages from the Registrar.
 
-~~~~
-
-          ++++ multi-hop mesh
-          |R |----    +---+    +--+        +--+
-          |  |    \   |6  |----|J |........|P |
-          ++++     \--+ LR|    |  |        |  |
-                      +---+    +--+        +--+
-       Registrar             Join Proxy   Pledge
+~~~~ aasvg
+                    multi-hop mesh
+         .---.
+         | R +---.    +----+    +---+        +--+
+         |   |    \   |6LR +----+ J |........|P |
+         '---'     `--+    |    |   |  clear |  |
+                      +----+    +---+        +--+
+       Registrar             Join Proxy     Pledge
 
 
 ~~~~
@@ -327,7 +327,7 @@ Header and Contents fields together are consist of one CBOR {{RFC8949}} array of
 ~~~
     JPY_message =
     [
-       pledge_context   : bstr,
+       pledge_context_message : bstr,
        content   : bstr
     ]
 
