@@ -404,13 +404,30 @@ The stateless Join Proxy can discover the join-port of the Registrar by sending 
 Upon success, the return payload will contain the join-port of the Registrar.
 
 ~~~~
-  REQ: GET coap://[IP_address]/.well-known/core?rt=brski.rjp
+  REQ: GET /.well-known/core?rt=brski.rjp
 
   RES: 2.05 Content
   <coaps+jpy://[IP_address]:join-port>;rt=brski.rjp
 ~~~~
 
-The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{RFC9148}}).
+In the {{RFC6690}} link format, and {{RFC3986, Section 3.2}}, the authority attribute can not include a port number unless it also includes the IP address.
+
+The returned join-port is expected to process the encapsulated JPY messages described in section {{stateless-jpy}}.
+The scheme remains coaps, as the inside protocol is still CoAP and DTLS.
+
+An EST/Registrar server running at address ```2001:db8:0:abcd::52```, with the JPY process on port 7634, and the stateful Registrar on port 5683 could reply to a multicast query as follows:
+
+~~~~
+  REQ: GET /.well-known/core?rt=brski*
+
+  RES: 2.05 Content
+  <coaps://[2001:db8:0:abcd::52]:7634>; rt=brski.rjp,
+  <coaps://[2001:db8:0:abcd::52]:5683/.well-known/brski/rv>;rt=brski.rv;ct=836,
+  <coaps://[2001:db8:0:abcd::52]:5683/.well-known/brski/vs>;rt=brski.vs;ct="50 60",
+  <coaps://[2001:db8:0:abcd::52]:5683/.well-known/brski/es>;rt=brski.es;ct="50 60",
+~~~~
+
+
 
 The coaps+jpy scheme is registered is defined in {{jpyscheme}}, as per {{RFC7252, Section 6.2}}
 
