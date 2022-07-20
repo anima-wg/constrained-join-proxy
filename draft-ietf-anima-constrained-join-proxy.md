@@ -441,10 +441,10 @@ Most Registrars will announce both a JPY-stateless and stateful ports, and may a
    [M_FLOOD, 51840231, h'fda379a6f6ee00000200000064000001', 180000,
    [["AN_join_registrar", 4, 255, ""],
     [O_IPv6_LOCATOR,
-     h'fda379a6f6ee00000200000064000001', IPPROTO_TCP, 8443]]]
+     h'fda379a6f6ee00000200000064000001', IPPROTO_TCP, 8443],
     ["AN_join_registrar", 4, 255, "BRSKI_JP"],
     [O_IPv6_LOCATOR,
-     h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5684]]]
+     h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5684],
     ["AN_join_registrar", 4, 255, "BRSKI_RJP"],
     [O_IPv6_LOCATOR,
      h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5685]]]
