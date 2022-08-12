@@ -407,7 +407,7 @@ Upon success, the return payload will contain the join-port of the Registrar.
   REQ: GET coap://[IP_address]/.well-known/core?rt=brski.rjp
 
   RES: 2.05 Content
-  <coaps+jpy://[IP_address]:join-port>; rt="brski.rjp"
+  <coaps+jpy://[IP_address]:join-port>;rt=brski.rjp
 ~~~~
 
 The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{RFC9148}}).
