@@ -248,10 +248,10 @@ IP_Jr:p_Jr = Routable IP address and client port of Join Proxy
 ~~~~
 {: #fig-statefull2 title='constrained stateful joining message flow with Registrar address known to Join Proxy.' align="left"}
 
-## Stateless Join Proxy
+## Stateless Join Proxy {#jpy-encapsulation-protocol}
 
-The stateless Join Proxy aims to minimize the requirements on the constrained Join Proxy device.
-Stateless operation requires no memory in the Join Proxy device, and may also reduce the CPU impact as the device does not need to search through a state table.
+The JPY Encapsulation Protocol allows the stateless Join Proxy to minimize memory requirements on a constrained Join Proxy device.
+The use of a stateless operation requires no memory in the Join Proxy device because it stores the state in a special encapsulation in the packet.  This may also reduce the CPU impact as the device does not need to search through a state table.
 
 If an untrusted Pledge that can only use link-local addressing wants to contact a trusted Registrar, and the Registrar is more than one hop away, it sends its DTLS messages to the Join Proxy.
 
