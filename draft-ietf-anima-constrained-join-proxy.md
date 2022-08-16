@@ -59,6 +59,7 @@ normative:
 
 informative:
   I-D.richardson-anima-state-for-joinrouter:
+  RFC3986:
   RFC6690:
   RFC7030:
   RFC7102:
