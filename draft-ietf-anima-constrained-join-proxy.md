@@ -412,7 +412,7 @@ Upon success, the return payload will contain the join-port of the Registrar.
 
 The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{RFC9148}}).
 
-The coaps+jpy scheme is registered is defined in {{jpyscheme}}.
+The coaps+jpy scheme is registered is defined in {{jpyscheme}}, as per {{RFC7252, Section 6.2}}
 
 ### GRASP discovery
 
