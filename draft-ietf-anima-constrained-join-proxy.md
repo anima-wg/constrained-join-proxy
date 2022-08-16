@@ -421,7 +421,7 @@ An EST/Registrar server running at address ```2001:db8:0:abcd::52```, with the J
   REQ: GET /.well-known/core?rt=brski*
 
   RES: 2.05 Content
-  <coaps://[2001:db8:0:abcd::52]:7634>; rt=brski.rjp,
+  <coaps+jpy://[2001:db8:0:abcd::52]:7634>;rt=brski.rjp,
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/rv>;rt=brski.rv;ct=836,
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/vs>;rt=brski.vs;ct="50 60",
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/es>;rt=brski.es;ct="50 60",
