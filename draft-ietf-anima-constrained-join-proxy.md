@@ -407,10 +407,12 @@ Upon success, the return payload will contain the join-port of the Registrar.
   REQ: GET coap://[IP_address]/.well-known/core?rt=brski.rjp
 
   RES: 2.05 Content
-  <coaps://[IP_address]:join-port>; rt="brski.rjp"
+  <coaps+jpy://[IP_address]:join-port>;rt=brski.rjp
 ~~~~
 
 The discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{RFC9148}}).
+
+The coaps+jpy scheme is registered is defined in {{jpyscheme}}, as per {{RFC7252, Section 6.2}}
 
 ### GRASP discovery
 
@@ -592,6 +594,21 @@ Parameters" registry per the {{RFC6690}} procedure.
                  Join Proxy to query and return Join Proxy specific
                  BRSKI resources of a Registrar.
     Reference: [this document]
+
+## CoAPS+JPY Scheme Registration {#jpyscheme}
+
+
+    Scheme name: coaps+jpy
+    Status: permanent
+    Applications/protocols that use this scheme name: Constrained BRSKI Join Proxy
+    Contact: ANIMA WG
+    Change controller: IESG
+    References: [THIS RFC]
+    Scheme syntax: identical to coaps
+    Scheme semantics: The encapsulation mechanism described in {{stateless-jpy}} is used with coaps.
+    Security considerations: The new encapsulation allows traffic to be returned to a calling node
+       behind a proxy.  The form of the encapsulation can include privacy and integrity protection
+       under the control of the proxy system.
 
 ## service name and port number registry {#dns-sd-spec}
 
