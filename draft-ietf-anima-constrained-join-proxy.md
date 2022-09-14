@@ -410,7 +410,7 @@ Upon success, the return payload will contain the join-port of the Registrar.
   <coaps+jpy://[IP_address]:join-port>;rt=brski.rjp
 ~~~~
 
-In the {{RFC6690}} link format, and {{RFC3986, Section 3.2}}, the authority attribute can not include a port number unless it also includes the IP address.
+In the {{RFC6690}} link format, and {{?RFC3986, Section 3.2}}, the authority attribute can not include a port number unless it also includes the IP address.
 
 The returned join-port is expected to process the encapsulated JPY messages described in section {{stateless-jpy}}.
 The scheme remains coaps, as the inside protocol is still CoAP and DTLS.
