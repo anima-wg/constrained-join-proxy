@@ -12,7 +12,7 @@ Expires: 27 March 2023                            vanderstok consultancy
 
 
            Constrained Join Proxy for Bootstrapping Protocols
-               draft-ietf-anima-constrained-join-proxy-12
+               draft-ietf-anima-constrained-join-proxy-13
 
 Abstract
 
