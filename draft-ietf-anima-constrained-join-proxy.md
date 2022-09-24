@@ -135,12 +135,10 @@ An enrolled Pledge can act as constrained Join Proxy between other Pledges and t
 
 Two modes of the constrained Join Proxy are specified:
 
-    1 A stateful Join Proxy that locally stores IP addresses
-      during the connection.
     1 A stateful Join Proxy that locally stores UDP connection state:
       IP addresses (link-local with interface and non-link-local and UDP port-numbers.
       during the connection.
-    2 A stateless Join Proxy where the connection the state
+    2 A stateless Join Proxy where the connection state
       is replaced by a new proxy header in the
       UDP messages between constrained Join Proxy and Registrar.
 
@@ -164,8 +162,6 @@ Registrar/Coordinator (JRC), Pledge, and Voucher.
 
 In this document, the term "Registrar" is used throughout instead of "Join
 Registrar/Coordinator (JRC)".
-
-The term "installation network" refers to all devices in the installation and the network connections between them. The term "installation IP_address" refers to an address out of the set of addresses which are routable over the whole installation network.
 
 The term "installation" refers to all devices in the network and their interconnections, including Registrar, enrolled nodes with and without constrained Join Proxy functionality and Pledges.
 

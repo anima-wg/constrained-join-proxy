@@ -88,9 +88,9 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   5
-   3.  Requirements Language . . . . . . . . . . . . . . . . . . . .   6
+   3.  Requirements Language . . . . . . . . . . . . . . . . . . . .   5
    4.  constrained Join Proxy functionality  . . . . . . . . . . . .   6
-   5.  constrained Join Proxy specification  . . . . . . . . . . . .   8
+   5.  constrained Join Proxy specification  . . . . . . . . . . . .   7
      5.1.  Stateful Join Proxy . . . . . . . . . . . . . . . . . . .   8
      5.2.  Stateless Join Proxy  . . . . . . . . . . . . . . . . . .  11
      5.3.  JPY Message structure . . . . . . . . . . . . . . . . . .  12
@@ -209,14 +209,14 @@ Internet-Draft                 Join Proxy                 September 2022
 
    Two modes of the constrained Join Proxy are specified:
 
-1 A stateful Join Proxy that locally stores IP addresses
-  during the connection.
 1 A stateful Join Proxy that locally stores UDP connection state:
   IP addresses (link-local with interface and non-link-local and UDP port-numbers.
   during the connection.
-2 A stateless Join Proxy where the connection the state
+2 A stateless Join Proxy where the connection state
   is replaced by a new proxy header in the
   UDP messages between constrained Join Proxy and Registrar.
+
+
 
 
 
@@ -249,11 +249,6 @@ Internet-Draft                 Join Proxy                 September 2022
    In this document, the term "Registrar" is used throughout instead of
    "Join Registrar/Coordinator (JRC)".
 
-   The term "installation network" refers to all devices in the
-   installation and the network connections between them.  The term
-   "installation IP_address" refers to an address out of the set of
-   addresses which are routable over the whole installation network.
-
    The term "installation" refers to all devices in the network and
    their interconnections, including Registrar, enrolled nodes with and
    without constrained Join Proxy functionality and Pledges.
@@ -271,8 +266,13 @@ Internet-Draft                 Join Proxy                 September 2022
    The [RFC8995] Circuit Proxy is referred to as a TCP circuit Join
    Proxy.
 
+3.  Requirements Language
 
-
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
 
 
 
@@ -281,14 +281,6 @@ Richardson, et al.        Expires 27 March 2023                 [Page 5]
 
 Internet-Draft                 Join Proxy                 September 2022
 
-
-3.  Requirements Language
-
-   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in
-   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
-   capitals, as shown here.
 
 4.  constrained Join Proxy functionality
 
@@ -330,14 +322,6 @@ Internet-Draft                 Join Proxy                 September 2022
    discovery of the destination address of the Registrar, the
    constrained Join Proxy is introduced.  This constrained Join Proxy
    functionality is also (auto) configured into all authenticated
-
-
-
-Richardson, et al.        Expires 27 March 2023                 [Page 6]
-
-Internet-Draft                 Join Proxy                 September 2022
-
-
    devices in the network which may act as a constrained Join Proxy for
    Pledges.  The constrained Join Proxy allows for routing of the
    packets from the Pledge using IP routing to the intended Registrar.
@@ -345,6 +329,14 @@ Internet-Draft                 Join Proxy                 September 2022
    address of the Registrar over multiple hops.  The following Section 5
    specifies the two constrained Join Proxy modes.  A comparison is
    presented in Section 7.
+
+
+
+
+Richardson, et al.        Expires 27 March 2023                 [Page 6]
+
+Internet-Draft                 Join Proxy                 September 2022
+
 
    When a mesh network is set up, it consists of a Registrar and a set
    of connected pledges.  No constrained Join Proxies are present.  Only
@@ -384,16 +376,6 @@ Internet-Draft                 Join Proxy                 September 2022
    service.  This specification does not discuss how a constrained Join
    Proxy selects a Registrar when it discovers 2 or more.
 
-
-
-
-
-
-Richardson, et al.        Expires 27 March 2023                 [Page 7]
-
-Internet-Draft                 Join Proxy                 September 2022
-
-
 5.  constrained Join Proxy specification
 
    A Join Proxy can operate in two modes:
@@ -404,6 +386,13 @@ Internet-Draft                 Join Proxy                 September 2022
 
    The advantages and disadvantages of the two modes are presented in
    Section 7.
+
+
+
+Richardson, et al.        Expires 27 March 2023                 [Page 7]
+
+Internet-Draft                 Join Proxy                 September 2022
+
 
    A Join Proxy MUST implement both.  A Registrar MUST implement the
    stateful mode and SHOULD implement the Stateless mode.
@@ -442,6 +431,17 @@ Internet-Draft                 Join Proxy                 September 2022
    address and UDP port number packet header fields of UDP packets that
    it forwards between Pledge and Registrar.  Figure 2 explains this
    mapping state.
+
+
+
+
+
+
+
+
+
+
+
 
 
 
