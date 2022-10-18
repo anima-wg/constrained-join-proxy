@@ -166,9 +166,15 @@ Registrar/Coordinator (JRC)".
 
 The term "installation network" refers to all devices in the installation and the network connections between them. The term "installation IP_address" refers to an address out of the set of addresses which are routable over the whole installation network.
 
+The term "installation" refers to all devices in the network and their interconnections, including Registrar, enrolled nodes with and without constrained Join Proxy functionality and Pledges.
+
+(Installation) IP addresses are assumed to be routeable over the whole installation network except for link-local IP addresses.
+
 The "Constrained Join Proxy" enables a pledge that is multiple hops away from the Registrar, to securely execute the BRSKI protocol {{RFC8995}} over a secure channel.
 
 The term "join Proxy" is used interchangeably with the term "constrained Join Proxy" throughout this document.
+
+The {{RFC8995}} Circuit Proxy is referred to as a TCP circuit Join Proxy.
 
 # Requirements Language {#reqlang}
 
