@@ -35,6 +35,7 @@ venue:
   github: anima-wg/constrained-join-proxy
 
 normative:
+  RFC768:
   RFC6347:
   RFC8366:
   RFC8995:
@@ -211,12 +212,9 @@ The advantages and disadvantages of the two modes are presented in {{jr-comp}}.
 
 In stateful mode, the Join Proxy forwards the DTLS messages to the Registrar.
 
-Assume that the Pledge does not know the IP address of the Registrar it needs to contact.
-The Join Proxy has been enrolled via the Registrar and learns the IP address and port of the Registrar, by using a discovery mechanism such as described in {{jr-disc}}. The Pledge first discovers (see {{jr-disc}}) and selects the most appropriate Join Proxy.
-(Discovery can also be based upon {{RFC8995}} section 4.1).
-The Pledge initiates its request as if the Join Proxy is the intended Registrar. The Join Proxy receives the message at a discoverable join-port.
-The Join Proxy constructs an IP packet by copying the DTLS payload from the message received from the Pledge, and provides source and destination addresses to forward the message to the intended Registrar.
-The Join Proxy stores the 4-tuple array of the messages received from the Registrar and copies it back to the header of the message returned to the Pledge.
+In stateful mode, the Join Proxy acts as a UDP "circuit" proxy that does not
+change the UDP payload (data octets according to {{RFC768}}) but only rewrites
+the IP and UDP headers of each packet it receives from Pledge and Registrar.
 
 In {{fig-statefull2}} the various steps of the message flow are shown, with 5684 being the standard coaps port. The columns "SRc_IP:port" and "Dst_IP:port" show the IP address and port values for the source and destination of the message.
 
