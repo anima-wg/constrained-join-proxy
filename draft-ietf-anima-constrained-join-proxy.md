@@ -114,24 +114,22 @@ CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC6347}} as
 This is known as the "coaps" scheme.
 A constrained version of EST, using Coap and DTLS, is described in {{RFC9148}}.
 
-The {{I-D.ietf-anima-constrained-voucher}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
+The {{I-D.ietf-anima-constrained-voucher}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges that use CoAP.
 
-DTLS is a client-server protocol relying on the underlying IP layer to perform the routing between the DTLS Client and the DTLS Server.
-However, the Pledge will not be IP routable over the mesh network
+However, in networks that require authentication, such as those using {{RFC4944}},
+the Pledge will not be IP routable over the mesh network
 until it is authenticated to the mesh network. A new Pledge can only
 initially use a link-local IPv6 address to communicate with a
 mesh neighbor [RFC6775] until it receives the necessary network
 configuration parameters. The Pledge receives these configuration
 parameters from the Registrar. When the Registrar is not a direct
 neighbor of the Registrar but several hops away, the Pledge
-discovers a neighbor constrained Join Proxy, which transmits the DTLS
-protected request coming from the Pledge
-to the Registrar. The constrained Join Proxy must be enrolled
+discovers a neighbor that is operating the constrained Join Proxy, which
+forwards DTLS protected messages between Pledge and Registrar.
+The constrained Join Proxy must be enrolled
 previously such that the
 message from constrained Join Proxy to Registrar can be routed over
 one or more hops.
-
-During enrollment, a DTLS connection is required between Pledge and Registrar.
 
 An enrolled Pledge can act as constrained Join Proxy between other Pledges and the enrolling Registrar.
 
