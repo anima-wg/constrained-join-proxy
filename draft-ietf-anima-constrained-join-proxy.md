@@ -97,7 +97,13 @@ The Bootstrapping Remote Secure Key Infrastructure (BRSKI) protocol described in
 provides a solution for a secure zero-touch (automated) bootstrap of new (unconfigured) devices.
 In the context of BRSKI, new devices, called "Pledges", are equipped with a factory-installed Initial Device Identifier (IDevID) (see {{ieee802-1AR}}), and are enrolled into a network.
 BRSKI makes use of Enrollment over Secure Transport (EST) {{RFC7030}}
-with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls. In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a constrained Join Proxy. In particular, the underlying IP network is assumed to be a mesh network as described in {{RFC4944}}, although other IP-over-foo networks are not excluded. An example network is shown in {{fig-net}}.
+with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls. 
+
+In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a constrained Join Proxy. 
+In particular, this solution is intended to support mesh networks as described in {{RFC4944}}.
+
+The constrained Join Proxy as specified in this document is one of the Join Proxy
+options referred to in {{RFC8995}} section 2.5.2 as future work.
 
 A complete specification of the terminology is pointed at in {{Terminology}}.
 
