@@ -77,14 +77,18 @@ informative:
 
 --- abstract
 This document extends the work of Bootstrapping Remote Secure Key
-Infrastructures (BRSKI) by replacing the Circuit-proxy between
-Pledge and Registrar by a stateless/stateful constrained Join
-Proxy. The constrained Join Proxy is a mesh neighbor of the
+Infrastructures (BRSKI) by replacing the (stateful) TLS Circuit proxy between
+Pledge and Registrar with a stateless or stateful Circuit proxy using CoAP
+which is called the constrained Join Proxy. The constrained Join Proxy is a mesh neighbor of the
 Pledge and can relay a DTLS session originating from a Pledge with only link-local
 addresses to a Registrar which is not a mesh neighbor of the
 Pledge.
 
-This document defines a protocol to securely assign a Pledge to a domain, represented by a Registrar, using an intermediary node between Pledge and Registrar. This intermediary node is known as a "constrained Join Proxy". An enrolled Pledge can act as a constrained Join Proxy.
+Like the BRSKI Circuit proxy, this constrained Join Proxy eliminates the need of
+Pledges to have routeable IP addresses before enrolment by utilizing link-local
+addresses. Use of the constrained Join Proxy also eliminates the need of the Pledge 
+to authenticate to the network or perform network-wide Registrar discover before enrolment.
+
 --- middle
 
 # Introduction
