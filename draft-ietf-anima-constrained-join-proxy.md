@@ -191,10 +191,10 @@ If the Pledge, knowing the IP-address of the Registrar, initiates a DTLS connect
 
 ~~~~ aasvg
                     multi-hop mesh
-         .---.
-         | R +---.    +----+    +---+        +--+
+         .---.                         IPv6
+         | R +---.    +----+    +---+ subnet +--+
          |   |    \   |6LR +----+ J |........|P |
-         '---'     `--+    |    |   |  clear |  |
+         '---'     `--+    |    |   | clear  |  |
                       +----+    +---+        +--+
        Registrar             Join Proxy     Pledge
 
