@@ -235,21 +235,38 @@ A Join Proxy can operate in two modes:
   * Stateful mode
   * Stateless mode
 
-A Join Proxy MUST implement both. A Registrar MUST implement the stateful mode and SHOULD implement the Stateless mode.
-
-A mechanism to switch between modes is out of scope of this document. It is recommended that a Join Proxy uses only one of these modes at any given moment during an installation lifetime.
-
 The advantages and disadvantages of the two modes are presented in {{jr-comp}}.
 
-## Stateful Join Proxy
+A Join Proxy MUST implement both. A Registrar MUST implement the stateful mode and SHOULD implement the Stateless mode.
 
-In stateful mode, the Join Proxy forwards the DTLS messages to the Registrar.
+For a Join Proxy to be operational, the node on which it is running has to be
+able to talk to a Registrar (exchange UDP messages with it). This can happen
+fully automatically by the Join Proxy node first enrolling itself as a Pledge,
+and then learning the IP address, the UDP port and the mode(s) (Stateful and/or Stateless)
+of the Registrar, through a discovery mechanism such as those described in Section 6.
+Other methods, such as provisioning the Join Proxy are out of scope of this document
+but equally feasible.
+
+Once the Join Proxy is operational, its mode is determined by the mode of the Registrar.
+If the Registrar offers both Stateful and Stateless mode, the Join Proxy MUST use
+the stateless mode.
+
+Independent of the mode of the Join Proxy, the Pledge first discovers (see Section 6)
+and selects the most appropriate Join Proxy. From the discovery, the Pledge learns the
+Join Proxies link-local scope IP address and UDP (join) port.  This discovery can also be
+based upon {{RFC8995}} section 4.1.  If the discovery method does not support discovery
+of the join-port, then the Pledge assumes the default CoAP over DTLS UDP port (5683).
+
+## Stateful Join Proxy {#stateful}
 
 In stateful mode, the Join Proxy acts as a UDP "circuit" proxy that does not
 change the UDP payload (data octets according to {{RFC768}}) but only rewrites
 the IP and UDP headers of each packet it receives from Pledge and Registrar.
 
-In {{fig-statefull2}} the various steps of the message flow are shown, with 5684 being the standard coaps port. The columns "SRc_IP:port" and "Dst_IP:port" show the IP address and port values for the source and destination of the message.
+The stateful join proxy operates as a 'pseudo' UDP circuit proxy creating
+and utilizing connection mapping state to rewrite the IP address and UDP port number
+packet header fields of UDP packets that it forwards between Pledge and Registrar.
+{{fig-statefull2}} depiects how this state is used.
 
 ~~~~
 +------------+------------+-------------+--------------------------+
