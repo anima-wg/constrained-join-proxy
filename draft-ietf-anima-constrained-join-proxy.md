@@ -296,26 +296,33 @@ IP_Jr:p_Jr = Routable IP address and client port of Join Proxy
 ~~~~
 {: #fig-statefull2 title='constrained stateful joining message flow with Registrar address known to Join Proxy.' align="left"}
 
-## Stateless Join Proxy {#jpy-encapsulation-protocol}
-
-The JPY Encapsulation Protocol allows the stateless Join Proxy to minimize memory requirements on a constrained Join Proxy device.
-The use of a stateless operation requires no memory in the Join Proxy device because it stores the state in a special encapsulation in the packet.  This may also reduce the CPU impact as the device does not need to search through a state table.
+Because UDP does not have the notion of a connection, this document
+calls this a 'pseudo' connection, whose establishment is solely
+triggered by receipt of a packet from a pledge with an
+IP_p%IF:p_P source for which no mapping state exists, and that is
+termined by a connection expiry timer E.
 
 If an untrusted Pledge that can only use link-local addressing wants to contact a trusted Registrar, and the Registrar is more than one hop away, it sends its DTLS messages to the Join Proxy.
 
-When a Pledge attempts a DTLS connection to the Join Proxy, it uses its link-local IP address as its IP source address.
-This message is transmitted one-hop to a neighboring (Join Proxy) node.
-Under normal circumstances, this message would be dropped at the neighbor node since the Pledge is not yet IP routable or is not yet authenticated to send messages through the network.
-However, if the neighbor device has the Join Proxy functionality enabled; it routes the DTLS message to its Registrar of choice.
+## Stateless Join Proxy {#jpy-encapsulation-protocol}
 
-The Join Proxy transforms the DTLS message to a JPY message which includes the DTLS data as payload, and sends the JPY message to the join-port of the Registrar.
+Stateless join proxy operation eliminates the need and complexity to
+maintain per UDP connection mapping state on the proxy and the state machinery to build, maintain and
+remove this mapping state. It also removes the need to protect this mapping staate
+against DoS attacks and may also reduce memory and CPU requirements on the proxy.
 
-The JPY message payload consists of two parts:
+Stateless join proxy operations works by introducing a new JPY message payload for messages between Proxy and Registrar, which consists of two parts:
 
-  * Header (H) field: consisting of the source link-local address and port of the Pledge (P), and
-  * Contents (C) field: containing the original DTLS payload.
+  * Header (H) field: the link-local IP address, interface and UDP (source) port of the Pledge (P).
+  * Contents (C) field: the original UDP payload (data octets according to RFC768).
 
-On receiving the JPY message, the Registrar (or proxy) retrieves the two parts.
+When  the join proxy receives a UDP message from a Pledge, it encodes the Pledges
+link-local IP address, interface and UDP (source) port of the packet into the Header field
+and the UDP payload into the Content field and sends the packet to the Registrar from
+a fixed source UDP port. When the Registrar sends packets for the Pledge,
+it MUST return the Header field unchanged, so that the join proxy can decode the
+Header to reconstruct the Pledges link-local IP address, interace and UDP (destination) port
+for the return packet. {{fig-stateless}} shows this per-packet mapping on the join proxy.
 
 The Registrar transiently stores the Header field information.
 The Registrar uses the Contents field to execute the Registrar functionality.
@@ -326,9 +333,16 @@ The Header contains the original source link-local address and port of the Pledg
 On receiving the JPY message, the Join Proxy retrieves the two parts.
 It uses the Header field to route the DTLS message containing the DTLS payload retrieved from the Contents field to the Pledge.
 
-In this scenario, both the Registrar and the Join Proxy use discoverable join-ports, for the Join Proxy this may be a default CoAP port.
+When the Registrar receives such a JPY message, it MUST treat the Header
+H as a single additional opaque identifier for all packets of a UDP connection
+from a Plege: Whereas in the stateful proxy case, all packets with the same
+(IP_jr:p_Jr, IP_R:p_r) belong to a single Pledges UDP connection and hence
+DTLS/CoAP connection, only the packets with the same (IP_jr:p_Jr, IP_R:p_r, H)
+belong to a single Plegdes UDP connection / DTLS/CoAP connection. The
+JPY Content field payload is the UDP payload of the packet for that UDP
+connection. Packets with different H belong to different Pledges UDP connections.
 
-The {{fig-stateless}} depicts the message flow diagram:
+In the stateless join proxy mode, both the Registrar and the Join Proxy use discoverable UDP join-ports. For the Join Proxy this may be a default CoAP port.
 
 ~~~~
 +--------------+------------+---------------+-----------------------+
