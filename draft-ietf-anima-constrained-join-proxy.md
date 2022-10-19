@@ -202,12 +202,13 @@ If the Pledge, knowing the IP-address of the Registrar, initiates a DTLS connect
 ~~~~
 {: #fig-net title='multi-hop enrollment.' align="left"}
 
-Without routing the Pledge cannot establish a secure connection to the Registrar over multiple hops in the network.
+Without a routeable IPv6 address, the Pledge (P) cannot exchange IPv6/UDP/DTLS traffic
+with the Registrar (R), over multiple hops in the network.
 
-Furthermore, the Pledge cannot discover the IP address of the Registrar over multiple hops to initiate a DTLS connection and perform authentication.
+Furthermore, the Pledge may not be able to discover the IP address of the Registrar over multiple hops to initiate a DTLS connection and perform authentication.
 
 To overcome the problems with non-routability of DTLS packets and/or discovery of the destination address of the Registrar, the constrained Join Proxy is introduced.
-This constrained Join Proxy functionality is configured into all authenticated devices in the network which may act as a constrained Join Proxy for Pledges.
+This constrained Join Proxy functionality is also (auto) configured into all authenticated devices in the network which may act as a constrained Join Proxy for Pledges.
 The constrained Join Proxy allows for routing of the packets from the Pledge using IP routing to the intended Registrar. An authenticated constrained Join Proxy can discover the routable IP address of the Registrar over multiple hops.
 The following {{jr-spec}} specifies the two constrained Join Proxy modes. A comparison is presented in {{jr-comp}}.
 
