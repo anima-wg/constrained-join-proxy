@@ -152,7 +152,7 @@ Similar to the difference between storing and non-storing Modes of
 Operations (MOP) in RPL {{RFC6550}}, the stateful and stateless modes differ in the way that they store
 the state required to forward the return packet to the pledge.
 In the stateful method, the
-return forward state is stored in the join proxy.
+return forward state is stored in the Join Proxy.
 In the stateless method, the return forward state is stored in the network using the CoAP extended token in a way identical to that described in {{RFC9031}}.
 
 # Terminology          {#Terminology}
@@ -265,7 +265,7 @@ If the discovery method does not support discovery of the join-port, then the Pl
 
 In stateful mode, the Join Proxy acts as a UDP "circuit" proxy that does not change the UDP payload (data octets according to {{RFC768}}) but only rewrites the IP and UDP headers of each packet it receives from Pledge and Registrar.
 
-The stateful join proxy operates as a 'pseudo' UDP circuit proxy creating and utilizing connection mapping state to rewrite the IP address and UDP port number packet header fields of UDP packets that it forwards between Pledge and Registrar.
+The stateful Join Proxy operates as a 'pseudo' UDP circuit proxy creating and utilizing connection mapping state to rewrite the IP address and UDP port number packet header fields of UDP packets that it forwards between Pledge and Registrar.
 {{fig-statefull2}} depiects how this state is used.
 
 ~~~~
@@ -303,11 +303,11 @@ If an untrusted Pledge that can only use link-local addressing wants to contact 
 
 ## Stateless Join Proxy {#jpy-encapsulation-protocol}
 
-Stateless join proxy operation eliminates the need and complexity to maintain per UDP connection mapping state on the proxy and the state machinery to build, maintain and
+Stateless Join Proxy operation eliminates the need and complexity to maintain per UDP connection mapping state on the proxy and the state machinery to build, maintain and
 remove this mapping state.
 It also removes the need to protect this mapping state against DoS attacks and may also reduce memory and CPU requirements on the proxy.
 
-Stateless join proxy operations works by encapsulating the DTLS messages into a new CoAP header {{RFC7252}}.
+Stateless Join Proxy operations works by encapsulating the DTLS messages into a new CoAP header {{RFC7252}}.
 This new CoAP header is designed to be as minimalistic as possible.
 The use of CoAP here costs a XXX bytes more than a custom encapsulation, but simplies much of the operation, as well as permitting the result to pass through CoAP proxies, CoAP to HTTP proxies, and other mechanisms that might be introduced into a network.
 This also eliminates custom code that is only rarely used, which may reduce bugs.
@@ -330,12 +330,12 @@ The CoAP payload is configured much as {{RFC9031, Section 8.1.1}} specifies:
 
 {{coap-breakout}} shows an example CoAP header, assuming a 16-byte extended token, with the resulting overhead of 28 bytes.
 
-When the join proxy receives a UDP message from a Pledge, it encodes the Pledges link-local IP address, interface and UDP (source) port of the packet into the extended token.
+When the Join Proxy receives a UDP message from a Pledge, it encodes the Pledges link-local IP address, interface and UDP (source) port of the packet into the extended token.
 The result is sent to the Registrar from a fixed source UDP port.
 
 As described in {{RFC7252, Section 5.3.1}}, when the Registrar sends packets for the Pledge, it MUST return the token field unchanged.
-This allows the join proxy to decode the saved pledge state, and reconstruct the Pledges link-local IP address, interace and UDP (destination) port for the return packet.
-{{fig-stateless}} shows this per-packet mapping on the join proxy.
+This allows the Join Proxy to decode the saved pledge state, and reconstruct the Pledges link-local IP address, interace and UDP (destination) port for the return packet.
+{{fig-stateless}} shows this per-packet mapping on the Join Proxy.
 
 The Registrar transiently stores the extended token field information in case it needs to generate additional messages as a result of DTLS processing.
 
@@ -347,7 +347,7 @@ The Header contains the original source link-local address and port of the Pledg
 On receiving the CoAP message, the Join Proxy processes the CoAP header.
 It uses the extended token field to route the payload as a DTLS message to the Pledge.
 
-In the stateless join proxy mode, both the Registrar and the Join Proxy use discoverable UDP join-ports.
+In the stateless Join Proxy mode, both the Registrar and the Join Proxy use discoverable UDP join-ports.
 For the Join Proxy this may be a default CoAP port.
 
 ~~~~
@@ -637,7 +637,7 @@ A malicious node can read the header field of the message sent by the stateless 
 This ability does not yield much more information than the visible addresses transported in the network packets.
 
 It should be noted here that the contents of the CBOR array used to convey return address information is not DTLS protected.
-When the communication between JOIN Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge.
+When the communication between Join Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge.
 These concerns are also expressed in {{RFC8974}}.
 It is also pointed out that the encryption in the source is a local matter.
 Similarly to {{RFC8974}}, the use of AES-CCM {{RFC3610}} with a 64-bit tag is recommended, combined with a sequence number and a replay window.
