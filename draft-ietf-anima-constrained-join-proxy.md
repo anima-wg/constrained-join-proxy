@@ -576,37 +576,16 @@ The discovery of Join-Proxy by the Pledge uses the enhanced beacons as discussed
 The stateful and stateless mode of operation for the Join Proxy have their advantages and disadvantages.
 This section should enable operators to make a choice between the two modes based on the available device resources and network bandwidth.
 
-~~~~
-+-------------+----------------------------+------------------------+
 | Properties  |         Stateful mode      |     Stateless mode     |
-+-------------+----------------------------+------------------------+
-| State       |The Join Proxy needs        | No information is      |
-| Information |additional storage to       | maintained by the Join |
-|             |maintain mapping between    | Proxy. Registrar needs |
-|             |the address and port number | to store the packet    |
-|             |of the Pledge and those     | header.                |
-|             |of the Registrar.           |                        |
-+-------------+----------------------------+------------------------+
-|Packet size  |The size of the forwarded   |Size of the forwarded   |
-|             |message is the same as the  |message is bigger than  |
-|             |original message.           |the original,it includes|
-|             |                            |additional information  |
-+-------------+----------------------------+------------------------+
-|Specification|The Join Proxy needs        |CoAP message to         |
-|complexity   |additional functionality    |encapsulate DTLS payload|
-|             |to maintain state           |The Registrar           |
-|             |information, and specify    |and the Join Proxy      |
-|             |the source and destination  |have to understand the  |
-|             |addresses of the DTLS       |CoAP header in order    |
-|             |handshake messages          |to process it.          |
-+-------------+----------------------------+------------------------+
-| Ports       | Join Proxy needs           |Join Proxy and Registrar|
-|             | discoverable join-port     |need discoverable       |
-|             |                            | join-ports             |
-+-------------+----------------------------+------------------------+
-
-~~~~
-{: #fig-comparison title='Comparison between stateful and stateless mode' align="left"}
+|:----------- |:---------------------------|:-----------------------|
+| State Information |The Join Proxy needs additional storage to maintain mapping between the address and port number of the Pledge and those of the Registrar.  | No information is maintained by the Join Proxy. Registrar needs to store the packet  header.  |
+|-------------
+|Packet size  |The size of the forwarded message is the same as the original message.   |Size of the forwarded message is bigger than the original, it includes additional information  |
+|-------------
+|Specification complexity |The Join Proxy needs additional functionality to maintain state information, and specify the source and destination addresses of the DTLS handshake messages       |CoAP message to encapsulate DTLS payload. The Registrar and the Join Proxy have to understand the CoAP header in order to process it.          |
+|------------
+| Ports       | Join Proxy needs discoverable join-port |Join Proxy and Registrar need discoverable join-ports             |
+|=============
 
 # Security Considerations
 
