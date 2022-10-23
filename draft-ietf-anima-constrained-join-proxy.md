@@ -201,28 +201,39 @@ If the Pledge, knowing the IP-address of the Registrar, initiates a DTLS connect
 Without a routeable IPv6 address, the Pledge (P) cannot exchange IPv6/UDP/DTLS traffic
 with the Registrar (R), over multiple hops in the network.
 
-Furthermore, the Pledge may not be able to discover the IP address of the Registrar over multiple hops to initiate a DTLS connection and perform authentication.
+Furthermore, the Pledge may not even be able to discover the IP address of the Registrar over multiple hops to initiate a DTLS connection and perform authentication.
 
-To overcome the problems with non-routability of DTLS packets and/or discovery of the destination address of the Registrar, the constrained Join Proxy is introduced.
-This constrained Join Proxy functionality is also (auto) configured into all authenticated devices in the network which may act as a constrained Join Proxy for Pledges.
-The constrained Join Proxy allows for routing of the packets from the Pledge using IP routing to the intended Registrar. An authenticated constrained Join Proxy can discover the routable IP address of the Registrar over multiple hops.
-The following {{jr-spec}} specifies the two constrained Join Proxy modes. A comparison is presented in {{jr-comp}}.
+To overcome the problems with non-routability of DTLS packets and the discovery of the destination address of the Registrar, the constrained Join Proxy is introduced.
+This constrained Join Proxy functionality is also (auto) configured into all authenticated devices in the network which may act as a constrained Join Proxy for
+Pledges.
 
-When a mesh network is set up, it consists of a Registrar and a set of connected pledges. No constrained Join Proxies are present.  Only some of these pledges may be neighbors of the Registrar. Others would need for their traffic to be routed across one or more enrolled devices to reach the Registrar.
+The constrained Join Proxy allows for routing of the packets from the Pledge using IP routing to the intended Registrar.
+An authenticated constrained Join Proxy can discover the routable IP address of the Registrar over multiple hops.
+The following {{jr-spec}} specifies the two constrained Join Proxy modes.
+A comparison is presented in {{jr-comp}}.
 
-The desired state of the installation is a network with a Registrar and all Pledges becoming enrolled devices. Some of these enrolled devices can act as constrained Join Proxies. Pledges can only employ link-local communication until they are enrolled. A Pledge will regularly try to discover a constrained Join Proxy or a Registrar with link-local discovery requests. The Pledges which are neighbors of the Registrar will discover the Registrar and be enrolled following the constrained BRSKI protocol. An enrolled device can act as constrained Join Proxy. The Pledges which are not a neighbor of the Registrar will eventually discover a constrained Join Proxy and follow the constrained BRSKI protocol to be enrolled. While this goes on, more and more constrained Join Proxies with a larger hop distance to the Registrar will emerge. The network should be configured such that at the end of the enrollment process, all pledges have discovered a neighboring constrained Join Proxy or the Registrar, and all Pledges are enrolled.
+When a mesh network is set up, it consists of a Registrar and a set of connected pledges.
+No constrained Join Proxies are present.
+Only some of these pledges may be neighbors of the Registrar.
+Others would need for their traffic to be routed across one or more enrolled devices to reach the Registrar.
 
-The constrained Join Proxy is as a packet-by-packet proxy for UDP packets between Pledge and
-Registrar. The constrained BRSKI protocol between Pledge and Registrar described in
-{{I-D.ietf-anima-constrained-voucher}} which this Join Proxy supports
-uses UDP messages with DTLS payload, but the Join Proxy as described here is unaware
-of this payload. It can therefore potentially also work for other UDP based protocols
-as long as they are agnostic to (or can be made to work with) the change of IP header
-by the constrained Join Proxy.
+The desired state of the installation is a network with a Registrar and all Pledges becoming enrolled devices.
+Some of these enrolled devices can act as constrained Join Proxies.
+Pledges can only employ link-local communication until they are enrolled.
+A Pledge will regularly try to discover a constrained Join Proxy or a Registrar with link-local discovery requests.
+The Pledges which are neighbors of the Registrar will discover the Registrar and be enrolled following the constrained BRSKI protocol.
+An enrolled device can act as constrained Join Proxy.
+The Pledges which are not a neighbor of the Registrar will eventually discover a constrained Join Proxy and follow the constrained BRSKI protocol to be enrolled.
+While this goes on, more and more constrained Join Proxies with a larger hop distance to the Registrar will emerge.
+The network should be configured such that at the end of the enrollment process, all pledges have discovered a neighboring constrained Join Proxy or the Registrar, and all Pledges are enrolled.
+
+The constrained Join Proxy is as a packet-by-packet proxy for UDP packets between Pledge and Registrar.
+The constrained BRSKI protocol between Pledge and Registrar described in {{I-D.ietf-anima-constrained-voucher}} which this Join Proxy supports uses UDP messages with DTLS payload, but the Join Proxy as described here is unaware of this payload.
+It can therefore potentially also work for other UDP based protocols as long as they are agnostic to (or can be made to work with) the change of IP header by the constrained Join Proxy.
 
 In both Stateless and Stateful mode, the Join Proxy needs to be configured with
-or dynamically discover a Registrar to perform its service. This specification does not
-discuss how a constrained Join Proxy selects a Registrar when it discovers 2 or more.
+or dynamically discover a Registrar to perform its service.
+This specification does not discuss how a constrained Join Proxy selects a Registrar when it discovers 2 or more.
 
 # constrained Join Proxy specification {#jr-spec}
 
@@ -233,35 +244,27 @@ A Join Proxy can operate in two modes:
 
 The advantages and disadvantages of the two modes are presented in {{jr-comp}}.
 
-A Join Proxy MUST implement both. A Registrar MUST implement the stateful mode and SHOULD implement the Stateless mode.
+A Join Proxy MUST implement both.
+A Registrar MUST implement the stateful mode and SHOULD implement the Stateless mode.
 
 For a Join Proxy to be operational, the node on which it is running has to be
-able to talk to a Registrar (exchange UDP messages with it). This can happen
-fully automatically by the Join Proxy node first enrolling itself as a Pledge,
-and then learning the IP address, the UDP port and the mode(s) (Stateful and/or Stateless)
-of the Registrar, through a discovery mechanism such as those described in Section 6.
-Other methods, such as provisioning the Join Proxy are out of scope of this document
-but equally feasible.
+able to talk to a Registrar (exchange UDP messages with it).
+This can happen fully automatically by the Join Proxy node first enrolling itself as a Pledge, and then learning the IP address, the UDP port and the mode(s) (Stateful and/or Stateless) of the Registrar, through a discovery mechanism such as those described in Section 6.
+Other methods, such as provisioning the Join Proxy are out of scope of this document but equally feasible.
 
 Once the Join Proxy is operational, its mode is determined by the mode of the Registrar.
-If the Registrar offers both Stateful and Stateless mode, the Join Proxy MUST use
-the stateless mode.
+If the Registrar offers both Stateful and Stateless mode, the Join Proxy MUST use the stateless mode.
 
-Independent of the mode of the Join Proxy, the Pledge first discovers (see Section 6)
-and selects the most appropriate Join Proxy. From the discovery, the Pledge learns the
-Join Proxies link-local scope IP address and UDP (join) port.  This discovery can also be
-based upon {{RFC8995}} section 4.1.  If the discovery method does not support discovery
-of the join-port, then the Pledge assumes the default CoAP over DTLS UDP port (5683).
+Independent of the mode of the Join Proxy, the Pledge first discovers (see Section 6) and selects the most appropriate Join Proxy.
+From the discovery, the Pledge learns the Join Proxies link-local scope IP address and UDP (join) port.
+This discovery can also be based upon {{RFC8995}} section 4.1.
+If the discovery method does not support discovery of the join-port, then the Pledge assumes the default CoAP over DTLS UDP port (5683).
 
 ## Stateful Join Proxy {#stateful}
 
-In stateful mode, the Join Proxy acts as a UDP "circuit" proxy that does not
-change the UDP payload (data octets according to {{RFC768}}) but only rewrites
-the IP and UDP headers of each packet it receives from Pledge and Registrar.
+In stateful mode, the Join Proxy acts as a UDP "circuit" proxy that does not change the UDP payload (data octets according to {{RFC768}}) but only rewrites the IP and UDP headers of each packet it receives from Pledge and Registrar.
 
-The stateful join proxy operates as a 'pseudo' UDP circuit proxy creating
-and utilizing connection mapping state to rewrite the IP address and UDP port number
-packet header fields of UDP packets that it forwards between Pledge and Registrar.
+The stateful join proxy operates as a 'pseudo' UDP circuit proxy creating and utilizing connection mapping state to rewrite the IP address and UDP port number packet header fields of UDP packets that it forwards between Pledge and Registrar.
 {{fig-statefull2}} depiects how this state is used.
 
 ~~~~
@@ -292,33 +295,24 @@ IP_Jr:p_Jr = Routable IP address and client port of Join Proxy
 ~~~~
 {: #fig-statefull2 title='constrained stateful joining message flow with Registrar address known to Join Proxy.' align="left"}
 
-Because UDP does not have the notion of a connection, this document
-calls this a 'pseudo' connection, whose establishment is solely
-triggered by receipt of a packet from a pledge with an
-IP_p%IF:p_P source for which no mapping state exists, and that is
+Because UDP does not have the notion of a connection, this document calls this a 'pseudo' connection, whose establishment is solely triggered by receipt of a packet from a pledge with an IP_p%IF:p_P source for which no mapping state exists, and that is
 termined by a connection expiry timer E.
 
 If an untrusted Pledge that can only use link-local addressing wants to contact a trusted Registrar, and the Registrar is more than one hop away, it sends its DTLS messages to the Join Proxy.
 
 ## Stateless Join Proxy {#jpy-encapsulation-protocol}
 
-Stateless join proxy operation eliminates the need and complexity to
-maintain per UDP connection mapping state on the proxy and the state machinery to build, maintain and
-remove this mapping state. It also removes the need to protect this mapping staate
-against DoS attacks and may also reduce memory and CPU requirements on the proxy.
+Stateless join proxy operation eliminates the need and complexity to maintain per UDP connection mapping state on the proxy and the state machinery to build, maintain and
+remove this mapping state.
+It also removes the need to protect this mapping staate against DoS attacks and may also reduce memory and CPU requirements on the proxy.
 
 Stateless join proxy operations works by introducing a new JPY message payload for messages between Proxy and Registrar, which consists of two parts:
 
   * Header (H) field: the link-local IP address, interface and UDP (source) port of the Pledge (P).
   * Contents (C) field: the original UDP payload (data octets according to RFC768).
 
-When  the join proxy receives a UDP message from a Pledge, it encodes the Pledges
-link-local IP address, interface and UDP (source) port of the packet into the Header field
-and the UDP payload into the Content field and sends the packet to the Registrar from
-a fixed source UDP port. When the Registrar sends packets for the Pledge,
-it MUST return the Header field unchanged, so that the join proxy can decode the
-Header to reconstruct the Pledges link-local IP address, interace and UDP (destination) port
-for the return packet. {{fig-stateless}} shows this per-packet mapping on the join proxy.
+When  the join proxy receives a UDP message from a Pledge, it encodes the Pledges link-local IP address, interface and UDP (source) port of the packet into the Header field and the UDP payload into the Content field and sends the packet to the Registrar from a fixed source UDP port.
+When the Registrar sends packets for the Pledge, it MUST return the Header field unchanged, so that the join proxy can decode the Header to reconstruct the Pledges link-local IP address, interace and UDP (destination) port for the return packet. {{fig-stateless}} shows this per-packet mapping on the join proxy.
 
 The Registrar transiently stores the Header field information.
 The Registrar uses the Contents field to execute the Registrar functionality.
@@ -329,14 +323,8 @@ The Header contains the original source link-local address and port of the Pledg
 On receiving the JPY message, the Join Proxy retrieves the two parts.
 It uses the Header field to route the DTLS message containing the DTLS payload retrieved from the Contents field to the Pledge.
 
-When the Registrar receives such a JPY message, it MUST treat the Header
-H as a single additional opaque identifier for all packets of a UDP connection
-from a Plege: Whereas in the stateful proxy case, all packets with the same
-(IP_jr:p_Jr, IP_R:p_r) belong to a single Pledges UDP connection and hence
-DTLS/CoAP connection, only the packets with the same (IP_jr:p_Jr, IP_R:p_r, H)
-belong to a single Plegdes UDP connection / DTLS/CoAP connection. The
-JPY Content field payload is the UDP payload of the packet for that UDP
-connection. Packets with different H belong to different Pledges UDP connections.
+When the Registrar receives such a JPY message, it MUST treat the Header H as a single additional opaque identifier for all packets of a UDP connection from a Plege: Whereas in the stateful proxy case, all packets with the same (IP_jr:p_Jr, IP_R:p_r) belong to a single Pledges UDP connection and hence DTLS/CoAP connection, only the packets with the same (IP_jr:p_Jr, IP_R:p_r, H) belong to a single Plegdes UDP connection / DTLS/CoAP connection.
+The JPY Content field payload is the UDP payload of the packet for that UDP connection. Packets with different H belong to different Pledges UDP connections.
 
 In the stateless join proxy mode, both the Registrar and the Join Proxy use discoverable UDP join-ports. For the Join Proxy this may be a default CoAP port.
 
@@ -456,7 +444,7 @@ In order to accomodate automatic configuration of the Join-Proxy, it must discov
 ### CoAP discovery {#coap-disc}
 
 {{Section 10.2.2 of I-D.ietf-anima-constrained-voucher}} describes how to use CoAP Discovery.
-The stateless Join Proxy requires a different end point that can accept the JPY encapsulation.
+The stateless Join Proxy requires a different end point that can accept the JPYencapsulation.
 
 The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt) parameter with the value "brski.rjp" {{RFC6690}}.
 Upon success, the return payload will contain the join-port of the Registrar.
@@ -536,11 +524,10 @@ When doing constrained onboarding with DTLS as security, the Pledge will always 
 ### CoAP discovery {#jp-disc}
 
 In the context of a coap network without Autonomic Network support, discovery follows the standard coap policy.
-The Pledge can discover a Join Proxy by sending a link-local multicast message to ALL CoAP Nodes with address FF02::FD. Multiple or no nodes may respond. The handling of multiple responses and the absence of responses follow section 4 of {{RFC8995}}.
+The Pledge can discover a Join Proxy by sending a link-local multicast message to ALL CoAP Nodes with address FF02::FD. Multiple or no nodes may respond.
+The handling of multiple responses and the absence of responses follow section 4 of {{RFC8995}}.
 
-The join-port of the Join Proxy is discovered by
-sending a GET request to "/.well-known/core" including a resource type (rt)
-parameter with the value "brski.jp" {{RFC6690}}.
+The join-port of the Join Proxy is discovered by sending a GET request to "/.well-known/core" including a resource type (rt) parameter with the value "brski.jp" {{RFC6690}}.
 Upon success, the return payload will contain the join-port.
 
 The example below shows the discovery of the join-port of the Join Proxy.
@@ -586,9 +573,8 @@ The discovery of Join-Proxy by the Pledge uses the enhanced beacons as discussed
 
 # Comparison of stateless and stateful modes {#jr-comp}
 
-The stateful and stateless mode of operation for the Join Proxy have
-their advantages and disadvantages.
-This section should enable operators to make a choice between the two modes based  on the available device resources and network bandwidth.
+The stateful and stateless mode of operation for the Join Proxy have their advantages and disadvantages.
+This section should enable operators to make a choice between the two modes based on the available device resources and network bandwidth.
 
 ~~~~
 +-------------+----------------------------+------------------------+
@@ -638,18 +624,31 @@ A malicious constrained Join Proxy has a number of routing possibilities:
 
    * It uses the request from the pledge to appropriate the pledge certificate, but then it still needs to acquire the private key of the pledge. This, too, is assumed to be highly unlikely.
 
-   * A malicious node can construct an invalid Join Proxy message. Suppose, the destination port is the coaps port. In that case, a Join Proxy can accept the message and add the routing addresses without checking the payload. The Join Proxy then routes it to the Registrar. In all cases, the Registrar needs to receive the message at the join-port, checks that the message consists of two parts and uses the DTLS payload to start the BRSKI procedure. It is highly unlikely that this malicious payload will lead to node acceptance.
+   * A malicious node can construct an invalid Join Proxy message.
+Suppose, the destination port is the coaps port.
+In that case, a Join Proxy can accept the message and add the routing addresses without checking the payload.
+The Join Proxy then routes it to the Registrar.
+In all cases, the Registrar needs to receive the message at the join-port, checks that the message consists of two parts and uses the DTLS payload to start the BRSKI procedure.
+It is highly unlikely that this malicious payload will lead to node acceptance.
 
-  * A malicious node can sniff the messages routed by the constrained Join Proxy. It is very unlikely that the malicious node can decrypt the DTLS payload. A malicious node can read the header field of the message sent by the stateless Join Proxy. This ability does not yield much more information than the visible addresses transported in the network packets.
+  * A malicious node can sniff the messages routed by the constrained Join Proxy.
+It is very unlikely that the malicious node can decrypt the DTLS payload.
+A malicious node can read the header field of the message sent by the stateless Join Proxy.
+This ability does not yield much more information than the visible addresses transported in the network packets.
 
-It should be noted here that the contents of the CBOR array used to convey return address information is not DTLS protected. When the communication between JOIN Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge. These concerns are also expressed in {{RFC8974}}. It is also pointed out that the encryption in the source is a local matter. Similarly to {{RFC8974}}, the use of AES-CCM {{RFC3610}} with a 64-bit tag is recommended, combined with a sequence number and a replay window.
+It should be noted here that the contents of the CBOR array used to convey return address information is not DTLS protected.
+When the communication between JOIN Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge.
+These concerns are also expressed in {{RFC8974}}.
+It is also pointed out that the encryption in the source is a local matter.
+Similarly to {{RFC8974}}, the use of AES-CCM {{RFC3610}} with a 64-bit tag is recommended, combined with a sequence number and a replay window.
 
-If such scenario needs to be avoided, the constrained Join
-Proxy MUST encrypt the CBOR array using a locally generated symmetric
-key. The Registrar is not able to examine the encrypted result, but
-does not need to. The Registrar stores the encrypted header in the return packet without modifications. The constrained Join Proxy can decrypt the contents to route the message to the right destination.
+If such scenario needs to be avoided, the constrained Join Proxy MUST encrypt the CBOR array using a locally generated symmetric key.
+The Registrar is not able to examine the encrypted result, but does not need to.
+The Registrar stores the encrypted header in the return packet without modifications.
+The constrained Join Proxy can decrypt the contents to route the message to the right destination.
 
-In some installations, layer 2 protection is provided between all member pairs of the mesh. In such an environment encryption of the CBOR array is unnecessary because the layer 2 protection already provide it.
+In some installations, layer 2 protection is provided between all member pairs of the mesh.
+In such an environment encryption of the CBOR array is unnecessary because the layer 2 protection already provide it.
 
 # IANA Considerations
 
@@ -687,8 +686,7 @@ Parameters" registry per the {{RFC6690}} procedure.
 
 ## service name and port number registry {#dns-sd-spec}
 
-This specification registers two service names under the "Service Name and Transport Protocol Port
-Number" registry.
+This specification registers two service names under the "Service Name and Transport Protocol Port Number" registry.
 
     Service Name: brski-jp
     Transport Protocol(s): udp
