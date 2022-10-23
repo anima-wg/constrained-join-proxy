@@ -540,7 +540,7 @@ The example below shows the discovery of the join-port of the Join Proxy.
 ~~~~
 
 Port numbers are assumed to be the default numbers 5683 and 5684 for coap and coaps respectively (sections 12.6 and 12.7 of {{RFC7252}}) when not shown in the response.
-Discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{RFC9148}}).
+Discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 4.1 of {{RFC9148}}).
 
 ### GRASP discovery
 
