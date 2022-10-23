@@ -39,7 +39,6 @@ normative:
   RFC6347:
   RFC8366:
   RFC8995:
-  RFC9032:
   RFC9147:
   RFC9148:
   I-D.ietf-anima-constrained-voucher:
@@ -74,6 +73,7 @@ informative:
   RFC8974:
   RFC6550:
   RFC8610:
+  RFC9032:
 
 --- abstract
 This document extends the work of Bootstrapping Remote Secure Key
