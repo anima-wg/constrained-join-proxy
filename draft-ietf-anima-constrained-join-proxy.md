@@ -57,6 +57,7 @@ normative:
     author:
     rc: "IANA"
     date: 2021-10-19
+  RFC7252:
 
 informative:
   I-D.richardson-anima-state-for-joinrouter:
@@ -68,7 +69,6 @@ informative:
   I-D.kumar-dice-dtls-relay:
   RFC4944:
   RFC3610:
-  RFC7252:
   RFC6775:
   RFC7959:
   RFC8974:
@@ -250,6 +250,11 @@ A Registrar MUST implement the stateful mode and SHOULD implement the Stateless 
 For a Join Proxy to be operational, the node on which it is running has to be
 able to talk to a Registrar (exchange UDP messages with it).
 This can happen fully automatically by the Join Proxy node first enrolling itself as a Pledge, and then learning the IP address, the UDP port and the mode(s) (Stateful and/or Stateless) of the Registrar, through a discovery mechanism such as those described in Section 6.
+
+In mesh LLN networks like those based upon RPL ({{RFC6550}}), it would not be unusual for the 6LBR (the DODAG root) to have a wired network interface on which the Registrar can be found.
+Or the Registrar may in fact be co-located with the 6LBR.
+This 6LBR then becomes the first Join Proxy, and additional nodes attach to it in a concentric fashion.
+
 Other methods, such as provisioning the Join Proxy are out of scope of this document but equally feasible.
 
 Once the Join Proxy is operational, its mode is determined by the mode of the Registrar.
@@ -304,29 +309,50 @@ If an untrusted Pledge that can only use link-local addressing wants to contact 
 
 Stateless join proxy operation eliminates the need and complexity to maintain per UDP connection mapping state on the proxy and the state machinery to build, maintain and
 remove this mapping state.
-It also removes the need to protect this mapping staate against DoS attacks and may also reduce memory and CPU requirements on the proxy.
+It also removes the need to protect this mapping state against DoS attacks and may also reduce memory and CPU requirements on the proxy.
 
-Stateless join proxy operations works by introducing a new JPY message payload for messages between Proxy and Registrar, which consists of two parts:
+Stateless join proxy operations works by encapsulating the DTLS messages into a new CoAP header {{RFC7252}}.
+This new CoAP header is designed to be as minimalistic as possible.
+The use of CoAP here costs a XXX bytes more than a custom encapsulation, but simplies much of the operation, as well as permitting the result to pass through CoAP proxies, CoAP to HTTP proxies, and other mechanisms that might be introduced into a network.
+This also eliminates custom code that is only rarely used, which may reduce bugs.
 
-  * Header (H) field: the link-local IP address, interface and UDP (source) port of the Pledge (P).
-  * Contents (C) field: the original UDP payload (data octets according to RFC768).
+The CoAP payload is configured much as {{RFC9031, Section 8.1.1}} specifies:
 
-When  the join proxy receives a UDP message from a Pledge, it encodes the Pledges link-local IP address, interface and UDP (source) port of the packet into the Header field and the UDP payload into the Content field and sends the packet to the Registrar from a fixed source UDP port.
-When the Registrar sends packets for the Pledge, it MUST return the Header field unchanged, so that the join proxy can decode the Header to reconstruct the Pledges link-local IP address, interace and UDP (destination) port for the return packet. {{fig-stateless}} shows this per-packet mapping on the join proxy.
+   * The request method is POST.
 
-The Registrar transiently stores the Header field information.
-The Registrar uses the Contents field to execute the Registrar functionality.
-However, when the Registrar replies, it also extends its DTLS message with the header field in a JPY message and sends it back to the Join Proxy.
+   * The type is Confirmable (CON).
+
+   * The Proxy-Scheme option is set to "coap".
+
+   * No Uri_Host option is included, as none is technically required.
+
+   * No Uri-Path option is included.
+
+   * The payload is the DTLS payload as received from the pledge.
+
+   * An extended token {{RFC8974}} is included to contain some encrypted state that allows replies to be returned to the pledge.
+
+{{coap-breakout}} shows an example CoAP header, assuming a 16-byte extended token, with the resulting overhead of 28 bytes.
+
+When the join proxy receives a UDP message from a Pledge, it encodes the Pledges link-local IP address, interface and UDP (source) port of the packet into the extended token.
+The result is sent to the Registrar from a fixed source UDP port.
+
+As described in {{RFC7252, Section 5.3.1}}, when the Registrar sends packets for the Pledge, it MUST return the token field unchanged.
+This allows the join proxy to decode the saved pledge state, and reconstruct the Pledges link-local IP address, interace and UDP (destination) port for the return packet.
+{{fig-stateless}} shows this per-packet mapping on the join proxy.
+
+The Registrar transiently stores the extended token field information in case it needs to generate additional messages as a result of DTLS processing.
+
+The Registrar uses the payload field to execute the Registrar functionality.
+
 The Registrar SHOULD NOT assume that it can decode the Header Field, it should simply repeat it when responding.
 The Header contains the original source link-local address and port of the Pledge from the transient state stored earlier and the Contents field contains the DTLS payload.
 
-On receiving the JPY message, the Join Proxy retrieves the two parts.
-It uses the Header field to route the DTLS message containing the DTLS payload retrieved from the Contents field to the Pledge.
+On receiving the CoAP message, the Join Proxy processes the CoAP header.
+It uses the extended token field to route the payload as a DTLS message to the Pledge.
 
-When the Registrar receives such a JPY message, it MUST treat the Header H as a single additional opaque identifier for all packets of a UDP connection from a Plege: Whereas in the stateful proxy case, all packets with the same (IP_jr:p_Jr, IP_R:p_r) belong to a single Pledges UDP connection and hence DTLS/CoAP connection, only the packets with the same (IP_jr:p_Jr, IP_R:p_r, H) belong to a single Plegdes UDP connection / DTLS/CoAP connection.
-The JPY Content field payload is the UDP payload of the packet for that UDP connection. Packets with different H belong to different Pledges UDP connections.
-
-In the stateless join proxy mode, both the Registrar and the Join Proxy use discoverable UDP join-ports. For the Join Proxy this may be a default CoAP port.
+In the stateless join proxy mode, both the Registrar and the Join Proxy use discoverable UDP join-ports.
+For the Join Proxy this may be a default CoAP port.
 
 ~~~~
 +--------------+------------+---------------+-----------------------+
@@ -360,41 +386,21 @@ JPY[H(),C()] = Join Proxy message with header H and content C
 ~~~~
 {: #fig-stateless title='constrained stateless joining message flow.' align="left"}
 
-## Stateless Message structure {#stateless-jpy}
-
-The JPY message is constructed as a payload directly above UDP.
-There is no CoAP or DTLS layer as both are within the relayed payload.
-
-Header and Contents fields together are consist of one CBOR {{RFC8949}} array of 2 elements, explained in CDDL {{RFC8610}}:
-
-   1. The context payload.  This is a CBOR byte string. It SHOULD be between 8 and 32 bytes in size.
-   2. Content field: containing the DTLS payload as a CBOR byte string.
-
-~~~
-    JPY_message =
-    [
-       pledge_context_message : bstr,
-       content   : bstr
-    ]
-
-~~~
-{: #fig-cddl title='CDDL representation of JPY message' align="left"}
+## Constraucting the extended token  {#stateless-jpy}
 
 The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type.
 The contents are DTLS encrypted.
 
-The context payload is to be reflected by the Registrar when sending reply packets to the Join Proxy.
-The context payload is not standardized.
-It is to be used by the Join Proxy to record which pledge the traffic came from.
+The extended token payload is to be reflected by the Registrar when sending reply packets to the Join Proxy.
+The extended token content is not standardized, but this section provides an non-normative example.
 
-The Join Proxy SHOULD encrypt this context with a symmetric key known only to the Join Proxy.
+As explained in {{RFC8974, Section 5.2}}, the Join Proxy SHOULD encrypt the extended token with a symmetric key known only to the Join Proxy.
 This key need not persist on a long term basis, and MAY be changed periodically.
-The considerations of  {{Section 5.2 of RFC8974}} apply.
 
 This is intended to be identical to the mechanism described in {{Section 7.1 of RFC9031}}.
-However, since the CoAP layer is inside of the DTLS layer (which is between the Pledge and the Registrar), it is not possible for the Join Proxy to act as a CoAP proxy.
+However, since the CoAP layer is inside of the DTLS layer (which is between the Pledge and the Registrar), it is not possible for the Join Proxy to act as an actual CoAP proxy.
 
-A typical context parameter might be constructed with the following CDDL grammar:
+The context that is stored into the extended token might be constructed with the following CDDL grammar:
 (This is illustrative only: the contents are not subject to standardization)
 
 ~~~~
@@ -408,7 +414,7 @@ A typical context parameter might be constructed with the following CDDL grammar
 
 This results in a total of 96 bits, or 12 bytes.
 The structure stores the srcport, the originating IPv6 Link-Local address, the IPv4/IPv6 family (as a single bit) and an ifindex to provide the link-local scope.
-This fits nicely into a single AES128 CBC block for instance, resulting in a 16 byte context message.
+This fits nicely into a single AES128 CBC block for instance, resulting in a 16 byte token.
 The Join Proxy MUST maintain the same context block for all communications from the same pledge.
 This implies that any encryption key either does not change during the communication, or that when it does, it is acceptable to break any onboarding connections which have not yet completed.
 If using a context parameter like defined above, it should be easy for the Join Proxy to meet this requirement without maintaining any local state about the pledge.
@@ -416,22 +422,23 @@ If using a context parameter like defined above, it should be easy for the Join 
 Note: when IPv6 is used only the lower 64-bits of the origin IP need to be recorded, because they are all IPv6 Link-Local addresses, so the upper 64-bits are just "fe80::". For IPv4, a Link-Local IPv4 address {{?RFC3927}} would be used, and it would fit into 64-bits.
 On media where the IID is not 64-bits, a different arrangement will be necessary.
 
-For the JPY messages relayed to the Registrar, the Join Proxy SHOULD use the same UDP source port for the JPY messages related to all pledges.
+For the join messages relayed to a particular Registrar, the Join Proxy SHOULD use the same UDP source port for all messages related to all pledges.
 A Join Proxy MAY change the UDP source port, but doing so creates more local state.
-A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible in the future) could, for instance, use different source port numbers to demultiplex connections across CPUs.
+But, a Join Proxy with multiple CPUs (unlikely in a constrained system, but possible in some future) could, for instance, use different source port numbers to demultiplex connections across CPUs.
 
 ### Processing by Registrar
 
-On reception of a JPY message by the Registrar, the Registrar MUST verify that the number of array elements is 2 or more.
-The pledge_content field must be provided as input to a DTLS library {{RFC9147}}, which along with the 5-tuple of the UDP connection provides enough context for the Registrar to pick an appropriate context.
+On reception of a CoAP encapsulated join message by the Registrar, the Registrar processes the CoAP header and extracts the extended token.
+The extended token will need to be provided as input to a DTLS library {{RFC9147}}, as the 5-tuple of the UDP connection alone does not provide enough context for the Registrar to pick an appropriate context.
 Note that the socket will need to be used for multiple DTLS flows, which is atypical for how DTLS usually uses sockets.
-The pledge\_context\_message can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of of per session context.
-The pledge\_context\_message needs to be linked to the DTLS context, and when DTLS records need to be sent, then the pledge\_context\_message needs to be prepended to the data that is sent.
+
+As an alternative, the Registrar could split out the state processing from the DTLS processing, creating new sockets that it maintains, but this just duplicates state across many places.
+It may still be an advantage for some architectures.
 
 Examples are shown in {{examples}}.
 
 At the CoAP level, within the Constrained BRSKI and the EST-COAP {{RFC9148}} level, the block option {{RFC7959}} is often used.
-The Registrar and the Pledge MUST select a block size that would allow the addition of the JPY\_message header without violating MTU sizes.
+The Registrar and the Pledge MUST select a block size that would allow the addition of the additional CoAP header without violating MTU sizes.
 
 # Discovery {#jr-disc}
 
@@ -788,7 +795,32 @@ Their draft has served as a basis for this document.
 
 --- back
 
-#Stateless Proxy payload examples {#examples}
+# Stateless CoAP payload examples {#coap-breakout}
+
+This section shows how the CoAP header is arranged by the stateless proxy.
+
+~~~~
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |Ver|T=0|TKL=13 | Code=0.02 POST|          Message ID           |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |0 0 0 0 0 0 1 1|
+   |               16-bytes of extended token                      |
+   |                                                               |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |1 1 0 1 0 1 0 0|0 0 0 1 1 0 1 0| four bytes: "coap"            |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |1 1 1 1 1 1 1 1|    Payload (DTLS contents)
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+~~~~
+
+The Option is Proxy-Scheme, with a value 39, and must be encoded as an Option Delta of 13, followed by a single byte of (39-13=) 26.
+
+The total size of the header is 4,1+16,6,1 is 28 bytes.
+A CBOR header would have taken 4+16 bytes or 20 bytes, for a difference of 8 bytes.
+
+# Stateless Proxy payload examples {#examples}
 
 The examples show the request "GET coaps://192.168.1.200:5965/est/crts" to a Registrar. The header generated between Join Proxy and Registrar and from Registrar to Join Proxy are shown in detail. The DTLS payload is not shown.
 
