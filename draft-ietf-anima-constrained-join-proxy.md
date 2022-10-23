@@ -451,38 +451,35 @@ In order to accomodate automatic configuration of the Join-Proxy, it must discov
 ### CoAP discovery {#coap-disc}
 
 {{Section 10.2.2 of I-D.ietf-anima-constrained-voucher}} describes how to use CoAP Discovery.
-The stateless Join Proxy requires a different end point that can accept the JPYencapsulation.
+The stateless Join Proxy requires a different end point that can accept the second CoAP header encapsulation and extended token.
 
 The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt) parameter with the value "brski.rjp" {{RFC6690}}.
-Upon success, the return payload will contain the join-port of the Registrar.
+Upon success, the return payload will contain a port that contain process the CoAP encalsulated DTLS messages.
 
 ~~~~
   REQ: GET /.well-known/core?rt=brski.rjp
 
   RES: 2.05 Content
-  <coaps+jpy://[IP_address]:join-port>;rt=brski.rjp
+  <coap://[IP_address]:join-port>;rt=brski.rjp
 ~~~~
 
 In the {{RFC6690}} link format, and {{?RFC3986, Section 3.2}}, the authority attribute can not include a port number unless it also includes the IP address.
 
-The returned join-port is expected to process the encapsulated JPY messages described in section {{stateless-jpy}}.
-The scheme remains coaps, as the inside protocol is still CoAP and DTLS.
+The returned join-port is expected to process the CoAP encapsulated DTLS messages described in section {{stateless-jpy}}.
+The scheme is now coap, as the outside protocol is CoAP and could be subject to further CoAP operations.
 
-An EST/Registrar server running at address ```2001:db8:0:abcd::52```, with the JPY process on port 7634, and the stateful Registrar on port 5683 could reply to a multicast query as follows:
+An EST/Registrar server running at address ```2001:db8:0:abcd::52```, with the
+CoAP processing on port 7634, and the stateful Registrar on port 5683 could reply to a multicast query as follows:
 
 ~~~~
   REQ: GET /.well-known/core?rt=brski*
 
   RES: 2.05 Content
-  <coaps+jpy://[2001:db8:0:abcd::52]:7634>;rt=brski.rjp,
+  <coap://[2001:db8:0:abcd::52]:7634>;rt=brski.rjp,
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/rv>;rt=brski.rv;ct=836,
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/vs>;rt=brski.vs;ct="50 60",
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/es>;rt=brski.es;ct="50 60",
 ~~~~
-
-
-
-The coaps+jpy scheme is registered is defined in {{jpyscheme}}, as per {{RFC7252, Section 6.2}}
 
 ### GRASP discovery
 
@@ -507,7 +504,7 @@ Here is an example M\_FLOOD announcing the Registrar on example port 5685, which
 ~~~
 {: #fig-grasp-rgj title='Example of Registrar announcement message' align="left"}
 
-Most Registrars will announce both a JPY-stateless and stateful ports, and may also announce an HTTPS/TLS service:
+Most Registrars will announce both a CoAP-stateless and stateful ports, and may also announce an HTTPS/TLS service:
 
 ~~~
    [M_FLOOD, 51840231, h'fda379a6f6ee00000200000064000001', 180000,
@@ -599,12 +596,12 @@ This section should enable operators to make a choice between the two modes base
 |             |original message.           |the original,it includes|
 |             |                            |additional information  |
 +-------------+----------------------------+------------------------+
-|Specification|The Join Proxy needs        |New JPY message to      |
+|Specification|The Join Proxy needs        |CoAP message to         |
 |complexity   |additional functionality    |encapsulate DTLS payload|
 |             |to maintain state           |The Registrar           |
 |             |information, and specify    |and the Join Proxy      |
 |             |the source and destination  |have to understand the  |
-|             |addresses of the DTLS       |JPY message in order    |
+|             |addresses of the DTLS       |CoAP header in order    |
 |             |handshake messages          |to process it.          |
 +-------------+----------------------------+------------------------+
 | Ports       | Join Proxy needs           |Join Proxy and Registrar|
@@ -675,21 +672,6 @@ Parameters" registry per the {{RFC6690}} procedure.
                  Join Proxy to query and return Join Proxy specific
                  BRSKI resources of a Registrar.
     Reference: [this document]
-
-## CoAPS+JPY Scheme Registration {#jpyscheme}
-
-
-    Scheme name: coaps+jpy
-    Status: permanent
-    Applications/protocols that use this scheme name: Constrained BRSKI Join Proxy
-    Contact: ANIMA WG
-    Change controller: IESG
-    References: [THIS RFC]
-    Scheme syntax: identical to coaps
-    Scheme semantics: The encapsulation mechanism described in {{stateless-jpy}} is used with coaps.
-    Security considerations: The new encapsulation allows traffic to be returned to a calling node
-       behind a proxy.  The form of the encapsulation can include privacy and integrity protection
-       under the control of the proxy system.
 
 ## service name and port number registry {#dns-sd-spec}
 
