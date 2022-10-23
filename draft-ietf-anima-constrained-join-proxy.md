@@ -166,10 +166,6 @@ Registrar/Coordinator (JRC), Pledge, and Voucher.
 In this document, the term "Registrar" is used throughout instead of "Join
 Registrar/Coordinator (JRC)".
 
-The term "installation" refers to all devices in the network and their interconnections, including Registrar, enrolled nodes with and without constrained Join Proxy functionality and Pledges.
-
-(Installation) IP addresses are assumed to be routeable over the whole installation network except for the link-local IP addresses used at the edges where new pledges join.
-
 The "Constrained Join Proxy" enables a pledge that is multiple hops away from the Registrar, to execute the BRSKI protocol {{RFC8995}} using a secure channel.
 
 The term "Join Proxy" is used interchangeably with the term "constrained Join Proxy" throughout this document.
