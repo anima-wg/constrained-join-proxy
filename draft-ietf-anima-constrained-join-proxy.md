@@ -514,7 +514,7 @@ Most Registrars will announce both a CoAP-stateless and stateful ports, and may 
     [O_IPv6_LOCATOR,
      h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5685]]]
 ~~~
-{: #fig-grasp-many title='Example of Registrar announcing two services' align="left"}
+{: #fig-grasp-many title='Example of Registrar announcing three services' align="left"}
 
 ## Pledge discovers Join-Proxy
 
