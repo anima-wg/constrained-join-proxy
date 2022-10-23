@@ -86,7 +86,7 @@ Pledge.
 
 Like the BRSKI Circuit proxy, this constrained Join Proxy eliminates the need of
 Pledges to have routeable IP addresses before enrolment by utilizing link-local
-addresses. Use of the constrained Join Proxy also eliminates the need of the Pledge 
+addresses. Use of the constrained Join Proxy also eliminates the need of the Pledge
 to authenticate to the network or perform network-wide Registrar discover before enrolment.
 
 --- middle
@@ -97,9 +97,9 @@ The Bootstrapping Remote Secure Key Infrastructure (BRSKI) protocol described in
 provides a solution for a secure zero-touch (automated) bootstrap of new (unconfigured) devices.
 In the context of BRSKI, new devices, called "Pledges", are equipped with a factory-installed Initial Device Identifier (IDevID) (see {{ieee802-1AR}}), and are enrolled into a network.
 BRSKI makes use of Enrollment over Secure Transport (EST) {{RFC7030}}
-with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls. 
+with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls.
 
-In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a constrained Join Proxy. 
+In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a constrained Join Proxy.
 In particular, this solution is intended to support mesh networks as described in {{RFC4944}}.
 
 The constrained Join Proxy as specified in this document is one of the Join Proxy
