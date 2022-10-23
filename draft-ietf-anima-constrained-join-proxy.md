@@ -157,6 +157,8 @@ In the stateless method, the return forward state is stored in the network using
 
 # Terminology          {#Terminology}
 
+{::boilerplate bcp14}
+
 The following terms are defined in {{RFC8366}}, and are used
 identically as in that document: artifact, imprint, domain, Join
 Registrar/Coordinator (JRC), Pledge, and Voucher.
@@ -173,10 +175,6 @@ The "Constrained Join Proxy" enables a pledge that is multiple hops away from th
 The term "join Proxy" is used interchangeably with the term "constrained Join Proxy" throughout this document.
 
 The {{RFC8995}} Circuit Proxy is referred to as a TCP circuit Join Proxy.
-
-# Requirements Language {#reqlang}
-
-{::boilerplate bcp14}
 
 # constrained Join Proxy functionality
 
