@@ -112,7 +112,7 @@ Constrained devices which may be part of constrained networks {{RFC7228}}, typic
 
 CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC6347}} as a security protocol for authenticity and confidentiality of the messages.
 This is known as the "coaps" scheme.
-A constrained version of EST, using Coap and DTLS, is described in {{RFC9148}}.
+A constrained version of EST, using CoAP and DTLS, is described in {{RFC9148}}.
 
 The {{I-D.ietf-anima-constrained-voucher}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges that use CoAP.
 
@@ -462,7 +462,7 @@ Upon success, the return payload will contain a port that contain process the Co
 In the {{RFC6690}} link format, and {{?RFC3986, Section 3.2}}, the authority attribute can not include a port number unless it also includes the IP address.
 
 The returned join-port is expected to process the CoAP encapsulated DTLS messages described in section {{stateless-jpy}}.
-The scheme is now coap, as the outside protocol is CoAP and could be subject to further CoAP operations.
+The scheme is now CoAP, as the outside protocol is CoAP and could be subject to further CoAP operations.
 
 An EST/Registrar server running at address ```2001:db8:0:abcd::52```, with the
 CoAP processing on port 7634, and the stateful Registrar on port 5683 could reply to a multicast query as follows:
@@ -523,7 +523,7 @@ When doing constrained onboarding with DTLS as security, the Pledge will always 
 
 ### CoAP discovery {#jp-disc}
 
-In the context of a coap network without Autonomic Network support, discovery follows the standard coap policy.
+In the context of a CoAP network without Autonomic Network support, discovery follows the standard CoAP policy.
 The Pledge can discover a Join Proxy by sending a link-local multicast message to ALL CoAP Nodes with address FF02::FD. Multiple or no nodes may respond.
 The handling of multiple responses and the absence of responses follow section 4 of {{RFC8995}}.
 
