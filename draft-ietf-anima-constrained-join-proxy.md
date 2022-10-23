@@ -140,7 +140,7 @@ Two modes of the constrained Join Proxy are specified:
       during the connection.
 
     2 A stateless Join Proxy where the connection state
-      is replaced by a new proxy header in the
+      is replaced by a second layer of CoAP header in the
       UDP messages between constrained Join Proxy and Registrar.
 
 
@@ -148,12 +148,12 @@ This document is very much inspired by text published earlier in {{I-D.kumar-dic
 {{I-D.richardson-anima-state-for-joinrouter}} outlined the various options for building a constrained Join Proxy.
 {{RFC8995}} adopted only the Circuit Proxy method (1), leaving the other methods as future work.
 
-Similar to the difference between storing and non_storing Modes of
+Similar to the difference between storing and non-storing Modes of
 Operations (MOP) in RPL {{RFC6550}}, the stateful and stateless modes differ in the way that they store
 the state required to forward the return packet to the pledge.
 In the stateful method, the
-return forward state is stored in the join proxy.  In the stateless
-method, the return forward state is stored in the network.
+return forward state is stored in the join proxy.
+In the stateless method, the return forward state is stored in the network using the CoAP extended token in a way identical to that described in {{RFC9031}}.
 
 # Terminology          {#Terminology}
 
