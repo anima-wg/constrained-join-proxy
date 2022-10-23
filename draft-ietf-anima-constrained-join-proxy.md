@@ -240,8 +240,8 @@ A Join Proxy can operate in two modes:
 
 The advantages and disadvantages of the two modes are presented in {{jr-comp}}.
 
-A Join Proxy MUST implement both.
-A Registrar MUST implement the stateful mode and SHOULD implement the Stateless mode.
+A Registrar MUST implement both the stateful mode and the Stateless mode, but an operator MAY configure it to announce only one.
+A Join Proxy MUST implement the stateless mode, but SHOULD implement the stateful mode if it has sufficient memory.
 
 For a Join Proxy to be operational, the node on which it is running has to be
 able to talk to a Registrar (exchange UDP messages with it).
