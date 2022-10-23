@@ -57,11 +57,11 @@ normative:
     author:
     rc: "IANA"
     date: 2021-10-19
+  RFC6690:
   RFC7252:
 
 informative:
   I-D.richardson-anima-state-for-joinrouter:
-  RFC6690:
   RFC7030:
   RFC7102:
   RFC7228:
