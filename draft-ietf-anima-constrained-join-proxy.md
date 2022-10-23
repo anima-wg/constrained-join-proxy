@@ -778,8 +778,7 @@ A CBOR header would have taken 4+16 bytes or 20 bytes, for a difference of 8 byt
 
 The examples show the request "GET coaps://192.168.1.200:5965/est/crts" to a Registrar. The header generated between Join Proxy and Registrar and from Registrar to Join Proxy are shown in detail. The DTLS payload is not shown.
 
-
-
+NOTE THESE ARE OLD.
 
 The request from Join Proxy to Registrar looks like:
 
