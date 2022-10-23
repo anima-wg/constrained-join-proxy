@@ -647,9 +647,6 @@ The Registrar is not able to examine the encrypted result, but does not need to.
 The Registrar stores the encrypted header in the return packet without modifications.
 The constrained Join Proxy can decrypt the contents to route the message to the right destination.
 
-In some installations, layer 2 protection is provided between all member pairs of the mesh.
-In such an environment encryption of the CBOR array is unnecessary because the layer 2 protection already provide it.
-
 # IANA Considerations
 
 ## Resource Type Attributes registry
