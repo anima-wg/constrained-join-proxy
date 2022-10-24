@@ -301,6 +301,12 @@ termined by a connection expiry timer E.
 
 If an untrusted Pledge that can only use link-local addressing wants to contact a trusted Registrar, and the Registrar is more than one hop away, it sends its DTLS messages to the Join Proxy.
 
+When a proxy receives an ICMP error message from the Registrar or Plege, for which mapping state exist, the proxy SHOULD map the ICMP message as it would map a UDP message and forward the ICMP message to the Registrar / Pledge.
+Processing of ICMP messages SHOULD NOT reset the connection expiry timer.
+
+To protect itself and the Registrar against malfunctioning Pledges and or denial of service attacks, the join proxy SHOULD limit the number of simultaneous mapping states on per ip address to 2 and the number of simultaneous mapping states per interface to 10.
+When mapping state can not be built due to exhausted state, the proxy SHOULD return an  ICMP error (1), "Destination Port Unreachable" message with code (1), "Communication with destination  administratively prohibited".
+
 ## Stateless Join Proxy {#jpy-encapsulation-protocol}
 
 Stateless Join Proxy operation eliminates the need and complexity to maintain per UDP connection mapping state on the proxy and the state machinery to build, maintain and
