@@ -478,6 +478,7 @@ CoAP processing on port 7634, and the stateful Registrar on port 5683 could repl
 
   RES: 2.05 Content
   <coap://[2001:db8:0:abcd::52]:7634>;rt=brski.rjp,
+  <coaps://[2001:db8:0:abcd::52]/.well-known/brski>;rt=brski,
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/rv>;rt=brski.rv;ct=836,
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/vs>;rt=brski.vs;ct="50 60",
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/es>;rt=brski.es;ct="50 60",
