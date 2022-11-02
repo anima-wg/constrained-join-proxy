@@ -481,7 +481,7 @@ CoAP processing on port 7634, and the stateful Registrar on port 5683 could repl
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/es>;rt=brski.es;ct="50 60",
 ~~~~
 
-### GRASP discovery
+### GRASP discovery {#graspregistrardiscovery}
 
 {{Section 10.2.1 of I-D.ietf-anima-constrained-voucher}} describes how to use GRASP {{RFC8990}} discovery within the ACP to locate the stateful port of the Registrar.
 
@@ -672,6 +672,11 @@ Parameters" registry per the {{RFC6690}} procedure.
                  Join Proxy to query and return Join Proxy specific
                  BRSKI resources of a Registrar.
     Reference: [this document]
+
+## GRASP Discovery Registry
+
+IANA is asked to extend the registration of the "AN\_join\_registrar" (without quotes) in the "GRASP Objective Names" table in the Grasp Parameter registry.
+This document should also be cited for the objective values "BRSKI_RJP" defined in {{graspregistrardiscovery}}.
 
 ## service name and port number registry {#dns-sd-spec}
 
