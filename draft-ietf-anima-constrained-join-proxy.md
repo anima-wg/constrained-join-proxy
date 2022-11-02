@@ -552,6 +552,8 @@ This section is normative for uses with an ANIMA ACP.
 In the context of autonomic networks, the Join-Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself.
 Section 4.1.1 of {{RFC8995}} discusses this in more detail.
 
+Note that there is no change here wrt {{I-D.ietf-anima-constrained-voucher}}, it is repeated here for completeness only.
+
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
 
 * The transport-proto is IPPROTO_UDP
