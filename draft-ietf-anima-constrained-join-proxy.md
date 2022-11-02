@@ -3,7 +3,7 @@ v: 3
 
 title: Constrained Join Proxy for Bootstrapping Protocols
 abbrev: Join Proxy
-docname: draft-ietf-anima-constrained-join-proxy-12
+docname: draft-ietf-anima-constrained-join-proxy-13
 
 # stand_alone: true
 
@@ -481,7 +481,7 @@ CoAP processing on port 7634, and the stateful Registrar on port 5683 could repl
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/es>;rt=brski.es;ct="50 60",
 ~~~~
 
-### GRASP discovery
+### GRASP discovery {#graspregistrardiscovery}
 
 {{Section 10.2.1 of I-D.ietf-anima-constrained-voucher}} describes how to use GRASP {{RFC8990}} discovery within the ACP to locate the stateful port of the Registrar.
 
@@ -551,6 +551,8 @@ Discoverable port numbers are usually returned for Join Proxy resources in the &
 This section is normative for uses with an ANIMA ACP.
 In the context of autonomic networks, the Join-Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself.
 Section 4.1.1 of {{RFC8995}} discusses this in more detail.
+
+Note that there is no change here wrt {{I-D.ietf-anima-constrained-voucher}}, it is repeated here for completeness only.
 
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
 
@@ -672,6 +674,11 @@ Parameters" registry per the {{RFC6690}} procedure.
                  Join Proxy to query and return Join Proxy specific
                  BRSKI resources of a Registrar.
     Reference: [this document]
+
+## GRASP Discovery Registry
+
+IANA is asked to extend the registration of the "AN\_join\_registrar" (without quotes) in the "GRASP Objective Names" table in the Grasp Parameter registry.
+This document should also be cited for the objective values "BRSKI_RJP" defined in {{graspregistrardiscovery}}.
 
 ## service name and port number registry {#dns-sd-spec}
 
