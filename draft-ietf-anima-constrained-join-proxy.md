@@ -461,7 +461,10 @@ Most Registrars will announce both a JPY-stateless and stateful ports, and may a
    [M_FLOOD, 51840231, h'fda379a6f6ee00000200000064000001', 180000,
    [["AN_join_registrar", 4, 255, ""],
     [O_IPv6_LOCATOR,
-     h'fda379a6f6ee00000200000064000001', IPPROTO_TCP, 8443],
+    h'fda379a6f6ee00000200000064000001', IPPROTO_TCP, 8443],
+    ["AN_join_registrar", 4, 255, "CMP"],
+    [O_IPv6_LOCATOR,
+     h'fda379a6f6ee00000200000064000001', IPPROTO_TCP, 8448],
     ["AN_join_registrar", 4, 255, "BRSKI_JP"],
     [O_IPv6_LOCATOR,
      h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5684],
@@ -508,6 +511,7 @@ The following changes are necessary with respect to figure 10 of {{RFC8995}}:
 
 * The transport-proto is IPPROTO_UDP
 * the objective is AN_Proxy
+* the objective-value is "DTLS-EST"
 
 The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
 Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
@@ -516,7 +520,7 @@ Here is an example M_FLOOD announcing the Join-Proxy at fe80::1, on standard coa
 
 ~~~
      [M_FLOOD, 12340815, h'fe800000000000000000000000000001', 180000,
-     [["AN_Proxy", 4, 1, ""],
+     [["AN_Proxy", 4, 1, "DTLS-EST"],
      [O_IPv6_LOCATOR,
      h'fe800000000000000000000000000001', IPPROTO_UDP, 5684]]]
 ~~~
@@ -595,6 +599,15 @@ does not need to. The Registrar stores the encrypted header in the return packet
 In some installations, layer 2 protection is provided between all member pairs of the mesh. In such an environment encryption of the CBOR array is unnecessary because the layer 2 protection already provide it.
 
 # IANA Considerations
+
+## Extensions to the "BRSKI AN_Proxy Objective Value" Registry
+
+{{I-D.ietf-anima-constrained-voucher}} previously registered the objective value DTLS-EST.
+This document makes use of it, and the registry should be extended to reference this document as well.
+
+## Extensions to the "BRSKI AN_join_registrar Objective Value" Registry
+
+This document registers the objective-value: "BRSKI_RJP"
 
 ## Resource Type Attributes registry
 
