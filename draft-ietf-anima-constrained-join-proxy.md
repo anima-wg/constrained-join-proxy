@@ -142,7 +142,7 @@ Similar to the difference between storing and non_storing Modes of
 Operations (MOP) in RPL {{RFC6550}}, the stateful and stateless modes differ in the way that they store
 the state required to forward the return packet to the pledge.
 In the stateful method, the
-return forward state is stored in the join proxy.  In the stateless
+return forward state is stored in the Join Proxy.  In the stateless
 method, the return forward state is stored in the network.
 
 # Terminology          {#Terminology}
@@ -160,7 +160,7 @@ The term "installation network" refers to all devices in the installation and th
 
 The "Constrained Join Proxy" enables a pledge that is multiple hops away from the Registrar, to securely execute the BRSKI protocol {{RFC8995}} over a secure channel.
 
-The term "join Proxy" is used interchangeably with the term "constrained Join Proxy" throughout this document.
+The term "Join Proxy" is used interchangeably with the term "constrained Join Proxy" throughout this document.
 
 The {{RFC8995}} Circuit Proxy is referred to as a TCP circuit Join Proxy.
 
@@ -397,9 +397,9 @@ The Registrar and the Pledge MUST select a block size that would allow the addit
 # Discovery {#jr-disc}
 
 
-## Discovery operations by Join-Proxy
+## Discovery operations by Join Proxy
 
-In order to accomodate automatic configuration of the Join-Proxy, it must discover the location and a capabilities of the Registar.
+In order to accomodate automatic configuration of the Join Proxy, it must discover the location and a capabilities of the Registar.
 {{Section 10.2 of I-D.ietf-anima-constrained-voucher}} explains the basic mechanism, and this section explains the extensions required to discover if stateless operation is supported.
 
 ### CoAP discovery {#coap-disc}
@@ -442,7 +442,7 @@ The coaps+jpy scheme is registered is defined in {{jpyscheme}}, as per {{RFC7252
 
 {{Section 10.2.1 of I-D.ietf-anima-constrained-voucher}} describes how to use GRASP {{RFC8990}} discovery within the ACP to locate the stateful port of the Registrar.
 
-A join proxy which supports a stateless mode of operation using the mechanism described in {{stateless-jpy}} must know where to send the encoded content from the pledge.
+A Join Proxy which supports a stateless mode of operation using the mechanism described in {{stateless-jpy}} must know where to send the encoded content from the pledge.
 The Registrar announces its willingness to use the stateless mechanism by including an additional objective in it's M\_FLOOD'ed ```AN_join_registrar``` announcements, but with a different objective value.
 
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
@@ -480,7 +480,7 @@ Most Registrars will announce both a JPY-stateless and stateful ports, and may a
 ~~~
 {: #fig-grasp-many title='Example of Registrar announcing two services' align="left"}
 
-## Pledge discovers Join-Proxy
+## Pledge discovers Join Proxy
 
 Regardless of whether the Join Proxy operates in stateful or stateless mode, the Join Proxy is discovered by the Pledge identically.
 When doing constrained onboarding with DTLS as security, the Pledge will always see an IPv6 Link-Local destination, with a single UDP port to which DTLS messages are to be sent.
@@ -510,7 +510,7 @@ Discoverable port numbers are usually returned for Join Proxy resources in the &
 ### GRASP discovery
 
 This section is normative for uses with an ANIMA ACP.
-In the context of autonomic networks, the Join-Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself.
+In the context of autonomic networks, the Join Proxy uses the DULL GRASP M_FLOOD mechanism to announce itself.
 Section 4.1.1 of {{RFC8995}} discusses this in more detail.
 
 The following changes are necessary with respect to figure 10 of {{RFC8995}}:
@@ -522,7 +522,7 @@ The following changes are necessary with respect to figure 10 of {{RFC8995}}:
 The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
 Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
 
-Here is an example M_FLOOD announcing the Join-Proxy at fe80::1, on standard coaps port 5684.
+Here is an example M_FLOOD announcing the Join Proxy at fe80::1, on standard coaps port 5684.
 
 ~~~
      [M_FLOOD, 12340815, h'fe800000000000000000000000000001', 180000,
@@ -600,7 +600,7 @@ A malicious constrained Join Proxy has a number of routing possibilities:
 
   * A malicious node can sniff the messages routed by the constrained Join Proxy. It is very unlikely that the malicious node can decrypt the DTLS payload. A malicious node can read the header field of the message sent by the stateless Join Proxy. This ability does not yield much more information than the visible addresses transported in the network packets.
 
-It should be noted here that the contents of the CBOR array used to convey return address information is not DTLS protected. When the communication between JOIN Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge. These concerns are also expressed in {{RFC8974}}. It is also pointed out that the encryption in the source is a local matter. Similarly to {{RFC8974}}, the use of AES-CCM {{RFC3610}} with a 64-bit tag is recommended, combined with a sequence number and a replay window.
+It should be noted here that the contents of the CBOR array used to convey return address information is not DTLS protected. When the communication between Join Proxy and Registrar passes over an unsecure network, an attacker can change the CBOR array, causing the Registrar to deviate traffic from the intended Pledge. These concerns are also expressed in {{RFC8974}}. It is also pointed out that the encryption in the source is a local matter. Similarly to {{RFC8974}}, the use of AES-CCM {{RFC3610}} with a 64-bit tag is recommended, combined with a sequence number and a replay window.
 
 If such scenario needs to be avoided, the constrained Join
 Proxy MUST encrypt the CBOR array using a locally generated symmetric
