@@ -76,11 +76,14 @@ informative:
   RFC8610:
 
 --- abstract
-This document extends the work of Bootstrapping Remote Secure Key Infrastructures (BRSKI) by replacing the TCP Circuit-proxy between Pledge and Registrar by a stateless or stateful CoAP Join
-Proxy.
-The CoAP Join Proxy is a mesh neighbor of the Pledge and can relay a DTLS session originating from a Pledge with only link-local addresses to a Registrar which is not a mesh neighbor of the Pledge.
 
-This document defines a solution for a constrained Pledge to securely communicate with a Registrar via a discovered CoAP Join Proxy.
+This document extends the work of Bootstrapping Remote Secure Key
+Infrastructures (BRSKI) by replacing the Circuit-proxy between
+Pledge and Registrar by a stateless/stateful constrained Join Proxy.
+The constrained Join Proxy is a mesh neighbor of the Pledge and can relay a DTLS session originating from a Pledge with only link-local addresses to a Registrar which is not a mesh neighbor of the Pledge.
+
+This document defines a protocol to securely assign a Pledge to a domain, represented by a Registrar, using an intermediary node between Pledge and Registrar.
+This intermediary node is known as a "constrained Join Proxy". An enrolled Pledge can act as a constrained Join Proxy.
 
 --- middle
 
