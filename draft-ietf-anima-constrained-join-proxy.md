@@ -186,7 +186,7 @@ If the Pledge, knowing the IP address of the Registrar, initiates a DTLS connect
 ~~~~
 {: #fig-net title='multi-hop enrollment.' align="left"}
 
-Without routing the Pledge cannot establish a secure connection to the Registrar over multiple hops in the network.
+Without multi-hop routing, the Pledge cannot establish a secure connection to the Registrar over multiple hops in the network.
 
 Furthermore, the Pledge cannot discover the IP address of the Registrar over multiple hops to initiate a DTLS connection and perform authentication.
 
