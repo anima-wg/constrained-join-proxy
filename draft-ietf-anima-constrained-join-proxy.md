@@ -151,10 +151,10 @@ method, the return forward state is stored in the network.
 
 The following terms are defined in {{RFC8366}}, and are used
 identically as in that document: artifact, imprint, domain, Join
-Registrar/Coordinator (JRC), Pledge, and Voucher.
+Registrar/Coordinator, Pledge, and Voucher.
 
-In this document, the term "Registrar" is used throughout instead of "Join
-Registrar/Coordinator (JRC)".
+The term "Registrar" is used throughout this document instead of
+"Join Registrar/Coordinator (JRC)" as defined in {{RFC8366}}.
 
 The term "installation network" refers to all devices in the installation and the network connections between them. The term "installation IP_address" refers to an address out of the set of addresses which are routable over the whole installation network.
 
@@ -164,14 +164,14 @@ The term "Join Proxy" is used interchangeably with the term "constrained Join Pr
 
 The {{RFC8995}} Circuit Proxy is referred to as a TCP circuit Join Proxy.
 
-# constrained Join Proxy functionality
+# Constrained Join Proxy functionality
 
 As depicted in the {{fig-net}}, the Pledge (P), in a Low-Power and Lossy Network (LLN) mesh
  {{RFC7102}} can be more than one hop away from the Registrar (R) and not yet authenticated into the network.
 
 In this situation, the Pledge can only communicate one-hop to its nearest neighbor, the constrained Join Proxy (J) using their link-local IPv6 addresses.
 However, the Pledge needs to communicate with end-to-end security with a Registrar to authenticate and get the relevant system/network parameters.
-If the Pledge, knowing the IP-address of the Registrar, initiates a DTLS connection to the Registrar, then the packets are dropped at the constrained Join Proxy since the Pledge is not yet admitted to the network or there is no IP routability to Pledge for any returned messages from the Registrar.
+If the Pledge, knowing the IP address of the Registrar, initiates a DTLS connection to the Registrar, then the packets are dropped at the constrained Join Proxy since the Pledge is not yet admitted to the network or there is no IP routability to Pledge for any returned messages from the Registrar.
 
 ~~~~ aasvg
                     multi-hop mesh
@@ -197,7 +197,7 @@ The following {{jr-spec}} specifies the two constrained Join Proxy modes. A comp
 
 When a mesh network is set up, it consists of a Registrar and a set of connected pledges. No constrained Join Proxies are present. The wanted end-state is a network with a Registrar and a set of enrolled devices. Some of these enrolled devices can act as constrained Join Proxies. Pledges can only employ link-local communication until they are enrolled. A Pledge will regularly try to discover a constrained Join Proxy or a Registrar with link-local discovery requests. The Pledges which are neighbors of the Registrar will discover the Registrar and be enrolled following the BRSKI protocol. An enrolled device can act as constrained Join Proxy. The Pledges which are not a neighbor of the Registrar will eventually discover a constrained Join Proxy and follow the BRSKI protocol to be enrolled. While this goes on, more and more constrained Join Proxies with a larger hop distance to the Registrar will emerge. The network should be configured such that at the end of the enrollment process, all pledges have discovered a neighboring constrained Join Proxy or the Registrar, and all Pledges are enrolled.
 
-# constrained Join Proxy specification {#jr-spec}
+# Constrained Join Proxy specification {#jr-spec}
 
 A Join Proxy can operate in two modes:
 
@@ -532,7 +532,7 @@ Here is an example M_FLOOD announcing the Join Proxy at fe80::1, on standard coa
 ~~~
 {: #fig-grasp-rg title='Example of Registrar announcement message' align="left"}
 
-### 6tisch discovery
+### 6tisch Discovery
 
 The discovery of CoJP {{?RFC9031}} compatible Join-Proxy by the Pledge uses the enhanced beacons  as discussed in {{RFC9032}}.
 6tisch does not use DTLS and so this specification does not apply to it.
@@ -652,7 +652,7 @@ Parameters" registry per the {{RFC6690}} procedure.
        behind a proxy.  The form of the encapsulation can include privacy and integrity protection
        under the control of the proxy system.
 
-## service name and port number registry {#dns-sd-spec}
+## Service name and port number registry {#dns-sd-spec}
 
 This specification registers two service names under the "Service Name and Transport Protocol Port
 Number" registry.
