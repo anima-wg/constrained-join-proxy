@@ -174,7 +174,7 @@ However, the Pledge needs to communicate with end-to-end security with a Registr
 If the Pledge, knowing the IP address of the Registrar, initiates a DTLS connection to the Registrar, then the packets are dropped at the constrained Join Proxy since the Pledge is not yet admitted to the network or there is no IP routability to Pledge for any returned messages from the Registrar.
 
 ~~~~ aasvg
-                    multi-hop mesh
+                    multi-hop LLN mesh
          .---.
          | R +---.    +----+    +---+        +--+
          |   |    \   |6LR +----+ J |........|P |
