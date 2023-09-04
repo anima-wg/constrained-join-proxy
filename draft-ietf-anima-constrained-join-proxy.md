@@ -400,7 +400,7 @@ The Registrar and the Pledge MUST select a block size that would allow the addit
 ## Discovery operations by Join Proxy
 
 In order to accomodate automatic configuration of the Join Proxy, it must discover the location and a capabilities of the Registar.
-{{Section 10.2 of I-D.ietf-anima-constrained-voucher}} explains the basic mechanism, and this section explains the extensions required to discover if stateless operation is supported.
+{{Section 10.2 of I-D.ietf-anima-constrained-voucher}} explains the basic mechanism, and this section explains the extensions required to discover whether stateless operation is supported.
 
 ### CoAP discovery {#coap-disc}
 
@@ -445,7 +445,7 @@ The coaps+jpy scheme is registered is defined in {{jpyscheme}}, as per {{RFC7252
 A Join Proxy which supports a stateless mode of operation using the mechanism described in {{stateless-jpy}} must know where to send the encoded content from the pledge.
 The Registrar announces its willingness to use the stateless mechanism by including an additional objective in it's M\_FLOOD'ed ```AN_join_registrar``` announcements, but with a different objective value.
 
-The following changes are necessary with respect to figure 10 of {{RFC8995}}:
+The following changes are necessary with respect to Figure 10 of {{RFC8995}}:
 
 * The transport-proto is IPPROTO_UDP
 * the objective is AN\_join\_registrar, identical to {{RFC8995}}.
