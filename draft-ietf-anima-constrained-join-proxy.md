@@ -35,7 +35,7 @@ venue:
   github: anima-wg/constrained-join-proxy
 
 normative:
-  RFC6347:
+  RFC9147:
   RFC8366:
   RFC8995:
   RFC9032:
@@ -106,7 +106,7 @@ The specified solutions in {{RFC8995}} and {{RFC7030}} are based on POST or GET 
 These requests use https and may be too large in terms of code space or bandwidth required for constrained devices.
 Constrained devices which may be part of challenged networks {{RFC7228}}, typically implement the IPv6 over Low-Power Wireless personal Area Networks (6LoWPAN) {{RFC4944}} and Constrained Application Protocol (CoAP) {{RFC7252}}.
 
-CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC6347}} as a security protocol for authenticity and confidentiality of the messages.
+CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC9147}} as a security protocol for authenticity and confidentiality of the messages.
 This is known as the "coaps" scheme.
 A constrained version of EST, using CoAP and DTLS, is described in {{RFC9148}}.
 
