@@ -108,7 +108,7 @@ Constrained devices which may be part of challenged networks {{RFC7228}}, typica
 
 CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC6347}} as a security protocol for authenticity and confidentiality of the messages.
 This is known as the "coaps" scheme.
-A constrained version of EST, using Coap and DTLS, is described in {{RFC9148}}.
+A constrained version of EST, using CoAP and DTLS, is described in {{RFC9148}}.
 
 The {{I-D.ietf-anima-constrained-voucher}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges.
 
@@ -487,7 +487,7 @@ When doing constrained onboarding with DTLS as security, the Pledge will always 
 
 ### CoAP discovery {#jp-disc}
 
-In the context of a coap network without Autonomic Network support, discovery follows the standard coap policy.
+In the context of a CoAP network without Autonomic Network support, discovery follows the standard CoAP policy.
 The Pledge can discover a Join Proxy by sending a link-local multicast message to ALL CoAP Nodes with address FF02::FD. Multiple or no nodes may respond. The handling of multiple responses and the absence of responses follow section 4 of {{RFC8995}}.
 
 The join-port of the Join Proxy is discovered by
