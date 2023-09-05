@@ -528,8 +528,13 @@ Here is an example M_FLOOD announcing the Join-Proxy at fe80::1, on standard coa
 
 ### 6tisch discovery
 
-The discovery of Join-Proxy by the Pledge uses the enhanced beacons as discussed in {{RFC9032}}.
+The discovery of CoJP {{?RFC9031}} compatible Join-Proxy by the Pledge uses the enhanced beacons  as discussed in {{RFC9032}}.
 6tisch does not use DTLS and so this specification does not apply to it.
+
+The Enhanced Beason discovery mechanism used in 6tisch does not convey a method to the pledge, (equivalent to an objective value, as described above), so only the CoAP/OSCORE mechanism described in {{?RFC9031}} is announced.
+
+A 6tisch network that wanted to use DTLS for security would need a new attribute for the enhanced beacon that announced the availability of a DTLS proxy as described in this document.
+Future work could provide that capability.
 
 # Comparison of stateless and stateful modes {#jr-comp}
 
