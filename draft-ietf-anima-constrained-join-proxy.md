@@ -1,7 +1,7 @@
 ---
 v: 3
 
-title: Constrained Join Proxy for Bootstrapping Protocols
+title: Join Proxy for Bootstrapping of Constrained Network ElementsBootstrapping Protocols
 abbrev: Join Proxy
 docname: draft-ietf-anima-constrained-join-proxy-14
 
@@ -76,15 +76,12 @@ informative:
   RFC8610:
 
 --- abstract
-This document extends the work of Bootstrapping Remote Secure Key
-Infrastructures (BRSKI) by replacing the Circuit-proxy between
-Pledge and Registrar by a stateless/stateful constrained Join
-Proxy. The constrained Join Proxy is a mesh neighbor of the
-Pledge and can relay a DTLS session originating from a Pledge with only link-local
-addresses to a Registrar which is not a mesh neighbor of the
-Pledge.
+This document extends the work of Bootstrapping Remote Secure Key Infrastructures (BRSKI) by replacing the TCP Circuit-proxy between Pledge and Registrar by a stateless or stateful CoAP Join
+Proxy.
+The CoAP Join Proxy is a mesh neighbor of the Pledge and can relay a DTLS session originating from a Pledge with only link-local addresses to a Registrar which is not a mesh neighbor of the Pledge.
 
-This document defines a protocol to securely assign a Pledge to a domain, represented by a Registrar, using an intermediary node between Pledge and Registrar. This intermediary node is known as a "constrained Join Proxy". An enrolled Pledge can act as a constrained Join Proxy.
+This document defines a allows for a constrained Pledge to securely communicate via a constrained Join Proxy with a Registrar.
+
 --- middle
 
 # Introduction
@@ -93,12 +90,18 @@ The Bootstrapping Remote Secure Key Infrastructure (BRSKI) protocol described in
 provides a solution for a secure zero-touch (automated) bootstrap of new (unconfigured) devices.
 In the context of BRSKI, new devices, called "Pledges", are equipped with a factory-installed Initial Device Identifier (IDevID) (see {{ieee802-1AR}}), and are enrolled into a network.
 BRSKI makes use of Enrollment over Secure Transport (EST) {{RFC7030}}
-with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls. In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a constrained Join Proxy. In particular, the underlying IP network is assumed to be a mesh network as described in {{RFC4944}}, although other IP-over-foo networks are not excluded. An example network is shown in {{fig-net}}.
+with {{RFC8366}} vouchers to securely enroll devices.
+
+A Registrar provides the security anchor of the network to which a Pledge enrolls.
+In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a constrained Join Proxy.
+In particular, the underlying IP network is assumed to be a mesh network as described in {{RFC4944}}, although other IP-over-foo networks are not excluded.
+An example network is shown in {{fig-net}}.
 
 A complete specification of the terminology is pointed at in {{Terminology}}.
 
-The specified solutions in {{RFC8995}} and {{RFC7030}} are based on POST or GET requests to the EST resources (/cacerts, /simpleenroll, /simplereenroll, /serverkeygen, and /csrattrs), and the brski resources (/requestvoucher, /voucher_status, and /enrollstatus). These requests use https and may be too large in terms of code space or bandwidth required for constrained devices.
-Constrained devices which may be part of constrained networks {{RFC7228}}, typically implement the IPv6 over Low-Power Wireless personal Area Networks (6LoWPAN) {{RFC4944}} and Constrained Application Protocol (CoAP) {{RFC7252}}.
+The specified solutions in {{RFC8995}} and {{RFC7030}} are based on POST or GET requests to the EST resources (/cacerts, /simpleenroll, /simplereenroll, /serverkeygen, and /csrattrs), and the brski resources (/requestvoucher, /voucher_status, and /enrollstatus).
+These requests use https and may be too large in terms of code space or bandwidth required for constrained devices.
+Constrained devices which may be part of challenged networks {{RFC7228}}, typically implement the IPv6 over Low-Power Wireless personal Area Networks (6LoWPAN) {{RFC4944}} and Constrained Application Protocol (CoAP) {{RFC7252}}.
 
 CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC6347}} as a security protocol for authenticity and confidentiality of the messages.
 This is known as the "coaps" scheme.
@@ -115,22 +118,18 @@ configuration parameters. The Pledge receives these configuration
 parameters from the Registrar. When the Registrar is not a direct
 neighbor of the Registrar but several hops away, the Pledge
 discovers a neighbor constrained Join Proxy, which transmits the DTLS
-protected request coming from the Pledge
-to the Registrar. The constrained Join Proxy must be enrolled
-previously such that the
-message from constrained Join Proxy to Registrar can be routed over
-one or more hops.
+protected request coming from the Pledge to the Registrar.
+The constrained Join Proxy must be enrolled previously such that the message from constrained Join Proxy to Registrar can be routed over one or more hops.
 
 During enrollment, a DTLS connection is required between Pledge and Registrar.
 
 An enrolled Pledge can act as constrained Join Proxy between other Pledges and the enrolling Registrar.
 
-This document specifies a new form of constrained Join Proxy and protocol to act as intermediary between Pledge and Registrar to relay DTLS messages between Pledge and Registrar. Two modes of the constrained Join Proxy are specified:
+This document specifies a new form of constrained Join Proxy and protocol to act as intermediary between Pledge and Registrar to relay DTLS messages between Pledge and Registrar.
+Two modes of the constrained Join Proxy are specified:
 
-    1 A stateful Join Proxy that locally stores IP addresses
-      during the connection.
-    2 A stateless Join Proxy where the connection state
-     is stored in the messages.
+    1 A stateful Join Proxy that locally stores IP addresses during the connection.
+    2 A stateless Join Proxy where the connection state is stored in the messages.
 
 This document is very much inspired by text published earlier in {{I-D.kumar-dice-dtls-relay}}.
 {{I-D.richardson-anima-state-for-joinrouter}} outlined the various options for building a constrained Join Proxy.
