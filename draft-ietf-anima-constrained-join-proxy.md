@@ -119,7 +119,7 @@ parameters from the Registrar. When the Registrar is not a direct
 neighbor of the Registrar but several hops away, the Pledge
 discovers a neighbor constrained Join Proxy, which transmits the DTLS
 protected request coming from the Pledge to the Registrar.
-The constrained Join Proxy must be enrolled previously such that the message from constrained Join Proxy to Registrar can be routed over one or more hops.
+The constrained Join Proxy must have been enrolled previously into the network, such that the message from the constrained Join Proxy to the Registrar can be routed over one or more hops.
 
 During enrollment, a DTLS connection is required between Pledge and Registrar.
 
