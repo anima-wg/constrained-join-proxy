@@ -80,7 +80,7 @@ This document extends the work of Bootstrapping Remote Secure Key Infrastructure
 Proxy.
 The CoAP Join Proxy is a mesh neighbor of the Pledge and can relay a DTLS session originating from a Pledge with only link-local addresses to a Registrar which is not a mesh neighbor of the Pledge.
 
-This document defines a allows for a constrained Pledge to securely communicate via a constrained Join Proxy with a Registrar.
+This document defines a solution for a constrained Pledge to securely communicate with a Registrar via a discovered CoAP Join Proxy.
 
 --- middle
 
