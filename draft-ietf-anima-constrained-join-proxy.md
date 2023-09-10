@@ -128,7 +128,7 @@ An enrolled Pledge can act as constrained Join Proxy between other Pledges and t
 This document specifies a new form of constrained Join Proxy and protocol to act as intermediary between Pledge and Registrar to relay DTLS messages between Pledge and Registrar.
 Two modes of the constrained Join Proxy are specified:
 
-    1 A stateful Join Proxy that locally stores IP addresses during the connection.
+    1 A stateful Join Proxy that locally stores IP addresses during for the duration of the DTLS connection between Pledge and Registrar.
     2 A stateless Join Proxy where the connection state is stored in the messages.
 
 This document is very much inspired by text published earlier in {{I-D.kumar-dice-dtls-relay}}.
