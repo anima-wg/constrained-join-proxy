@@ -3,7 +3,7 @@ v: 3
 
 title: Join Proxy for Bootstrapping of Constrained Network Elements
 abbrev: Join Proxy
-docname: draft-ietf-anima-constrained-join-proxy-14
+docname: draft-ietf-anima-constrained-join-proxy-15
 
 # stand_alone: true
 
