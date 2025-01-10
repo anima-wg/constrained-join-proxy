@@ -60,6 +60,7 @@ normative:
   
 informative:
   RFC3610:
+  RFC3927:
   RFC3986:
   RFC4944:
   RFC6550:
@@ -369,49 +370,55 @@ JPY[H(),C()] = Join Proxy message with header H and content C
 
 ## Stateless Message structure {#stateless-jpy}
 
-The JPY message is constructed as a payload directly above UDP.
-There is no CoAP or DTLS layer as both are within the relayed payload.
+The JPY message is carried directly over the UDP layer.
+There is no CoAP or DTLS layer used between the JPY messages and the UDP layer.
 
-Header and Contents fields together are consist of one CBOR {{RFC8949}} array of 2 elements, explained in CDDL {{RFC8610}}:
+A JPY messages consists of one CBOR {{RFC8949}} array of 2 elements:
 
-   1. The context payload.  This is a CBOR byte string. It SHOULD be between 8 and 32 bytes in size.
-   2. Content field: containing the DTLS payload as a CBOR byte string.
+   1. The Join Proxy's context data: This is a CBOR byte string. It SHOULD be between 8 and 32 bytes in size.
+   2. The content field: This contains the binary DTLS payload being relayed, wrapped in a CBOR byte string.
+
+Using CDDL {{RFC8610}}, the CBOR array that constitutes the JPY message can be formally defined as:
 
 ~~~
     JPY_message =
     [
-       pledge_context_message : bstr,
-       content   : bstr
+       jp_context : bstr,
+       content    : bstr
     ]
-
 ~~~
-{: #fig-cddl title='CDDL representation of JPY message' align="left"}
+{: #fig-cddl title='CDDL representation of a JPY message' align="left"}
 
-The Join Proxy cannot decrypt the DTLS payload and has no knowledge of the transported media type.
-The contents are DTLS encrypted.
+The content field is DTLS-encrypted. 
+Therefore, the Join Proxy cannot decrypt it and has no knowledge of any transported (CoAP) messages, or media types.
 
-The context payload is to be reflected by the Registrar when sending reply packets to the Join Proxy.
-The context payload is not standardized.
-It is to be used by the Join Proxy to record which pledge the traffic came from.
+The context data is to be reflected (unmodified) by the Registrar when sending return data packets to the Join Proxy.
+The context data internal representation is not standardized: it can be constructed by the Join Proxy in whatever way.
+It is to be used by the Join Proxy to record the context (state) of the associated content field, for example the 
+information which Pledge the data traffic came from.
 
-The Join Proxy SHOULD encrypt this context with a symmetric key known only to the Join Proxy.
-This key need not persist on a long term basis, and MAY be changed periodically.
+The Join Proxy SHOULD encrypt the context data prior to wrapping it in a CBOR byte string. It is encrypted with a 
+symmetric key known only to the Join Proxy itself.
+This key need not persist on a long-term basis, and MAY be changed periodically.
 The considerations of  {{Section 5.2 of RFC8974}} apply.
 
-This is intended to be identical to the mechanism described in {{Section 7.1 of RFC9031}}.
-However, since the CoAP layer is inside of the DTLS layer (which is between the Pledge and the Registrar), it is not possible for the Join Proxy to act as a CoAP proxy.
+This context data is intended to be identical to the "state object" mechanism described in {{Section 7.1 of RFC9031}}.
+However, since the CoAP protocol layer is inside of the DTLS layer (end-to-end encrypted between the Pledge and the 
+Registrar), it is not possible for the Join Proxy to act as a CoAP proxy.
 
-For the JPY messages relayed to the Registrar, the Join Proxy SHOULD use the same UDP source port for the JPY messages related to all pledges.
-A Join Proxy MAY change the UDP source port, but doing so creates more local state.
-A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible in the future) could, for instance, use different source port numbers to demultiplex connections across CPUs.
+For the JPY messages relayed to the Registrar, the Join Proxy SHOULD use the same UDP source port for the JPY messages 
+of all pledges.
+A Join Proxy MAY vary the UDP source port, but doing so creates more local state.
+A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible in the future) could, for instance, use 
+different source port numbers to demultiplex connections across CPUs.
 
-### Stateless Message structure example construction
+### Example format for Join Proxy context data
 
-A typical context parameter might be constructed with the following CDDL grammar:
-(This is illustrative only: the contents are not subject to standardization)
+A typical context data format might be constructed using the following CDDL grammar.
+This is illustrative only: the format of jp_context is not subject to standardization.
 
 ~~~~
-    pledge_context_message = [
+    jp_context_plaintext = [
       family:  uint .bits 1,
       ifindex: uint .bits 8,
       srcport: uint .bits 16,
@@ -420,36 +427,48 @@ A typical context parameter might be constructed with the following CDDL grammar
 ~~~~
 
 This results in a total of 96 bits, or 12 bytes.
-The structure stores the srcport, the originating IPv6 Link-Local address, the IPv4/IPv6 family (as a single bit) and an ifindex to provide the link-local scope.
-This fits nicely into a single AES128 CBC block for instance, resulting in a 16 byte context message.
+The structure stores the Pledge's UDP source port (srcport), the IID bits of the Pledge's originating IPv6 link-Local 
+address (iid), the IPv4/IPv6 family (as a single bit) and an interface index (ifindex) to provide the link-local scope.
+This size fits nicely into a single AES128 CBC block for instance, resulting in a 16 byte block of context data,
+jp_context_encrypted.
+This jp_context_encrypted data block is then wrapped in a CBOR byte string to form the jp_context element.
+So for the example jp_context_plaintext of 12 bytes, we get a jp_context_encrypted of 16 bytes, and finally 
+a jp_context of 17 bytes which adds a 1-byte overhead of encoding the data as a CBOR byte string.
 
-The Join Proxy MUST maintain the same context block for all communications from the same pledge.
-This implies that any encryption key either does not change during the communication, or that when it does, it is acceptable to break any onboarding connections which have not yet completed.
+Note: when IPv6 is used only the lower 64-bits of the origin IP need to be recorded, 
+because they are all IPv6 link-Local addresses, so the upper 64-bits are just "fe80::" and can be elided. 
+For IPv4, a link-Local IPv4 address {{RFC3927}} would be used, and it would always fit into 64 bits.
+On media where the Interface IDentifier (IID) is not 64-bits, a different field size for iid will be necessary.
 
-If using a context parameter like defined above, it should be easy for the Join Proxy to meet this requirement without maintaining any local state about the pledge.
+The Join Proxy MUST maintain the same context data for all communications from the same Pledge.
+This implies that the encryption key used either does not change during the onboarding attempt of the Pledge, 
+or that when it does, it is acceptable to break any onboarding connections which have not yet completed.
 
-Note: when IPv6 is used only the lower 64-bits of the origin IP need to be recorded, because they are all IPv6 Link-Local addresses, so the upper 64-bits are just "fe80::". For IPv4, a Link-Local IPv4 address {{?RFC3927}} would be used, and it would fit into 64-bits.
-On media where the Interface IDentifier (IID) is not 64-bits, a different arrangement will be necessary.
+If using a context data format like defined above, it should be easy for the Join Proxy to meet this requirement without maintaining any local state about the pledge.
 
 ### Processing by Registrar
 
-On reception of a JPY message by the Registrar, the Registrar MUST verify that the number of array elements is 2 or more.
-The pledge_content field must be provided as input to a DTLS library {{RFC9147}}, which along with the 5-tuple of the UDP connection provides enough context for the Registrar to pick an appropriate context.
-Note that the socket will need to be used for multiple DTLS flows, which is atypical for how DTLS usually uses sockets.
-The pledge\_context\_message can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of of per session context.
-The pledge\_context\_message needs to be linked to the DTLS context, and when DTLS records need to be sent, then the pledge\_context\_message needs to be prepended to the data that is sent.
+On reception of a JPY message by the Registrar, the Registrar MUST verify that the number of CBOR array elements is 2 or more.
+The content field must be provided as input to a DTLS library {{RFC9147}}, which along with the 5-tuple of the UDP connection 
+provides enough information for the Registrar to pick an appropriate (active) client context.
+Note that the same UDP socket will need to be used for multiple DTLS flows, which is atypical for how DTLS usually uses sockets.
+The jp_context field can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of of per-session context.
+The jp_context field needs to be linked to the DTLS context, and when a DTLS message need to be sent back to the client, 
+then the jp_context needs to be included in a JPY message along with the DTLS message in the content field. 
 
 Examples are shown in {{examples}}.
 
-At the CoAP level, within the Constrained BRSKI and the EST-COAP {{RFC9148}} level, the block option {{RFC7959}} is often used.
-The Registrar and the Pledge MUST select a block size that would allow the addition of the JPY\_message header without violating MTU sizes.
+At the CoAP level, using the cBRSKI {{I-D.ietf-anima-constrained-voucher}} and the EST-CoAPS {{RFC9148}} protocols, 
+the CoAP blockwise options {{RFC7959}} are often used to split large payloads into multiple data blocks.
+The Registrar and the Pledge MUST select a block size that would allow the addition of the JPY\_message header 
+(including a jp_context field of up to 34 bytes) without violating MTU sizes.
 
 # Discovery {#jr-disc}
 
 
 ## Discovery operations by Join Proxy
 
-In order to accomodate automatic configuration of the Join Proxy, it must discover the location and a capabilities of the Registar.
+In order to accommodate automatic configuration of the Join Proxy, it must discover the location and a capabilities of the Registar.
 {{Section 10.2 of I-D.ietf-anima-constrained-voucher}} explains the basic mechanism, and this section explains the extensions required to discover whether stateless operation is supported.
 
 ### CoAP discovery {#coap-disc}
@@ -737,6 +756,7 @@ Their draft text has served as a basis for this document.
 # Changelog
 -15 to -16
 
+       * Clarify 'context payload' terminology; issue #49.
        * Use shorter and consistent term for Join Proxy; issue #58.
        * Author added.
        * Update reference RFC8366 to RFC8366bis.
