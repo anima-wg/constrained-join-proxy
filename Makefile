@@ -20,6 +20,8 @@ ${DRAFT}-${VERSION}.txt: ${DRAFT}.txt
 submit: ${DRAFT}.xml
 	curl -s -F "user=mcr+ietf@sandelman.ca" ${REPLACES} -F "xml=@${DRAFT}.xml" https://datatracker.ietf.org/api/submission | jq
 
+html:	${DRAFT}.html
+
 version:
 	echo Version: ${VERSION}
 
