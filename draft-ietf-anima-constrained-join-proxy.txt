@@ -470,6 +470,7 @@ Internet-Draft                 Join Proxy                   January 2025
    |        <--Finished--                  |   IP_Jl:p_Jl| IP_P:p_P   |
    |              :             :          |      :      |     :      |
    +---------------------------------------+-------------+------------+
+
    IP_P:p_P = Link-local IP address and port of Pledge (DTLS Client)
    IP_R:5684 = Routable IP address and coaps port of Registrar
    IP_Jl:p_Jl = Link-local IP address and join-port of Join Proxy
@@ -495,7 +496,6 @@ Internet-Draft                 Join Proxy                   January 2025
    machinery to build, maintain and remove this mapping state.  It also
    removes the need to protect this mapping state against DoS attacks
    and may also reduce memory and CPU requirements on the proxy.
-
 
 
 
@@ -570,29 +570,30 @@ Internet-Draft                 Join Proxy                   January 2025
    |    Pledge    | Join Proxy |    Registrar  |        Message        |
    |     (P)      |     (J)    |      (R)      |Src_IP:port|Dst_IP:port|
    +--------------+------------+---------------+-----------+-----------+
-   |      --ClientHello-->                     | IP_P:p_P  |IP_Jl:p_Jl |
-   |                    --JPY[H(IP_P:p_P),-->  | IP_Jr:p_Jr|IP_R:p_Ra  |
+   |   ---ClientHello--->                      | IP_P:p_P  |IP_Jl:p_Jl |
+   |                   ---JPY[H(IP_P:p_P), --> | IP_Jr:p_Jr|IP_R:p_Ra  |
    |                          C(ClientHello)]  |           |           |
-   |                    <--JPY[H(IP_P:p_P),--  | IP_R:p_Ra |IP_Jr:p_Jr |
-   |                         C(ServerHello)]   |           |           |
-   |      <--ServerHello--                     | IP_Jl:p_Jl|IP_P:p_P   |
+   |                   <--JPY[H(IP_P:p_P), --- | IP_R:p_Ra |IP_Jr:p_Jr |
+   |                          C(ServerHello)]  |           |           |
+   |   <---ServerHello---                      | IP_Jl:p_Jl|IP_P:p_P   |
    |              :                            |           |           |
    |          [ DTLS messages ]                |     :     |    :      |
    |              :                            |     :     |    :      |
-   |      --Finished-->                        | IP_P:p_P  |IP_Jr:p_Jr |
-   |                    --JPY[H(IP_P:p_P),-->  | IP_Jl:p_Jl|IP_R:p_Ra  |
+   |   ---Finished--->                         | IP_P:p_P  |IP_Jr:p_Jr |
+   |                   ---JPY[H(IP_P:p_P), --> | IP_Jl:p_Jl|IP_R:p_Ra  |
    |                          C(Finished)]     |           |           |
-   |                    <--JPY[H(IP_P:p_P),--  | IP_R:p_Ra |IP_Jr:p_Jr |
-   |                         C(Finished)]      |           |           |
-   |      <--Finished--                        | IP_Jl:p_Jl|IP_P:p_P   |
+   |                   <--JPY[H(IP_P:p_P), --- | IP_R:p_Ra |IP_Jr:p_Jr |
+   |                          C(Finished)]     |           |           |
+   |   <---Finished--                          | IP_Jl:p_Jl|IP_P:p_P   |
    |              :                            |     :     |    :      |
    +-------------------------------------------+-----------+-----------+
+
    IP_P:p_P = Link-local IP address and port of the Pledge
    IP_R:p_Ra = Routable IP address and join-port of Registrar
    IP_Jl:p_Jl = Link-local IP address and join-port of Join Proxy
    IP_Jr:p_Jr = Routable IP address and port of Join Proxy
 
-   JPY[H(),C()] = Join Proxy message with header H and content C
+   JPY[H( ),C( )] = Join Proxy message with header H and content C
 
            Figure 3: constrained stateless joining message flow.
 
@@ -608,7 +609,6 @@ Internet-Draft                 Join Proxy                   January 2025
 
    2.  The content field: This contains the binary DTLS payload being
        relayed, wrapped in a CBOR byte string.
-
 
 
 

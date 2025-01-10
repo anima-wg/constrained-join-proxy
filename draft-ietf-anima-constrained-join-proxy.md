@@ -285,7 +285,7 @@ and utilizing connection mapping state to rewrite the IP address and UDP port nu
 packet header fields of UDP packets that it forwards between Pledge and Registrar.
 {{fig-statefull2}} depiects how this state is used.
 
-~~~~
+~~~~aasvg
 +------------+------------+-------------+--------------------------+
 |   Pledge   | Join Proxy |  Registrar  |          Message         |
 |    (P)     |     (J)    |    (R)      | Src_IP:port | Dst_IP:port|
@@ -306,6 +306,7 @@ packet header fields of UDP packets that it forwards between Pledge and Registra
 |        <--Finished--                  |   IP_Jl:p_Jl| IP_P:p_P   |
 |              :             :          |      :      |     :      |
 +---------------------------------------+-------------+------------+
+
 IP_P:p_P = Link-local IP address and port of Pledge (DTLS Client)
 IP_R:5684 = Routable IP address and coaps port of Registrar
 IP_Jl:p_Jl = Link-local IP address and join-port of Join Proxy
@@ -365,35 +366,35 @@ connection. Packets with different header H belong to different Pledge's UDP con
 In the stateless join proxy mode, both the Registrar and the Join Proxy use discoverable UDP join-ports. 
 For the Join Proxy this may be a default CoAPS port (5684), or another free port.
 
-~~~~
+~~~~aasvg
 +--------------+------------+---------------+-----------------------+
 |    Pledge    | Join Proxy |    Registrar  |        Message        |
 |     (P)      |     (J)    |      (R)      |Src_IP:port|Dst_IP:port|
 +--------------+------------+---------------+-----------+-----------+
-|      --ClientHello-->                     | IP_P:p_P  |IP_Jl:p_Jl |
-|                    --JPY[H(IP_P:p_P),-->  | IP_Jr:p_Jr|IP_R:p_Ra  |
+|   ---ClientHello--->                      | IP_P:p_P  |IP_Jl:p_Jl |
+|                   ---JPY[H(IP_P:p_P), --> | IP_Jr:p_Jr|IP_R:p_Ra  |
 |                          C(ClientHello)]  |           |           |
-|                    <--JPY[H(IP_P:p_P),--  | IP_R:p_Ra |IP_Jr:p_Jr |
-|                         C(ServerHello)]   |           |           |
-|      <--ServerHello--                     | IP_Jl:p_Jl|IP_P:p_P   |
+|                   <--JPY[H(IP_P:p_P), --- | IP_R:p_Ra |IP_Jr:p_Jr |
+|                          C(ServerHello)]  |           |           |
+|   <---ServerHello---                      | IP_Jl:p_Jl|IP_P:p_P   |
 |              :                            |           |           |
 |          [ DTLS messages ]                |     :     |    :      |
 |              :                            |     :     |    :      |
-|      --Finished-->                        | IP_P:p_P  |IP_Jr:p_Jr |
-|                    --JPY[H(IP_P:p_P),-->  | IP_Jl:p_Jl|IP_R:p_Ra  |
+|   ---Finished--->                         | IP_P:p_P  |IP_Jr:p_Jr |
+|                   ---JPY[H(IP_P:p_P), --> | IP_Jl:p_Jl|IP_R:p_Ra  |
 |                          C(Finished)]     |           |           |
-|                    <--JPY[H(IP_P:p_P),--  | IP_R:p_Ra |IP_Jr:p_Jr |
-|                         C(Finished)]      |           |           |
-|      <--Finished--                        | IP_Jl:p_Jl|IP_P:p_P   |
+|                   <--JPY[H(IP_P:p_P), --- | IP_R:p_Ra |IP_Jr:p_Jr |
+|                          C(Finished)]     |           |           |
+|   <---Finished--                          | IP_Jl:p_Jl|IP_P:p_P   |
 |              :                            |     :     |    :      |
 +-------------------------------------------+-----------+-----------+
+
 IP_P:p_P = Link-local IP address and port of the Pledge
 IP_R:p_Ra = Routable IP address and join-port of Registrar
 IP_Jl:p_Jl = Link-local IP address and join-port of Join Proxy
 IP_Jr:p_Jr = Routable IP address and port of Join Proxy
 
-JPY[H(),C()] = Join Proxy message with header H and content C
-
+JPY[H( ),C( )] = Join Proxy message with header H and content C
 ~~~~
 {: #fig-stateless title='constrained stateless joining message flow.' align="left"}
 
