@@ -104,6 +104,7 @@ with {{RFC8366bis}} vouchers to securely enroll devices. A Registrar provides th
 
 In this document, BRSKI is extended such that a Pledge can connect to a Registrar via a constrained Join Proxy.
 In particular, this solution is intended to support 6LoWPAN mesh networks as described in {{RFC4944}}.
+However, 6TiSCH networks are not in scope since these use CoJP {{RFC9031}} mechanism already.
 
 The Join Proxy as specified in this document is one of the Join Proxy
 options referred to in {{RFC8995}} section 2.5.2 as future work.
@@ -602,10 +603,10 @@ Here is an example M_FLOOD announcing the Join Proxy at fe80::1, on standard coa
 
 ### 6tisch Discovery
 
-The discovery of CoJP {{?RFC9031}} compatible Join-Proxy by the Pledge uses the enhanced beacons  as discussed in {{RFC9032}}.
+The discovery of CoJP {{RFC9031}} compatible Join-Proxy by the Pledge uses the enhanced beacons as discussed in {{RFC9032}}.
 6tisch does not use DTLS and so this specification does not apply to it.
 
-The Enhanced Beason discovery mechanism used in 6tisch does not convey a method to the pledge, (equivalent to an objective value, as described above), so only the CoAP/OSCORE mechanism described in {{?RFC9031}} is announced.
+The Enhanced Beason discovery mechanism used in 6tisch does not convey a method to the pledge, (equivalent to an objective value, as described above), so only the CoAP/OSCORE mechanism described in {{RFC9031}} is announced.
 
 A 6tisch network that wanted to use DTLS for security would need a new attribute for the enhanced beacon that announced the availability of a DTLS proxy as described in this document.
 Future work could provide that capability.

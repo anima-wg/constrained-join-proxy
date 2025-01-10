@@ -150,7 +150,8 @@ Internet-Draft                 Join Proxy                   January 2025
    In this document, BRSKI is extended such that a Pledge can connect to
    a Registrar via a constrained Join Proxy.  In particular, this
    solution is intended to support 6LoWPAN mesh networks as described in
-   [RFC4944].
+   [RFC4944].  However, 6TiSCH networks are not in scope since these use
+   CoJP [RFC9031] mechanism already.
 
    The Join Proxy as specified in this document is one of the Join Proxy
    options referred to in [RFC8995] section 2.5.2 as future work.
@@ -161,7 +162,6 @@ Internet-Draft                 Join Proxy                   January 2025
    The specified solutions in [RFC8995] and [RFC7030] are based on POST
    or GET requests to the EST resources (/cacerts, /simpleenroll,
    /simplereenroll, /serverkeygen, and /csrattrs), and the brski
-   resources (/requestvoucher, /voucher_status, and /enrollstatus).
 
 
 
@@ -170,6 +170,7 @@ Richardson, et al.        Expires 14 July 2025                  [Page 3]
 Internet-Draft                 Join Proxy                   January 2025
 
 
+   resources (/requestvoucher, /voucher_status, and /enrollstatus).
    These requests use https and may be too large in terms of code space
    or bandwidth required for constrained devices.  Constrained devices
    which may be part of challenged networks [RFC7228], typically
@@ -212,7 +213,6 @@ Internet-Draft                 Join Proxy                   January 2025
    2.  A stateless Join Proxy where the connection state is replaced by
        a new proxy header in the UDP messages between constrained Join
        Proxy and Registrar.
-
 
 
 
