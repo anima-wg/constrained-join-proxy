@@ -7,10 +7,12 @@ docname: draft-ietf-anima-constrained-join-proxy-16
 
 # stand_alone: true
 
+ipr: trust200902
 area: Internet
 wg: anima Working Group
 kw: Internet-Draft
 cat: std
+stream: IETF
 
 author:
 
@@ -41,7 +43,6 @@ venue:
 
 normative:
   RFC768:
-  RFC6347:
   RFC8366bis: I-D.ietf-anima-rfc8366bis
   RFC8949:
   RFC8990:
@@ -56,13 +57,7 @@ normative:
     author:
     rc: "IEEE Standard"
     date: 2009
-  family: # this really should be IANA.address-family-numbers
-    target: "https://www.iana.org/assignments/address-family-numbers/address-family-numbers.xhtml"
-    title: "Address Family Numbers"
-    author:
-    rc: "IANA"
-    date: 2021-10-19
-
+  
 informative:
   RFC3610:
   RFC3986:
@@ -143,13 +138,11 @@ An enrolled Pledge can act as constrained Join Proxy between other Pledges and t
 
 Two modes of the constrained Join Proxy are specified:
 
-    1 A stateful Join Proxy that locally stores UDP connection state:
-      IP addresses (link-local with interface and non-link-local and UDP port-numbers)
-      during the connection.
+1. A stateful Join Proxy that locally stores UDP connection state:
+IP addresses (link-local with interface and non-link-local and UDP port-numbers) during the connection.
 
-    2 A stateless Join Proxy where the connection state
-      is replaced by a new proxy header in the
-      UDP messages between constrained Join Proxy and Registrar.
+2. A stateless Join Proxy where the connection state
+is replaced by a new proxy header in the UDP messages between constrained Join Proxy and Registrar.
 
 This document is very much inspired by text published earlier in {{I-D.kumar-dice-dtls-relay}}.
 {{I-D.richardson-anima-state-for-joinrouter}} outlined the various options for building a constrained Join Proxy.
@@ -492,9 +485,9 @@ An EST/Registrar server running at address ```2001:db8:0:abcd::52```, with the J
 
   RES: 2.05 Content
   <coaps+jpy://[2001:db8:0:abcd::52]:7634>;rt=brski.rjp,
-  <coaps://[2001:db8:0:abcd::52]/.well-known/brski/rv>;rt=brski.rv;ct=836,
-  <coaps://[2001:db8:0:abcd::52]/.well-known/brski/vs>;rt=brski.vs;ct="50 60",
-  <coaps://[2001:db8:0:abcd::52]/.well-known/brski/es>;rt=brski.es;ct="50 60",
+  <coaps://[2001:db8:0:abcd::52]/.well-known/brski/rv>;rt=brski.rv,
+  <coaps://[2001:db8:0:abcd::52]/.well-known/brski/vs>;rt=brski.vs,
+  <coaps://[2001:db8:0:abcd::52]/.well-known/brski/es>;rt=brski.es
 ~~~~
 
 
@@ -702,18 +695,19 @@ Parameters" registry per the {{RFC6690}} procedure.
 
 ## CoAPS+JPY Scheme Registration {#jpyscheme}
 
-
     Scheme name: coaps+jpy
     Status: permanent
-    Applications/protocols that use this scheme name: Constrained BRSKI Join Proxy
+    Applications/protocols that use this scheme name: cBRSKI
     Contact: ANIMA WG
     Change controller: IESG
     References: [THIS RFC]
-    Scheme syntax: identical to coaps
-    Scheme semantics: The encapsulation mechanism described in {{stateless-jpy}} is used with coaps.
-    Security considerations: The new encapsulation allows traffic to be returned to a calling node
-       behind a proxy.  The form of the encapsulation can include privacy and integrity protection
-       under the control of the proxy system.
+    Scheme syntax: identical to the "coaps" scheme
+    Scheme semantics: The encapsulation mechanism described in 
+       {{stateless-jpy}} is used with coaps.
+    Security considerations: The new encapsulation allows traffic to be 
+       returned to a calling node behind a proxy.  The form of the 
+       encapsulation can include privacy and integrity protection under 
+       the control of the proxy system.
 
 ## Service name and port number registry {#dns-sd-spec}
 
@@ -725,7 +719,7 @@ Number" registry.
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
     Description: Bootstrapping Remote Secure Key Infrastructure
-                  constrained Join Proxy
+                 constrained Join Proxy
     Reference: [this document]
 
     Service Name: brski-rjp
@@ -744,73 +738,92 @@ Many thanks for the comments by {{{Carsten Bormann}}}, {{{Brian Carpenter}}}, {{
 
 # Contributors
 
-{{{Sandeep Kumar}}}, {{{Sye loong Keoh}}}, and {{{Oscar Garcia-Morchon}}} are the co-authors of the draft-kumar-dice-dtls-relay-02. Their draft has served as a basis for this document. Much text from their draft is copied over to this draft.
+{{{Sandeep Kumar}}}, {{{Sye loong Keoh}}}, and {{{Oscar Garcia-Morchon}}} are the co-authors of the draft-kumar-dice-dtls-relay-02.
+Their draft text has served as a basis for this document.
 
 # Changelog
+-15 to -16
 
-## 13 to 12
-    * jpy message encrypted and no longer standardized
+       * Author added.
+       * Update reference RFC8366 to RFC8366bis.
+       * Editorial updates.
 
-## 12 to 11
-    * many typos fixes and text re-organized
-    * core of GRASP and CoAP discovery moved to contrained-voucher document, only stateless extensions remain
+-13 to -15
 
-## 11 to 10
-    * Join-Proxy and Registrar discovery merged
-    * GRASP discovery updated
-    * ARTART review
-    * TSVART review
+       * Various editorial updates and minor changes. 
 
-## 10 to 09
-    * OPSDIR review
-    * IANA review
-    * SECDIR review
-    * GENART review
+-12 to -13
 
-## 09 to 07
-     * typos
+       * jpy message encrypted and no longer standardized
 
-## 06 to 07
-     * AD review changes
+-11 to -12
 
-## 05 to 06
-     * RT value change to brski.jp and brski.rjp
-     * new registry values for IANA
-     * improved handling of jpy header array
+       * many typos fixed and text re-organized
+       * core of GRASP and CoAP discovery moved to constrained-voucher
+         document, only stateless extensions remain
 
-## 04 to 05
-     * Join Proxy and join-port consistent spelling
-     * some nits removed
-     * restructured discovery
-     * section
-     * rephrased parts of security section
+-10 to -11
 
-## 03 to 04
+       * Join-Proxy and Registrar discovery merged
+       * GRASP discovery updated
+       * ARTART review
+       * TSVART review
 
-    * mail address and reference
+-09 to -10
 
-## 02 to 03
+       * OPSDIR review
+       * IANA review
+       * SECDIR review
+       * GENART review
 
-    * Terminology updated
-    * Several clarifications on discovery and routability
-    * DTLS payload introduced
+-07 to -09
 
-## 01 to 02
+        * typos
 
-   * Discovery of Join Proxy and Registrar ports
+-06 to -07
+     
+        * AD review changes
 
-## 00 to 01
+-05 to -06
 
-   * Registrar used throughout instead of EST server
-   * Emphasized additional Join Proxy port for Join Proxy and Registrar
-   * updated discovery accordingly
-   * updated stateless Join Proxy JPY header
-   * JPY header described with CDDL
-   * Example simplified and corrected
+        * RT value change to brski.jp and brski.rjp
+        * new registry values for IANA
+        * improved handling of jpy header array
 
-## 00 to 00
+-04 to -05
 
-   * copied from vanderstok-anima-constrained-join-proxy-05
+        * Join Proxy and join-port consistent spelling
+        * some nits removed
+        * restructured discovery
+        * section
+        * rephrased parts of security section
+
+-03 to -04
+
+       * mail address and reference
+
+-02 to -03
+
+       * Terminology updated
+       * Several clarifications on discovery and routability
+       * DTLS payload introduced
+
+-01 to -02
+
+      * Discovery of Join Proxy and Registrar ports
+
+-00 to -01
+
+       * Registrar used throughout instead of EST server
+       * Emphasized Join Proxy port for Join Proxy and Registrar
+       * updated discovery accordingly
+       * updated stateless Join Proxy JPY header
+       * JPY header described with CDDL
+       * Example simplified and corrected
+
+-00 to -00
+
+       * copied from vanderstok-anima-constrained-join-proxy-05
 
 --- back
 
