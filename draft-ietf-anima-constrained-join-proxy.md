@@ -42,14 +42,14 @@ venue:
 normative:
   RFC768:
   RFC6347:
-  RFC8366:
+  RFC8366bis: I-D.ietf-anima-rfc8366bis
+  RFC8949:
+  RFC8990:
   RFC8995:
   RFC9032:
   RFC9147:
   RFC9148:
   I-D.ietf-anima-constrained-voucher:
-  RFC8949:
-  RFC8990:
   ieee802-1AR:
     target: "https://standards.ieee.org/standard/802.1AR-2009.html"
     title: "IEEE 802.1AR Secure Device Identifier"
@@ -64,22 +64,22 @@ normative:
     date: 2021-10-19
 
 informative:
-  I-D.richardson-anima-state-for-joinrouter:
+  RFC3610:
   RFC3986:
+  RFC4944:
+  RFC6550:
   RFC6690:
+  RFC6775:
   RFC7030:
   RFC7102:
   RFC7228:
+  RFC7252:
+  RFC7959:
+  RFC8610:
+  RFC8974:
   RFC9031:
   I-D.kumar-dice-dtls-relay:
-  RFC4944:
-  RFC3610:
-  RFC7252:
-  RFC6775:
-  RFC7959:
-  RFC8974:
-  RFC6550:
-  RFC8610:
+  I-D.richardson-anima-state-for-joinrouter:
 
 --- abstract
 
@@ -104,7 +104,7 @@ The Bootstrapping Remote Secure Key Infrastructure (BRSKI) protocol described in
 provides a solution for a secure zero-touch (automated) bootstrap of new (unconfigured) devices.
 In the context of BRSKI, new devices, called "Pledges", are equipped with a factory-installed Initial Device Identifier (IDevID) (see {{ieee802-1AR}}), and are enrolled into a network.
 BRSKI makes use of Enrollment over Secure Transport (EST) {{RFC7030}}
-with {{RFC8366}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls.
+with {{RFC8366bis}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls.
 
 In this document, BRSKI is extended such that a Pledge connects to "Registrars" via a constrained Join Proxy.
 In particular, this solution is intended to support mesh networks as described in {{RFC4944}}.
@@ -166,12 +166,12 @@ method, the return forward state is stored in the network.
 
 {::boilerplate bcp14}
 
-The following terms are defined in {{RFC8366}}, and are used
+The following terms are defined in {{RFC8366bis}}, and are used
 identically as in that document: artifact, imprint, domain, Join
 Registrar/Coordinator, Pledge, and Voucher.
 
 The term "Registrar" is used throughout this document instead of
-"Join Registrar/Coordinator (JRC)" as defined in {{RFC8366}}.
+"Join Registrar/Coordinator (JRC)" as defined in {{RFC8366bis}}.
 
 The term "installation" refers to all devices in the network and their interconnections, including Registrar, enrolled nodes with and without constrained Join Proxy functionality and Pledges.
 
@@ -647,7 +647,7 @@ This section should enable operators to make a choice between the two modes base
 
 All the concerns in {{RFC8995}} section 4.1 apply.
 The Pledge can be deceived by malicious Join Proxy announcements.
-The Pledge will only join a network to which it receives a valid {{RFC8366}} voucher {{I-D.ietf-anima-constrained-voucher}}. Once the Pledge joined, the payload between Pledge and Registrar is protected by DTLS.
+The Pledge will only join a network to which it receives a valid voucher {{I-D.ietf-anima-constrained-voucher}}. Once the Pledge joined, the payload between Pledge and Registrar is protected by DTLS.
 
 A malicious constrained Join Proxy has a number of routing possibilities:
 
