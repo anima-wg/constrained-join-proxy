@@ -469,11 +469,10 @@ The Registrar and the Pledge MUST select a block size that would allow the addit
 ## Discovery operations by Join Proxy
 
 In order to accommodate automatic configuration of the Join Proxy, it must discover the location and a capabilities of the Registar.
-{{Section 10.2 of cBRSKI}} explains the basic mechanism, and this section explains the extensions required to discover whether stateless operation is supported.
+This includes discovering whether stateless operation is supported, or not.
 
 ### CoAP discovery {#coap-disc}
 
-{{Section 10.2.2 of cBRSKI}} describes how to use CoAP Discovery.
 The stateless Join Proxy requires a different end point that can accept the JPY encapsulation.
 
 The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt) parameter with the value "brski.rjp" {{RFC6690}}.
@@ -486,7 +485,7 @@ Upon success, the return payload will contain the join-port of the Registrar.
   <coaps+jpy://[IP_address]:join-port>;rt=brski.rjp
 ~~~~
 
-In the {{RFC6690}} link format, and {{?RFC3986, Section 3.2}}, the authority attribute can not include a port number unless it also includes the IP address.
+In the {{RFC6690}} link format, and {{RFC3986, Section 3.2}}, the authority attribute can not include a port number unless it also includes the IP address.
 
 The returned join-port is expected to process the encapsulated JPY messages described in section {{stateless-jpy}}.
 The scheme remains coaps, as the inside protocol is still CoAP and DTLS.
@@ -509,7 +508,7 @@ The coaps+jpy scheme is registered is defined in {{jpyscheme}}, as per {{RFC7252
 
 ### GRASP discovery
 
-{{Section 10.2.1 of cBRSKI}} describes how to use GRASP {{RFC8990}} discovery within the ACP to locate the stateful port of the Registrar.
+TODO: missing how to use GRASP {{RFC8990}} discovery within the ACP to locate the stateful port of the Registrar.
 
 A Join Proxy which supports a stateless mode of operation using the mechanism described in {{stateless-jpy}} must know where to send the encoded content from the pledge.
 The Registrar announces its willingness to use the stateless mechanism by including an additional objective in it's M\_FLOOD'ed ```AN_join_registrar``` announcements, but with a different objective value.
@@ -681,7 +680,8 @@ In some installations, layer 2 protection is provided between all member pairs o
 
 ## Extensions to the "BRSKI AN_Proxy Objective Value" Registry
 
-{{cBRSKI}} previously registered the objective value DTLS-EST.
+TODO: register the objective value DTLS-EST.
+
 This document makes use of it, and the registry should be extended to reference this document as well.
 
 ## Extensions to the "BRSKI AN_join_registrar Objective Value" Registry
