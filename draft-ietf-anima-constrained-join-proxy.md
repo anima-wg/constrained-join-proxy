@@ -84,7 +84,7 @@ Infrastructures (BRSKI) by replacing the (stateful) TLS Circuit proxy between
 Pledge and Registrar with a stateless or stateful DTLS Circuit proxy 
 which is called the constrained Join Proxy. The Join Proxy is a mesh neighbor of the
 Pledge and can relay a DTLS session originating from a Pledge with only link-local
-addresses to a Registrar which is not a mesh neighbor of the
+addresses to a Registrar that is not a mesh neighbor of the
 Pledge.
 
 Like the BRSKI Circuit proxy, this Join Proxy eliminates the need of
@@ -111,15 +111,17 @@ options referred to in {{RFC8995}} section 2.5.2 as future work.
 
 A complete specification of the terminology is pointed at in {{Terminology}}.
 
-The specified solutions in {{RFC8995}} and {{RFC7030}} are based on POST or GET requests to the EST resources (/cacerts, /simpleenroll, /simplereenroll, /serverkeygen, and /csrattrs), and the brski resources (/requestvoucher, /voucher_status, and /enrollstatus).
-These requests use https and may be too large in terms of code space or bandwidth required for constrained devices.
-Constrained devices which may be part of challenged networks {{RFC7228}}, typically implement the IPv6 over Low-Power Wireless personal Area Networks (6LoWPAN) {{RFC4944}} and Constrained Application Protocol (CoAP) {{RFC7252}}.
+The specified solutions in {{RFC8995}} and {{RFC7030}} are based on POST or GET requests to the EST resources 
+(`/cacerts`, `/simpleenroll`, `/simplereenroll`, `/serverkeygen`, and `/csrattrs`), and the brski resources 
+(`/requestvoucher`, `/voucher_status`, and `/enrollstatus`).
+These requests use https and may be too large (in terms of code space or bandwidth required for constrained devices).
+Constrained devices, which may be part of challenged networks {{RFC7228}}, typically implement the IPv6 over Low-Power Wireless personal Area Networks (6LoWPAN) {{RFC4944}} and Constrained Application Protocol (CoAP) {{RFC7252}}.
 
 CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC9147}} as a security protocol for authenticity and confidentiality of the messages.
 This is known as the "coaps" scheme.
 A constrained version of EST, using CoAP and DTLS, is described in {{RFC9148}}.
 
-The {{cBRSKI}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges that use CoAP.
+{{cBRSKI}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges that use CoAP.
 
 However, in networks that require authentication, such as those using {{RFC4944}},
 the Pledge will not be IP routable over the mesh network
@@ -166,7 +168,7 @@ artifact, Circuit Proxy, Join Proxy, domain, imprint, Registrar, Pledge, and Vou
 
 The term "installation" refers to all devices in the network and their interconnections, including Registrar, enrolled nodes with and without constrained Join Proxy functionality and Pledges.
 
-(Installation) IP addresses are assumed to be routeable over the whole installation network except for link-local IP addresses.
+(Installation) IP addresses are assumed to be routable over the whole installation network except for link-local IP addresses.
 
 The term "Join Proxy" as used in this document refers specifically to an {{RFC8995}} Join Proxy that can support 
 Pledges execute the cBRSKI protocol {{cBRSKI}} over an end-to-end secured
@@ -175,10 +177,11 @@ channel to the cBRSKI Registrar.
 
 # Join Proxy functionality
 
-As depicted in the {{fig-net}}, the Pledge (P), in a network such as a Low-Power and Lossy Network (LLN) mesh
+As depicted in {{fig-net}}, the Pledge (P), in a network such as a Low-Power and Lossy Network (LLN) mesh
  {{RFC7102}} can be more than one hop away from the Registrar (R) and not yet authenticated into the network.
 
-In this situation, the Pledge can only communicate one-hop to its nearest neighbor, the constrained Join Proxy (J) using their link-local IPv6 addresses.
+In this situation, the Pledge can only communicate one-hop to its nearest neighbor, the constrained Join Proxy (J), 
+using their link-local IPv6 addresses.
 However, the Pledge needs to communicate with end-to-end security with a Registrar to authenticate and get the relevant system/network parameters.
 If the Pledge, knowing the IP-address of the Registrar, initiates a DTLS connection to the Registrar, then the packets are dropped at the Join Proxy since the Pledge is not yet admitted to the network or there is no IP routability to the Pledge for any returned messages from the Registrar.
 
@@ -201,13 +204,34 @@ with the Registrar (R), over multiple hops in the network.
 Furthermore, the Pledge may not be able to discover the IP address of the Registrar over multiple hops to initiate a DTLS connection and perform authentication.
 
 To overcome the problems with non-routability of DTLS packets and/or discovery of the destination address of the Registrar, the Join Proxy is introduced.
-This Join Proxy functionality is also (auto) configured into all authenticated devices in the network which may act as a Join Proxy for Pledges.
+This Join Proxy functionality is also (auto) configured into all authenticated devices in the network that may act as a Join Proxy for Pledges.
 The Join Proxy allows for routing of the packets from the Pledge using IP routing to the intended Registrar. An authenticated Join Proxy can discover the routable IP address of the Registrar over multiple hops.
 The following {{jr-spec}} specifies the two Join Proxy modes. A comparison is presented in {{jr-comp}}.
 
-When a mesh network is set up, it consists of a Registrar and a set of connected pledges. No Join Proxies are present.  Only some of these pledges may be neighbors of the Registrar. Others would need for their traffic to be routed across one or more enrolled devices to reach the Registrar.
+When a mesh network is set up using cBRSKI, it requires an active Registrar that is reachable by the nodes to be 
+onboarded into the mesh network. Typically, the first device to be set up is a 6LoWPAN Border Router (6LBR) which 
+enables cBRSKI onboarding of new devices via a 6LoWPAN network interface. 
+This 6LBR may host the cBRSKI Registrar.
+At the time the Registrar and the 6LBR are enabled, there may be zero Pledges, or there may be already one or more 
+Pledges waiting - periodically attempting to discover a Join Proxy for cBRSKI onboarding.
 
-The desired state of the installation is a network with a Registrar and all Pledges becoming enrolled devices. Some of these enrolled devices can act as Join Proxies. Pledges can only employ link-local communication until they are enrolled. A Pledge will regularly try to discover a Join Proxy or a Registrar with link-local discovery requests. The Pledges which are neighbors of the Registrar will discover the Registrar and be enrolled following the constrained BRSKI protocol. An enrolled device can act as Join Proxy. The Pledges which are not a neighbor of the Registrar will eventually discover a Join Proxy and follow the constrained BRSKI protocol to be enrolled. While this goes on, more and more Join Proxies with a larger hop distance to the Registrar will emerge. The network should be configured such that at the end of the enrollment process, all pledges have discovered a neighboring Join Proxy or the Registrar, and all Pledges are enrolled.
+The Registrar hosted on the 6LBR will, per {{cBRSKI}}, make itself discoverable as a Join Proxy so that Pledges can 
+use it for onboarding.
+Note that only some of these Pledges may be neighbors of the Registrar/6LBR. 
+Others would need their traffic to be relayed across one or more enrolled mesh devices (6LR) to reach the Registrar.
+
+The desired state of the installation is a network with a Registrar and all Pledges successfully enrolled in the 
+network domain. 
+Some of these enrolled devices can act as Join Proxies. 
+Pledges can only employ link-local communication until they are enrolled. 
+A Pledge will regularly try to discover a Join Proxy with link-local discovery requests. 
+The Pledges that are neighbors of the Registrar will discover the Registrar itself (as it is posing as a Join Proxy) 
+and will be enrolled first using cBRSKI. 
+An enrolled device can then act as Join Proxy itself. 
+The Pledges that are not a neighbor of the Registrar will eventually discover a Join Proxy and be enrolled with 
+cBRSKI. 
+While this continues, more and more Join Proxies with a larger hop distance to the Registrar will emerge. 
+The mesh network auto-configured in this way, such that at the end of the enrollment process, all Pledges are enrolled.
 
 The Join Proxy is as a packet-by-packet proxy for UDP packets between Pledge and
 Registrar. The constrained BRSKI protocol between Pledge and Registrar described in
@@ -225,8 +249,8 @@ discuss how a Join Proxy selects a Registrar when it discovers 2 or more.
 
 A Join Proxy can operate in two modes:
 
-  * Stateful mode
-  * Stateless mode
+   1. Stateful mode
+   2. Stateless mode
 
 The advantages and disadvantages of the two modes are presented in {{jr-comp}}.
 
@@ -237,7 +261,7 @@ able to talk to a Registrar (exchange UDP messages with it). This can happen
 fully automatically by the Join Proxy node first enrolling itself as a Pledge,
 and then learning the IP address, the UDP port and the mode(s) (Stateful and/or Stateless)
 of the Registrar, through a discovery mechanism such as those described in Section 6.
-Other methods, such as provisioning the Join Proxy are out of scope of this document
+Other methods, such as provisioning the Join Proxy are out of scope for this document
 but equally feasible.
 
 Once the Join Proxy is operational, its mode is determined by the mode of the Registrar.
@@ -301,41 +325,45 @@ If an untrusted Pledge that can only use link-local addressing wants to contact 
 
 Stateless join proxy operation eliminates the need and complexity to
 maintain per UDP connection mapping state on the proxy and the state machinery to build, maintain and
-remove this mapping state. It also removes the need to protect this mapping staate
+remove this mapping state. It also removes the need to protect this mapping state
 against DoS attacks and may also reduce memory and CPU requirements on the proxy.
 
-Stateless join proxy operations works by introducing a new JPY message payload for messages between Proxy and Registrar, which consists of two parts:
+Stateless join proxy operations works by introducing a new JPY message used in communication between Proxy and Registrar, 
+which consists of two parts:
 
-  * Header (H) field: the link-local IP address, interface and UDP (source) port of the Pledge (P).
-  * Contents (C) field: the original UDP payload (data octets according to RFC768).
+  * Header (H) field: contains context information about the Pledge (P) such as the link-local IP address, interface and UDP (source) port.
+  * Contents (C) field: the original UDP payload (data octets according to RFC768) received from the Pledge, or destined to the Pledge.
 
-When  the join proxy receives a UDP message from a Pledge, it encodes the Pledges
-link-local IP address, interface and UDP (source) port of the packet into the Header field
+When the join proxy receives a UDP message from a Pledge, it encodes the Pledge's
+link-local IP address, interface and UDP (source) port of the UDP packet into the Header field
 and the UDP payload into the Content field and sends the packet to the Registrar from
 a fixed source UDP port. When the Registrar sends packets for the Pledge,
 it MUST return the Header field unchanged, so that the join proxy can decode the
-Header to reconstruct the Pledges link-local IP address, interace and UDP (destination) port
-for the return packet. {{fig-stateless}} shows this per-packet mapping on the join proxy.
+Header to reconstruct the Pledge's link-local IP address, interace and UDP (destination) port
+for the return UDP packet. {{fig-stateless}} shows this per-packet mapping on the join proxy.
 
 The Registrar transiently stores the Header field information.
 The Registrar uses the Contents field to execute the Registrar functionality.
-However, when the Registrar replies, it also extends its DTLS message with the header field in a JPY message and sends it back to the Join Proxy.
+When the Registrar replies, it wraps its DTLS message in a JPY message and sends it back to the Join Proxy.
 The Registrar SHOULD NOT assume that it can decode the Header Field, it should simply repeat it when responding.
-The Header contains the original source link-local address and port of the Pledge from the transient state stored earlier and the Contents field contains the DTLS payload.
+The Header contains the original source link-local address and port of the Pledge from the transient state stored 
+earlier and the Contents field contains the DTLS payload.
 
 On receiving the JPY message, the Join Proxy retrieves the two parts.
-It uses the Header field to route the DTLS message containing the DTLS payload retrieved from the Contents field to the Pledge.
+It uses the Header field information to send a UDP message containing the (DTLS) payload retrieved from the Contents field to a 
+particular Pledge.
 
 When the Registrar receives such a JPY message, it MUST treat the Header
 H as a single additional opaque identifier for all packets of a UDP connection
-from a Plege: Whereas in the stateful proxy case, all packets with the same
-(IP_jr:p_Jr, IP_R:p_r) belong to a single Pledges UDP connection and hence
+from a Pledge: Whereas in the stateful proxy case, all packets with the same
+(IP_jr:p_Jr, IP_R:p_r) belong to a single Pledge's UDP connection and hence
 DTLS/CoAP connection, only the packets with the same (IP_jr:p_Jr, IP_R:p_r, H)
-belong to a single Plegdes UDP connection / DTLS/CoAP connection. The
-JPY Content field payload is the UDP payload of the packet for that UDP
-connection. Packets with different H belong to different Pledges UDP connections.
+belong to a single Pledge's UDP connection / DTLS/CoAP connection. The
+JPY message Content field contains the UDP payload of the packet for that UDP
+connection. Packets with different header H belong to different Pledge's UDP connections.
 
-In the stateless join proxy mode, both the Registrar and the Join Proxy use discoverable UDP join-ports. For the Join Proxy this may be a default CoAP port.
+In the stateless join proxy mode, both the Registrar and the Join Proxy use discoverable UDP join-ports. 
+For the Join Proxy this may be a default CoAPS port (5684), or another free port.
 
 ~~~~
 +--------------+------------+---------------+-----------------------+
@@ -404,7 +432,7 @@ This key need not persist on a long-term basis, and MAY be changed periodically.
 The considerations of  {{Section 5.2 of RFC8974}} apply.
 
 This context data is intended to be identical to the "state object" mechanism described in {{Section 7.1 of RFC9031}}.
-However, since the CoAP protocol layer is inside of the DTLS layer (end-to-end encrypted between the Pledge and the 
+However, since the CoAP protocol layer is inside the DTLS layer (end-to-end encrypted between the Pledge and the 
 Registrar), it is not possible for the Join Proxy to act as a CoAP proxy.
 
 For the JPY messages relayed to the Registrar, the Join Proxy SHOULD use the same UDP source port for the JPY messages 
@@ -443,9 +471,9 @@ On media where the Interface IDentifier (IID) is not 64-bits, a different field 
 
 The Join Proxy MUST maintain the same context data for all communications from the same Pledge.
 This implies that the encryption key used either does not change during the onboarding attempt of the Pledge, 
-or that when it does, it is acceptable to break any onboarding connections which have not yet completed.
+or that when it does, it is acceptable to break any onboarding connections that have not yet completed.
 
-If using a context data format like defined above, it should be easy for the Join Proxy to meet this requirement without maintaining any local state about the pledge.
+If using a context data format as defined above, it should be easy for the Join Proxy to meet this requirement without maintaining any local state about the pledge.
 
 ### Processing by Registrar
 
@@ -453,7 +481,7 @@ On reception of a JPY message by the Registrar, the Registrar MUST verify that t
 The content field must be provided as input to a DTLS library {{RFC9147}}, which along with the 5-tuple of the UDP connection 
 provides enough information for the Registrar to pick an appropriate (active) client context.
 Note that the same UDP socket will need to be used for multiple DTLS flows, which is atypical for how DTLS usually uses sockets.
-The jp_context field can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of of per-session context.
+The jp_context field can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of per-session context.
 The jp_context field needs to be linked to the DTLS context, and when a DTLS message need to be sent back to the client, 
 then the jp_context needs to be included in a JPY message along with the DTLS message in the content field. 
 
@@ -486,7 +514,7 @@ Upon success, the return payload will contain the join-port of the Registrar.
   <coaps+jpy://[IP_address]:join-port>;rt=brski.rjp
 ~~~~
 
-In the {{RFC6690}} link format, and {{RFC3986, Section 3.2}}, the authority attribute can not include a port number unless it also includes the IP address.
+In the {{RFC6690}} link format, and {{RFC3986, Section 3.2}}, the authority attribute cannot include a port number unless it also includes the IP address.
 
 The returned join-port is expected to process the encapsulated JPY messages described in section {{stateless-jpy}}.
 The scheme remains coaps, as the inside protocol is still CoAP and DTLS.
@@ -503,16 +531,14 @@ An EST/Registrar server running at address ```2001:db8:0:abcd::52```, with the J
   <coaps://[2001:db8:0:abcd::52]/.well-known/brski/es>;rt=brski.es
 ~~~~
 
-
-
-The coaps+jpy scheme is registered is defined in {{jpyscheme}}, as per {{RFC7252, Section 6.2}}
+Note: the coaps+jpy scheme is registered in {{jpyscheme}}.
 
 ### GRASP discovery
 
 TODO: missing how to use GRASP {{RFC8990}} discovery within the ACP to locate the stateful port of the Registrar.
 
-A Join Proxy which supports a stateless mode of operation using the mechanism described in {{stateless-jpy}} must know where to send the encoded content from the pledge.
-The Registrar announces its willingness to use the stateless mechanism by including an additional objective in it's M\_FLOOD'ed ```AN_join_registrar``` announcements, but with a different objective value.
+A Join Proxy that supports a stateless mode of operation using the mechanism described in {{stateless-jpy}} must know where to send the encoded content from the pledge.
+The Registrar announces its willingness to use the stateless mechanism by including an additional objective in its M\_FLOOD'ed ```AN_join_registrar``` announcements, but with a different objective value.
 
 The following changes are necessary with respect to Figure 10 of {{RFC8995}}:
 
@@ -530,7 +556,7 @@ Here is an example M\_FLOOD announcing the Registrar on example port 5685, which
 ~~~
 {: #fig-grasp-rgj title='Example of Registrar announcement message' align="left"}
 
-Most Registrars will announce both a JPY-stateless and stateful ports, and may also announce an HTTPS/TLS service:
+Most Registrars will announce both JPY-stateless and stateful ports, and may also announce an HTTPS/TLS service:
 
 ~~~
    [M_FLOOD, 51840231, h'fda379a6f6ee00000200000064000001', 180000,
@@ -589,7 +615,7 @@ The following changes are necessary with respect to figure 10 of {{RFC8995}}:
 * the objective-value is "DTLS-EST"
 
 The Registrar announces itself using ACP instance of GRASP using M_FLOOD messages.
-Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}} .
+Autonomic Network Join Proxies MUST support GRASP discovery of Registrar as described in section 4.3 of {{RFC8995}}.
 
 Here is an example M_FLOOD announcing the Join Proxy at fe80::1, on standard coaps port 5684.
 
@@ -611,49 +637,31 @@ The Enhanced Beason discovery mechanism used in 6tisch does not convey a method 
 A 6tisch network that wanted to use DTLS for security would need a new attribute for the enhanced beacon that announced the availability of a DTLS proxy as described in this document.
 Future work could provide that capability.
 
-# Comparison of stateless and stateful modes {#jr-comp}
+# Comparison of stateless and stateful Join Proxy modes {#jr-comp}
 
-The stateful and stateless mode of operation for the Join Proxy have
-their advantages and disadvantages.
-This section should enable operators to make a choice between the two modes based  on the available device resources and network bandwidth.
+The stateful and stateless mode of operation for the Join Proxy each have their advantages and disadvantages.
+This section should enable operators to make a choice between the two modes based on the available device resources and network bandwidth.
 
-~~~~
-+-------------+----------------------------+------------------------+
 | Properties  |         Stateful mode      |     Stateless mode     |
-+-------------+----------------------------+------------------------+
-| State       |The Join Proxy needs        | No information is      |
-| Information |additional storage to       | maintained by the Join |
-|             |maintain mapping between    | Proxy. Registrar needs |
-|             |the address and port number | to store the packet    |
-|             |of the Pledge and those     | header.                |
-|             |of the Registrar.           |                        |
-+-------------+----------------------------+------------------------+
-|Packet size  |The size of the forwarded   |Size of the forwarded   |
-|             |message is the same as the  |message is bigger than  |
-|             |original message.           |the original,it includes|
-|             |                            |additional information  |
-+-------------+----------------------------+------------------------+
-|Specification|The Join Proxy needs        |New JPY message to      |
-|complexity   |additional functionality    |encapsulate DTLS payload|
-|             |to maintain state           |The Registrar           |
-|             |information, and specify    |and the Join Proxy      |
-|             |the source and destination  |have to understand the  |
-|             |addresses of the DTLS       |JPY message in order    |
-|             |handshake messages          |to process it.          |
-+-------------+----------------------------+------------------------+
-| Ports       | Join Proxy needs           |Join Proxy and Registrar|
-|             | discoverable join-port     |need discoverable       |
-|             |                            | join-ports             |
-+-------------+----------------------------+------------------------+
-
-~~~~
+|:----------- |:---------------------------|:-----------------------|
+| State Information | The Join Proxy needs additional storage to maintain mappings between the address and port number of the Pledge and those of the Registrar.  | No information is maintained by the Join Proxy. Registrar transiently stores the JPY message header.  |
+|-------------
+|Packet size  |The size of a relayed message is the same as the original message.   | Size of a relayed message is up to 34 bytes larger than the original: it includes additional context information.  |
+|-------------
+|Technical complexity |The Join Proxy needs additional functions to maintain state information, and specify the source and destination addresses and ports of relayed messages. | Requires new JPY message structure (CBOR) in Join Proxy. The Registrar requires a function to process JPY messages.|
+|------------
+| Join Proxy Ports | Join Proxy needs discoverable join-port | Join Proxy needs discoverable join-port  |
+|------------
+| Registrar Ports  | Registrar can host on a single UDP port. | Registrar must host on two UDP ports: one for DTLS, one for JPY messages. |
+|=============
 {: #fig-comparison title='Comparison between stateful and stateless mode' align="left"}
 
 # Security Considerations
 
 All the concerns in {{RFC8995}} section 4.1 apply.
 The Pledge can be deceived by malicious Join Proxy announcements.
-The Pledge will only join a network to which it receives a valid voucher {{cBRSKI}}. Once the Pledge joined, the payload between Pledge and Registrar is protected by DTLS.
+The Pledge will only join a network to which it receives a valid voucher {{cBRSKI}}.
+Once the Pledge has joined, the payload between Pledge and Registrar is protected by DTLS.
 
 A malicious Join Proxy has a number of routing possibilities:
 
@@ -675,7 +683,7 @@ If such scenario needs to be avoided, the Join Proxy MUST encrypt the CBOR array
 key. The Registrar is not able to examine the encrypted result, but
 does not need to. The Registrar stores the encrypted header in the return packet without modifications. The Join Proxy can decrypt the contents to route the message to the right destination.
 
-In some installations, layer 2 protection is provided between all member pairs of the mesh. In such an environment encryption of the CBOR array is unnecessary because the layer 2 protection already provide it.
+In some installations, layer 2 protection is provided between all member pairs of the mesh. In such an environment encryption of the CBOR array is unnecessary because the layer 2 protection already provides it.
 
 # IANA Considerations
 
