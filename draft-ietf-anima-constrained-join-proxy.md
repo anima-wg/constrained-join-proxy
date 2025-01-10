@@ -50,7 +50,7 @@ normative:
   RFC9032:
   RFC9147:
   RFC9148:
-  I-D.ietf-anima-constrained-voucher:
+  cBRSKI: I-D.ietf-anima-constrained-voucher
   ieee802-1AR:
     target: "https://standards.ieee.org/standard/802.1AR-2009.html"
     title: "IEEE 802.1AR Secure Device Identifier"
@@ -118,7 +118,7 @@ CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC9147}} as
 This is known as the "coaps" scheme.
 A constrained version of EST, using CoAP and DTLS, is described in {{RFC9148}}.
 
-The {{I-D.ietf-anima-constrained-voucher}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges that use CoAP.
+The {{cBRSKI}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges that use CoAP.
 
 However, in networks that require authentication, such as those using {{RFC4944}},
 the Pledge will not be IP routable over the mesh network
@@ -168,7 +168,7 @@ The term "installation" refers to all devices in the network and their interconn
 (Installation) IP addresses are assumed to be routeable over the whole installation network except for link-local IP addresses.
 
 The term "Join Proxy" as used in this document refers specifically to an {{RFC8995}} Join Proxy that can support 
-Pledges execute the cBRSKI protocol {{I-D.ietf-anima-constrained-voucher}} over an end-to-end secured
+Pledges execute the cBRSKI protocol {{cBRSKI}} over an end-to-end secured
 channel to the cBRSKI Registrar.
 
 
@@ -210,7 +210,7 @@ The desired state of the installation is a network with a Registrar and all Pled
 
 The Join Proxy is as a packet-by-packet proxy for UDP packets between Pledge and
 Registrar. The constrained BRSKI protocol between Pledge and Registrar described in
-{{I-D.ietf-anima-constrained-voucher}} which this Join Proxy supports
+{{cBRSKI}} which this Join Proxy supports
 uses UDP messages with DTLS payload, but the Join Proxy as described here is unaware
 of this payload. It can therefore potentially also work for other UDP based protocols
 as long as they are agnostic to (or can be made to work with) the change of IP header
@@ -458,7 +458,7 @@ then the jp_context needs to be included in a JPY message along with the DTLS me
 
 Examples are shown in {{examples}}.
 
-At the CoAP level, using the cBRSKI {{I-D.ietf-anima-constrained-voucher}} and the EST-CoAPS {{RFC9148}} protocols, 
+At the CoAP level, using the cBRSKI {{cBRSKI}} and the EST-CoAPS {{RFC9148}} protocols, 
 the CoAP blockwise options {{RFC7959}} are often used to split large payloads into multiple data blocks.
 The Registrar and the Pledge MUST select a block size that would allow the addition of the JPY\_message header 
 (including a jp_context field of up to 34 bytes) without violating MTU sizes.
@@ -469,11 +469,11 @@ The Registrar and the Pledge MUST select a block size that would allow the addit
 ## Discovery operations by Join Proxy
 
 In order to accommodate automatic configuration of the Join Proxy, it must discover the location and a capabilities of the Registar.
-{{Section 10.2 of I-D.ietf-anima-constrained-voucher}} explains the basic mechanism, and this section explains the extensions required to discover whether stateless operation is supported.
+{{Section 10.2 of cBRSKI}} explains the basic mechanism, and this section explains the extensions required to discover whether stateless operation is supported.
 
 ### CoAP discovery {#coap-disc}
 
-{{Section 10.2.2 of I-D.ietf-anima-constrained-voucher}} describes how to use CoAP Discovery.
+{{Section 10.2.2 of cBRSKI}} describes how to use CoAP Discovery.
 The stateless Join Proxy requires a different end point that can accept the JPY encapsulation.
 
 The stateless Join Proxy can discover the join-port of the Registrar by sending a GET request to "/.well-known/core" including a resource type (rt) parameter with the value "brski.rjp" {{RFC6690}}.
@@ -509,7 +509,7 @@ The coaps+jpy scheme is registered is defined in {{jpyscheme}}, as per {{RFC7252
 
 ### GRASP discovery
 
-{{Section 10.2.1 of I-D.ietf-anima-constrained-voucher}} describes how to use GRASP {{RFC8990}} discovery within the ACP to locate the stateful port of the Registrar.
+{{Section 10.2.1 of cBRSKI}} describes how to use GRASP {{RFC8990}} discovery within the ACP to locate the stateful port of the Registrar.
 
 A Join Proxy which supports a stateless mode of operation using the mechanism described in {{stateless-jpy}} must know where to send the encoded content from the pledge.
 The Registrar announces its willingness to use the stateless mechanism by including an additional objective in it's M\_FLOOD'ed ```AN_join_registrar``` announcements, but with a different objective value.
@@ -574,7 +574,7 @@ The example below shows the discovery of the join-port of the Join Proxy.
 ~~~~
 
 Port numbers are assumed to be the default numbers 5683 and 5684 for coap and coaps respectively (sections 12.6 and 12.7 of {{RFC7252}}) when not shown in the response.
-Discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{RFC9148}}).
+Discoverable port numbers are usually returned for Join Proxy resources in the &lt;URI-Reference&gt; of the payload (see section 5.1 of {{RFC6690}}).
 
 ### GRASP discovery
 
@@ -653,7 +653,7 @@ This section should enable operators to make a choice between the two modes base
 
 All the concerns in {{RFC8995}} section 4.1 apply.
 The Pledge can be deceived by malicious Join Proxy announcements.
-The Pledge will only join a network to which it receives a valid voucher {{I-D.ietf-anima-constrained-voucher}}. Once the Pledge joined, the payload between Pledge and Registrar is protected by DTLS.
+The Pledge will only join a network to which it receives a valid voucher {{cBRSKI}}. Once the Pledge joined, the payload between Pledge and Registrar is protected by DTLS.
 
 A malicious Join Proxy has a number of routing possibilities:
 
@@ -681,7 +681,7 @@ In some installations, layer 2 protection is provided between all member pairs o
 
 ## Extensions to the "BRSKI AN_Proxy Objective Value" Registry
 
-{{I-D.ietf-anima-constrained-voucher}} previously registered the objective value DTLS-EST.
+{{cBRSKI}} previously registered the objective value DTLS-EST.
 This document makes use of it, and the registry should be extended to reference this document as well.
 
 ## Extensions to the "BRSKI AN_join_registrar Objective Value" Registry

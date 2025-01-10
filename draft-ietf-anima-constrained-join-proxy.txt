@@ -182,9 +182,9 @@ Internet-Draft                 Join Proxy                   January 2025
    of the messages.  This is known as the "coaps" scheme.  A constrained
    version of EST, using CoAP and DTLS, is described in [RFC9148].
 
-   The [I-D.ietf-anima-constrained-voucher] extends [RFC9148] with BRSKI
-   artifacts such as voucher, request voucher, and the protocol
-   extensions for constrained Pledges that use CoAP.
+   The [cBRSKI] extends [RFC9148] with BRSKI artifacts such as voucher,
+   request voucher, and the protocol extensions for constrained Pledges
+   that use CoAP.
 
    However, in networks that require authentication, such as those using
    [RFC4944], the Pledge will not be IP routable over the mesh network
@@ -261,8 +261,8 @@ Internet-Draft                 Join Proxy                   January 2025
 
    The term "Join Proxy" as used in this document refers specifically to
    an [RFC8995] Join Proxy that can support Pledges execute the cBRSKI
-   protocol [I-D.ietf-anima-constrained-voucher] over an end-to-end
-   secured channel to the cBRSKI Registrar.
+   protocol [cBRSKI] over an end-to-end secured channel to the cBRSKI
+   Registrar.
 
 3.  Join Proxy functionality
 
@@ -351,12 +351,12 @@ Internet-Draft                 Join Proxy                   January 2025
 
    The Join Proxy is as a packet-by-packet proxy for UDP packets between
    Pledge and Registrar.  The constrained BRSKI protocol between Pledge
-   and Registrar described in [I-D.ietf-anima-constrained-voucher] which
-   this Join Proxy supports uses UDP messages with DTLS payload, but the
-   Join Proxy as described here is unaware of this payload.  It can
-   therefore potentially also work for other UDP based protocols as long
-   as they are agnostic to (or can be made to work with) the change of
-   IP header by the Join Proxy.
+   and Registrar described in [cBRSKI] which this Join Proxy supports
+   uses UDP messages with DTLS payload, but the Join Proxy as described
+   here is unaware of this payload.  It can therefore potentially also
+   work for other UDP based protocols as long as they are agnostic to
+   (or can be made to work with) the change of IP header by the Join
+   Proxy.
 
    In both Stateless and Stateful mode, the Join Proxy needs to be
    configured with or dynamically discover a Registrar to perform its
@@ -737,13 +737,12 @@ Internet-Draft                 Join Proxy                   January 2025
 
    Examples are shown in Appendix A.
 
-   At the CoAP level, using the cBRSKI
-   [I-D.ietf-anima-constrained-voucher] and the EST-CoAPS [RFC9148]
-   protocols, the CoAP blockwise options [RFC7959] are often used to
-   split large payloads into multiple data blocks.  The Registrar and
-   the Pledge MUST select a block size that would allow the addition of
-   the JPY_message header (including a jp_context field of up to 34
-   bytes) without violating MTU sizes.
+   At the CoAP level, using the cBRSKI [cBRSKI] and the EST-CoAPS
+   [RFC9148] protocols, the CoAP blockwise options [RFC7959] are often
+   used to split large payloads into multiple data blocks.  The
+   Registrar and the Pledge MUST select a block size that would allow
+   the addition of the JPY_message header (including a jp_context field
+   of up to 34 bytes) without violating MTU sizes.
 
 5.  Discovery
 
@@ -751,15 +750,15 @@ Internet-Draft                 Join Proxy                   January 2025
 
    In order to accommodate automatic configuration of the Join Proxy, it
    must discover the location and a capabilities of the Registar.
-   Section 10.2 of [I-D.ietf-anima-constrained-voucher] explains the
-   basic mechanism, and this section explains the extensions required to
-   discover whether stateless operation is supported.
+   Section 10.2 of [cBRSKI] explains the basic mechanism, and this
+   section explains the extensions required to discover whether
+   stateless operation is supported.
 
 5.1.1.  CoAP discovery
 
-   Section 10.2.2 of [I-D.ietf-anima-constrained-voucher] describes how
-   to use CoAP Discovery.  The stateless Join Proxy requires a different
-   end point that can accept the JPY encapsulation.
+   Section 10.2.2 of [cBRSKI] describes how to use CoAP Discovery.  The
+   stateless Join Proxy requires a different end point that can accept
+   the JPY encapsulation.
 
    The stateless Join Proxy can discover the join-port of the Registrar
    by sending a GET request to "/.well-known/core" including a resource
@@ -776,8 +775,9 @@ Internet-Draft                 Join Proxy                   January 2025
    authority attribute can not include a port number unless it also
    includes the IP address.
 
-
-
+   The returned join-port is expected to process the encapsulated JPY
+   messages described in section Section 4.3.  The scheme remains coaps,
+   as the inside protocol is still CoAP and DTLS.
 
 
 
@@ -785,10 +785,6 @@ Richardson, et al.        Expires 14 July 2025                 [Page 14]
 
 Internet-Draft                 Join Proxy                   January 2025
 
-
-   The returned join-port is expected to process the encapsulated JPY
-   messages described in section Section 4.3.  The scheme remains coaps,
-   as the inside protocol is still CoAP and DTLS.
 
    An EST/Registrar server running at address 2001:db8:0:abcd::52, with
    the JPY process on port 7634, and the stateful Registrar on port 5683
@@ -807,9 +803,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 5.1.2.  GRASP discovery
 
-   Section 10.2.1 of [I-D.ietf-anima-constrained-voucher] describes how
-   to use GRASP [RFC8990] discovery within the ACP to locate the
-   stateful port of the Registrar.
+   Section 10.2.1 of [cBRSKI] describes how to use GRASP [RFC8990]
+   discovery within the ACP to locate the stateful port of the
+   Registrar.
 
    A Join Proxy which supports a stateless mode of operation using the
    mechanism described in Section 4.3 must know where to send the
@@ -835,14 +831,16 @@ Internet-Draft                 Join Proxy                   January 2025
        [O_IPv6_LOCATOR,
         h'fda379a6f6ee00000200000064000001', IPPROTO_UDP, 5685]]]
 
+            Figure 5: Example of Registrar announcement message
+
+
+
 
 
 Richardson, et al.        Expires 14 July 2025                 [Page 15]
 
 Internet-Draft                 Join Proxy                   January 2025
 
-
-            Figure 5: Example of Registrar announcement message
 
    Most Registrars will announce both a JPY-stateless and stateful
    ports, and may also announce an HTTPS/TLS service:
@@ -888,8 +886,10 @@ Internet-Draft                 Join Proxy                   January 2025
    The example below shows the discovery of the join-port of the Join
    Proxy.
 
+     REQ: GET coap://[FF02::FD]/.well-known/core?rt=brski.jp
 
-
+     RES: 2.05 Content
+     <coaps://[IP_address]:join-port>; rt="brski.jp"
 
 
 
@@ -898,16 +898,11 @@ Richardson, et al.        Expires 14 July 2025                 [Page 16]
 Internet-Draft                 Join Proxy                   January 2025
 
 
-     REQ: GET coap://[FF02::FD]/.well-known/core?rt=brski.jp
-
-     RES: 2.05 Content
-     <coaps://[IP_address]:join-port>; rt="brski.jp"
-
    Port numbers are assumed to be the default numbers 5683 and 5684 for
    coap and coaps respectively (sections 12.6 and 12.7 of [RFC7252])
    when not shown in the response.  Discoverable port numbers are
    usually returned for Join Proxy resources in the <URI-Reference> of
-   the payload (see section 5.1 of [RFC9148]).
+   the payload (see section 5.1 of [RFC6690]).
 
 5.2.2.  GRASP discovery
 
@@ -945,6 +940,11 @@ Internet-Draft                 Join Proxy                   January 2025
    uses the enhanced beacons as discussed in [RFC9032]. 6tisch does not
    use DTLS and so this specification does not apply to it.
 
+   The Enhanced Beason discovery mechanism used in 6tisch does not
+   convey a method to the pledge, (equivalent to an objective value, as
+   described above), so only the CoAP/OSCORE mechanism described in
+   [RFC9031] is announced.
+
 
 
 
@@ -953,11 +953,6 @@ Richardson, et al.        Expires 14 July 2025                 [Page 17]
 
 Internet-Draft                 Join Proxy                   January 2025
 
-
-   The Enhanced Beason discovery mechanism used in 6tisch does not
-   convey a method to the pledge, (equivalent to an objective value, as
-   described above), so only the CoAP/OSCORE mechanism described in
-   [RFC9031] is announced.
 
    A 6tisch network that wanted to use DTLS for security would need a
    new attribute for the enhanced beacon that announced the availability
@@ -1005,6 +1000,11 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
+
+
+
+
+
 Richardson, et al.        Expires 14 July 2025                 [Page 18]
 
 Internet-Draft                 Join Proxy                   January 2025
@@ -1014,9 +1014,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
    All the concerns in [RFC8995] section 4.1 apply.  The Pledge can be
    deceived by malicious Join Proxy announcements.  The Pledge will only
-   join a network to which it receives a valid voucher
-   [I-D.ietf-anima-constrained-voucher].  Once the Pledge joined, the
-   payload between Pledge and Registrar is protected by DTLS.
+   join a network to which it receives a valid voucher [cBRSKI].  Once
+   the Pledge joined, the payload between Pledge and Registrar is
+   protected by DTLS.
 
    A malicious Join Proxy has a number of routing possibilities:
 
@@ -1087,9 +1087,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 8.1.  Extensions to the "BRSKI AN_Proxy Objective Value" Registry
 
-   [I-D.ietf-anima-constrained-voucher] previously registered the
-   objective value DTLS-EST.  This document makes use of it, and the
-   registry should be extended to reference this document as well.
+   [cBRSKI] previously registered the objective value DTLS-EST.  This
+   document makes use of it, and the registry should be extended to
+   reference this document as well.
 
 8.2.  Extensions to the "BRSKI AN_join_registrar Objective Value"
       Registry
@@ -1290,8 +1290,7 @@ Richardson, et al.        Expires 14 July 2025                 [Page 23]
 Internet-Draft                 Join Proxy                   January 2025
 
 
-   [I-D.ietf-anima-constrained-voucher]
-              Richardson, M., Van der Stok, P., Kampanakis, P., and E.
+   [cBRSKI]   Richardson, M., Van der Stok, P., Kampanakis, P., and E.
               Dijk, "Constrained Bootstrapping Remote Secure Key
               Infrastructure (cBRSKI)", Work in Progress, Internet-
               Draft, draft-ietf-anima-constrained-voucher-26, 8 January
@@ -1338,6 +1337,7 @@ Internet-Draft                 Join Proxy                   January 2025
               and K. Watsen, "Bootstrapping Remote Secure Key
               Infrastructure (BRSKI)", RFC 8995, DOI 10.17487/RFC8995,
               May 2021, <https://www.rfc-editor.org/rfc/rfc8995>.
+
 
 
 
