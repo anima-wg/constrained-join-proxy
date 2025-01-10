@@ -755,7 +755,7 @@ Number" registry.
 
 # Acknowledgements
 
-Many thanks for the comments by {{{Carsten Bormann}}}, {{{Brian Carpenter}}}, {{{Spencer Dawkins}}}, {{{Esko Dijk}}}, {{{Toerless Eckert}}}, {{{Russ Housley}}}, {{{Ines Robles}}}, {{{Rich Salz}}}, {{{Jürgen Schönwälder}}}, {{{Mališa Vučinić}}}, and {{{Rob Wilton}}}.
+Many thanks for the comments by {{{Bill Atwood}}}, {{{Carsten Bormann}}}, {{{Brian Carpenter}}}, {{{Spencer Dawkins}}}, {{{Esko Dijk}}}, {{{Toerless Eckert}}}, {{{Russ Housley}}}, {{{Ines Robles}}}, {{{Rich Salz}}}, {{{Jürgen Schönwälder}}}, {{{Mališa Vučinić}}}, and {{{Rob Wilton}}}.
 
 # Contributors
 
@@ -765,6 +765,7 @@ Their draft text has served as a basis for this document.
 # Changelog
 -15 to -16
 
+       * Applied review comments of Bill Atwood of 2024-05-21.
        * Clarify 'context payload' terminology; issue #49.
        * Use shorter and consistent term for Join Proxy; issue #58.
        * Author added.

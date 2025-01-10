@@ -922,7 +922,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
    The Registrar announces itself using ACP instance of GRASP using
    M_FLOOD messages.  Autonomic Network Join Proxies MUST support GRASP
-   discovery of Registrar as described in section 4.3 of [RFC8995] .
+   discovery of Registrar as described in section 4.3 of [RFC8995].
 
    Here is an example M_FLOOD announcing the Join Proxy at fe80::1, on
    standard coaps port 5684.
@@ -1197,9 +1197,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 9.  Acknowledgements
 
-   Many thanks for the comments by Carsten Bormann, Brian Carpenter,
-   Spencer Dawkins, Esko Dijk, Toerless Eckert, Russ Housley, Ines
-   Robles, Rich Salz, Jürgen Schönwälder, Mališa Vučinić, and Rob
+   Many thanks for the comments by Bill Atwood, Carsten Bormann, Brian
+   Carpenter, Spencer Dawkins, Esko Dijk, Toerless Eckert, Russ Housley,
+   Ines Robles, Rich Salz, Jürgen Schönwälder, Mališa Vučinić, and Rob
    Wilton.
 
 10.  Contributors
@@ -1212,6 +1212,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
    -15 to -16
 
+      * Applied review comments of Bill Atwood of 2024-05-21.
       * Clarify 'context payload' terminology; issue #49.
       * Use shorter and consistent term for Join Proxy; issue #58.
       * Author added.
@@ -1225,7 +1226,6 @@ Internet-Draft                 Join Proxy                   January 2025
    -12 to -13
 
       * jpy message encrypted and no longer standardized
-
 
 
 
