@@ -20,17 +20,17 @@ Abstract
 
    This document extends the work of Bootstrapping Remote Secure Key
    Infrastructures (BRSKI) by replacing the (stateful) TLS Circuit proxy
-   between Pledge and Registrar with a stateless or stateful Circuit
-   proxy using CoAP which is called the constrained Join Proxy.  The
-   constrained Join Proxy is a mesh neighbor of the Pledge and can relay
-   a DTLS session originating from a Pledge with only link-local
-   addresses to a Registrar which is not a mesh neighbor of the Pledge.
+   between Pledge and Registrar with a stateless or stateful DTLS
+   Circuit proxy which is called the constrained Join Proxy.  The Join
+   Proxy is a mesh neighbor of the Pledge and can relay a DTLS session
+   originating from a Pledge with only link-local addresses to a
+   Registrar which is not a mesh neighbor of the Pledge.
 
-   Like the BRSKI Circuit proxy, this constrained Join Proxy eliminates
-   the need of Pledges to have routeable IP addresses before enrolment
-   by utilizing link-local addresses.  Use of the constrained Join Proxy
-   also eliminates the need of the Pledge to authenticate to the network
-   or perform network-wide Registrar discover before enrolment.
+   Like the BRSKI Circuit proxy, this Join Proxy eliminates the need of
+   Pledges to have routeable IP addresses before enrolment by utilizing
+   link-local addresses.  Use of the Join Proxy also eliminates the need
+   of the Pledge to authenticate to the network or perform network-wide
+   Registrar discovery before enrolment.
 
 About This Document
 
@@ -93,8 +93,8 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
    2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   5
-   3.  Constrained Join Proxy functionality  . . . . . . . . . . . .   6
-   4.  Constrained Join Proxy specification  . . . . . . . . . . . .   7
+   3.  Join Proxy functionality  . . . . . . . . . . . . . . . . . .   5
+   4.  Join Proxy specification  . . . . . . . . . . . . . . . . . .   7
      4.1.  Stateful Join Proxy . . . . . . . . . . . . . . . . . . .   8
      4.2.  Stateless Join Proxy  . . . . . . . . . . . . . . . . . .   9
      4.3.  Stateless Message structure . . . . . . . . . . . . . . .  11
@@ -132,7 +132,7 @@ Internet-Draft                 Join Proxy                   January 2025
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  23
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  23
      12.2.  Informative References . . . . . . . . . . . . . . . . .  24
-   Appendix A.  Stateless Proxy payload examples . . . . . . . . . .  26
+   Appendix A.  Stateless Proxy payload examples . . . . . . . . . .  27
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  27
 
 1.  Introduction
@@ -147,14 +147,13 @@ Internet-Draft                 Join Proxy                   January 2025
    securely enroll devices.  A Registrar provides the security anchor of
    the network to which a Pledge enrolls.
 
-   In this document, BRSKI is extended such that a Pledge connects to
-   "Registrars" via a constrained Join Proxy.  In particular, this
-   solution is intended to support mesh networks as described in
+   In this document, BRSKI is extended such that a Pledge can connect to
+   a Registrar via a constrained Join Proxy.  In particular, this
+   solution is intended to support 6LoWPAN mesh networks as described in
    [RFC4944].
 
-   The constrained Join Proxy as specified in this document is one of
-   the Join Proxy options referred to in [RFC8995] section 2.5.2 as
-   future work.
+   The Join Proxy as specified in this document is one of the Join Proxy
+   options referred to in [RFC8995] section 2.5.2 as future work.
 
    A complete specification of the terminology is pointed at in
    Section 2.
@@ -162,6 +161,7 @@ Internet-Draft                 Join Proxy                   January 2025
    The specified solutions in [RFC8995] and [RFC7030] are based on POST
    or GET requests to the EST resources (/cacerts, /simpleenroll,
    /simplereenroll, /serverkeygen, and /csrattrs), and the brski
+   resources (/requestvoucher, /voucher_status, and /enrollstatus).
 
 
 
@@ -170,7 +170,6 @@ Richardson, et al.        Expires 14 July 2025                  [Page 3]
 Internet-Draft                 Join Proxy                   January 2025
 
 
-   resources (/requestvoucher, /voucher_status, and /enrollstatus).
    These requests use https and may be too large in terms of code space
    or bandwidth required for constrained devices.  Constrained devices
    which may be part of challenged networks [RFC7228], typically
@@ -221,6 +220,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
+
 Richardson, et al.        Expires 14 July 2025                  [Page 4]
 
 Internet-Draft                 Join Proxy                   January 2025
@@ -248,12 +248,9 @@ Internet-Draft                 Join Proxy                   January 2025
    BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-   The following terms are defined in [RFC8366bis], and are used
-   identically as in that document: artifact, imprint, domain, Join
-   Registrar/Coordinator, Pledge, and Voucher.
-
-   The term "Registrar" is used throughout this document instead of
-   "Join Registrar/Coordinator (JRC)" as defined in [RFC8366bis].
+   The following terms are defined in [RFC8366bis] and [RFC8995], and
+   are used identically in this document: artifact, Circuit Proxy, Join
+   Proxy, domain, imprint, Registrar, Pledge, and Voucher.
 
    The term "installation" refers to all devices in the network and
    their interconnections, including Registrar, enrolled nodes with and
@@ -262,27 +259,12 @@ Internet-Draft                 Join Proxy                   January 2025
    (Installation) IP addresses are assumed to be routeable over the
    whole installation network except for link-local IP addresses.
 
-   The "Constrained Join Proxy" enables a pledge that is multiple hops
-   away from the Registrar, to securely execute the BRSKI protocol
-   [RFC8995] over a secure channel.
+   The term "Join Proxy" as used in this document refers specifically to
+   an [RFC8995] Join Proxy that can support Pledges execute the cBRSKI
+   protocol [I-D.ietf-anima-constrained-voucher] over an end-to-end
+   secured channel to the cBRSKI Registrar.
 
-   The term "join Proxy" is used interchangeably with the term
-   "constrained Join Proxy" throughout this document.
-
-   The [RFC8995] Circuit Proxy is referred to as a TCP circuit Join
-   Proxy.
-
-
-
-
-
-
-Richardson, et al.        Expires 14 July 2025                  [Page 5]
-
-Internet-Draft                 Join Proxy                   January 2025
-
-
-3.  Constrained Join Proxy functionality
+3.  Join Proxy functionality
 
    As depicted in the Figure 1, the Pledge (P), in a network such as a
    Low-Power and Lossy Network (LLN) mesh [RFC7102] can be more than one
@@ -292,11 +274,19 @@ Internet-Draft                 Join Proxy                   January 2025
    In this situation, the Pledge can only communicate one-hop to its
    nearest neighbor, the constrained Join Proxy (J) using their link-
    local IPv6 addresses.  However, the Pledge needs to communicate with
+
+
+
+Richardson, et al.        Expires 14 July 2025                  [Page 5]
+
+Internet-Draft                 Join Proxy                   January 2025
+
+
    end-to-end security with a Registrar to authenticate and get the
    relevant system/network parameters.  If the Pledge, knowing the IP-
    address of the Registrar, initiates a DTLS connection to the
-   Registrar, then the packets are dropped at the constrained Join Proxy
-   since the Pledge is not yet admitted to the network or there is no IP
+   Registrar, then the packets are dropped at the Join Proxy since the
+   Pledge is not yet admitted to the network or there is no IP
    routability to the Pledge for any returned messages from the
    Registrar.
 
@@ -319,17 +309,27 @@ Internet-Draft                 Join Proxy                   January 2025
    perform authentication.
 
    To overcome the problems with non-routability of DTLS packets and/or
-   discovery of the destination address of the Registrar, the
-   constrained Join Proxy is introduced.  This constrained Join Proxy
-   functionality is also (auto) configured into all authenticated
-   devices in the network which may act as a constrained Join Proxy for
-   Pledges.  The constrained Join Proxy allows for routing of the
-   packets from the Pledge using IP routing to the intended Registrar.
-   An authenticated constrained Join Proxy can discover the routable IP
+   discovery of the destination address of the Registrar, the Join Proxy
+   is introduced.  This Join Proxy functionality is also (auto)
+   configured into all authenticated devices in the network which may
+   act as a Join Proxy for Pledges.  The Join Proxy allows for routing
+   of the packets from the Pledge using IP routing to the intended
+   Registrar.  An authenticated Join Proxy can discover the routable IP
    address of the Registrar over multiple hops.  The following Section 4
-   specifies the two constrained Join Proxy modes.  A comparison is
-   presented in Section 6.
+   specifies the two Join Proxy modes.  A comparison is presented in
+   Section 6.
 
+   When a mesh network is set up, it consists of a Registrar and a set
+   of connected pledges.  No Join Proxies are present.  Only some of
+   these pledges may be neighbors of the Registrar.  Others would need
+   for their traffic to be routed across one or more enrolled devices to
+   reach the Registrar.
+
+   The desired state of the installation is a network with a Registrar
+   and all Pledges becoming enrolled devices.  Some of these enrolled
+   devices can act as Join Proxies.  Pledges can only employ link-local
+   communication until they are enrolled.  A Pledge will regularly try
+   to discover a Join Proxy or a Registrar with link-local discovery
 
 
 
@@ -338,45 +338,32 @@ Richardson, et al.        Expires 14 July 2025                  [Page 6]
 Internet-Draft                 Join Proxy                   January 2025
 
 
-   When a mesh network is set up, it consists of a Registrar and a set
-   of connected pledges.  No constrained Join Proxies are present.  Only
-   some of these pledges may be neighbors of the Registrar.  Others
-   would need for their traffic to be routed across one or more enrolled
-   devices to reach the Registrar.
+   requests.  The Pledges which are neighbors of the Registrar will
+   discover the Registrar and be enrolled following the constrained
+   BRSKI protocol.  An enrolled device can act as Join Proxy.  The
+   Pledges which are not a neighbor of the Registrar will eventually
+   discover a Join Proxy and follow the constrained BRSKI protocol to be
+   enrolled.  While this goes on, more and more Join Proxies with a
+   larger hop distance to the Registrar will emerge.  The network should
+   be configured such that at the end of the enrollment process, all
+   pledges have discovered a neighboring Join Proxy or the Registrar,
+   and all Pledges are enrolled.
 
-   The desired state of the installation is a network with a Registrar
-   and all Pledges becoming enrolled devices.  Some of these enrolled
-   devices can act as constrained Join Proxies.  Pledges can only employ
-   link-local communication until they are enrolled.  A Pledge will
-   regularly try to discover a constrained Join Proxy or a Registrar
-   with link-local discovery requests.  The Pledges which are neighbors
-   of the Registrar will discover the Registrar and be enrolled
-   following the constrained BRSKI protocol.  An enrolled device can act
-   as constrained Join Proxy.  The Pledges which are not a neighbor of
-   the Registrar will eventually discover a constrained Join Proxy and
-   follow the constrained BRSKI protocol to be enrolled.  While this
-   goes on, more and more constrained Join Proxies with a larger hop
-   distance to the Registrar will emerge.  The network should be
-   configured such that at the end of the enrollment process, all
-   pledges have discovered a neighboring constrained Join Proxy or the
-   Registrar, and all Pledges are enrolled.
-
-   The constrained Join Proxy is as a packet-by-packet proxy for UDP
-   packets between Pledge and Registrar.  The constrained BRSKI protocol
-   between Pledge and Registrar described in
-   [I-D.ietf-anima-constrained-voucher] which this Join Proxy supports
-   uses UDP messages with DTLS payload, but the Join Proxy as described
-   here is unaware of this payload.  It can therefore potentially also
-   work for other UDP based protocols as long as they are agnostic to
-   (or can be made to work with) the change of IP header by the
-   constrained Join Proxy.
+   The Join Proxy is as a packet-by-packet proxy for UDP packets between
+   Pledge and Registrar.  The constrained BRSKI protocol between Pledge
+   and Registrar described in [I-D.ietf-anima-constrained-voucher] which
+   this Join Proxy supports uses UDP messages with DTLS payload, but the
+   Join Proxy as described here is unaware of this payload.  It can
+   therefore potentially also work for other UDP based protocols as long
+   as they are agnostic to (or can be made to work with) the change of
+   IP header by the Join Proxy.
 
    In both Stateless and Stateful mode, the Join Proxy needs to be
    configured with or dynamically discover a Registrar to perform its
-   service.  This specification does not discuss how a constrained Join
-   Proxy selects a Registrar when it discovers 2 or more.
+   service.  This specification does not discuss how a Join Proxy
+   selects a Registrar when it discovers 2 or more.
 
-4.  Constrained Join Proxy specification
+4.  Join Proxy specification
 
    A Join Proxy can operate in two modes:
 
@@ -386,13 +373,6 @@ Internet-Draft                 Join Proxy                   January 2025
 
    The advantages and disadvantages of the two modes are presented in
    Section 6.
-
-
-
-Richardson, et al.        Expires 14 July 2025                  [Page 7]
-
-Internet-Draft                 Join Proxy                   January 2025
-
 
    A Join Proxy MUST implement both.  A Registrar MUST implement the
    stateful mode and SHOULD implement the Stateless mode.
@@ -405,6 +385,14 @@ Internet-Draft                 Join Proxy                   January 2025
    Registrar, through a discovery mechanism such as those described in
    Section 6.  Other methods, such as provisioning the Join Proxy are
    out of scope of this document but equally feasible.
+
+
+
+
+Richardson, et al.        Expires 14 July 2025                  [Page 7]
+
+Internet-Draft                 Join Proxy                   January 2025
+
 
    Once the Join Proxy is operational, its mode is determined by the
    mode of the Registrar.  If the Registrar offers both Stateful and
@@ -430,6 +418,18 @@ Internet-Draft                 Join Proxy                   January 2025
    address and UDP port number packet header fields of UDP packets that
    it forwards between Pledge and Registrar.  Figure 2 depiects how this
    state is used.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -992,8 +992,7 @@ Internet-Draft                 Join Proxy                   January 2025
    [I-D.ietf-anima-constrained-voucher].  Once the Pledge joined, the
    payload between Pledge and Registrar is protected by DTLS.
 
-   A malicious constrained Join Proxy has a number of routing
-   possibilities:
+   A malicious Join Proxy has a number of routing possibilities:
 
    *  It sends the message on to a malicious Registrar.  This is the
       same case as the presence of a malicious Registrar discussed in
@@ -1002,6 +1001,7 @@ Internet-Draft                 Join Proxy                   January 2025
    *  It does not send on the request or does not return the response
       from the Registrar.  This is the case of the not responding or
       crashing Registrar discussed in RFC 8995.
+
 
 
 
@@ -1028,12 +1028,12 @@ Internet-Draft                 Join Proxy                   January 2025
       is highly unlikely that this malicious payload will lead to node
       acceptance.
 
-   *  A malicious node can sniff the messages routed by the constrained
-      Join Proxy.  It is very unlikely that the malicious node can
-      decrypt the DTLS payload.  A malicious node can read the header
-      field of the message sent by the stateless Join Proxy.  This
-      ability does not yield much more information than the visible
-      addresses transported in the network packets.
+   *  A malicious node can sniff the messages routed by the Join Proxy.
+      It is very unlikely that the malicious node can decrypt the DTLS
+      payload.  A malicious node can read the header field of the
+      message sent by the stateless Join Proxy.  This ability does not
+      yield much more information than the visible addresses transported
+      in the network packets.
 
    It should be noted here that the contents of the CBOR array used to
    convey return address information is not DTLS protected.  When the
@@ -1045,12 +1045,12 @@ Internet-Draft                 Join Proxy                   January 2025
    [RFC8974], the use of AES-CCM [RFC3610] with a 64-bit tag is
    recommended, combined with a sequence number and a replay window.
 
-   If such scenario needs to be avoided, the constrained Join Proxy MUST
-   encrypt the CBOR array using a locally generated symmetric key.  The
-   Registrar is not able to examine the encrypted result, but does not
-   need to.  The Registrar stores the encrypted header in the return
-   packet without modifications.  The constrained Join Proxy can decrypt
-   the contents to route the message to the right destination.
+   If such scenario needs to be avoided, the Join Proxy MUST encrypt the
+   CBOR array using a locally generated symmetric key.  The Registrar is
+   not able to examine the encrypted result, but does not need to.  The
+   Registrar stores the encrypted header in the return packet without
+   modifications.  The Join Proxy can decrypt the contents to route the
+   message to the right destination.
 
    In some installations, layer 2 protection is provided between all
    member pairs of the mesh.  In such an environment encryption of the
@@ -1161,6 +1161,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
    -15 to -16
 
+      * Use shorter and consistent term for Join Proxy; issue #58.
       * Author added.
       * Update reference RFC8366 to RFC8366bis.
       * Editorial updates.
@@ -1169,7 +1170,6 @@ Internet-Draft                 Join Proxy                   January 2025
 
       * Various editorial updates and minor changes.
 
-   -12 to -13
 
 
 
@@ -1177,6 +1177,8 @@ Richardson, et al.        Expires 14 July 2025                 [Page 21]
 
 Internet-Draft                 Join Proxy                   January 2025
 
+
+   -12 to -13
 
       * jpy message encrypted and no longer standardized
 
@@ -1224,8 +1226,6 @@ Internet-Draft                 Join Proxy                   January 2025
 
    -03 to -04
 
-      * mail address and reference
-
 
 
 
@@ -1233,6 +1233,8 @@ Richardson, et al.        Expires 14 July 2025                 [Page 22]
 
 Internet-Draft                 Join Proxy                   January 2025
 
+
+      * mail address and reference
 
    -02 to -03
 
@@ -1279,9 +1281,7 @@ Internet-Draft                 Join Proxy                   January 2025
               DOI 10.17487/RFC2119, March 1997,
               <https://www.rfc-editor.org/rfc/rfc2119>.
 
-   [RFC768]   Postel, J., "User Datagram Protocol", STD 6, RFC 768,
-              DOI 10.17487/RFC0768, August 1980,
-              <https://www.rfc-editor.org/rfc/rfc768>.
+
 
 
 
@@ -1289,6 +1289,10 @@ Richardson, et al.        Expires 14 July 2025                 [Page 23]
 
 Internet-Draft                 Join Proxy                   January 2025
 
+
+   [RFC768]   Postel, J., "User Datagram Protocol", STD 6, RFC 768,
+              DOI 10.17487/RFC0768, August 1980,
+              <https://www.rfc-editor.org/rfc/rfc768>.
 
    [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
@@ -1335,10 +1339,6 @@ Internet-Draft                 Join Proxy                   January 2025
 
 12.2.  Informative References
 
-   [I-D.kumar-dice-dtls-relay]
-              Kumar, S. S., Keoh, S. L., and O. Garcia-Morchon, "DTLS
-              Relay for Constrained Environments", Work in Progress,
-
 
 
 Richardson, et al.        Expires 14 July 2025                 [Page 24]
@@ -1346,6 +1346,9 @@ Richardson, et al.        Expires 14 July 2025                 [Page 24]
 Internet-Draft                 Join Proxy                   January 2025
 
 
+   [I-D.kumar-dice-dtls-relay]
+              Kumar, S. S., Keoh, S. L., and O. Garcia-Morchon, "DTLS
+              Relay for Constrained Environments", Work in Progress,
               Internet-Draft, draft-kumar-dice-dtls-relay-02, 20 October
               2014, <https://datatracker.ietf.org/doc/html/draft-kumar-
               dice-dtls-relay-02>.
@@ -1388,11 +1391,8 @@ Internet-Draft                 Join Proxy                   January 2025
               Format", RFC 6690, DOI 10.17487/RFC6690, August 2012,
               <https://www.rfc-editor.org/rfc/rfc6690>.
 
-   [RFC6775]  Shelby, Z., Ed., Chakrabarti, S., Nordmark, E., and C.
-              Bormann, "Neighbor Discovery Optimization for IPv6 over
-              Low-Power Wireless Personal Area Networks (6LoWPANs)",
-              RFC 6775, DOI 10.17487/RFC6775, November 2012,
-              <https://www.rfc-editor.org/rfc/rfc6775>.
+
+
 
 
 
@@ -1401,6 +1401,12 @@ Richardson, et al.        Expires 14 July 2025                 [Page 25]
 
 Internet-Draft                 Join Proxy                   January 2025
 
+
+   [RFC6775]  Shelby, Z., Ed., Chakrabarti, S., Nordmark, E., and C.
+              Bormann, "Neighbor Discovery Optimization for IPv6 over
+              Low-Power Wireless Personal Area Networks (6LoWPANs)",
+              RFC 6775, DOI 10.17487/RFC6775, November 2012,
+              <https://www.rfc-editor.org/rfc/rfc6775>.
 
    [RFC7030]  Pritikin, M., Ed., Yee, P., Ed., and D. Harkins, Ed.,
               "Enrollment over Secure Transport", RFC 7030,
@@ -1442,6 +1448,16 @@ Internet-Draft                 Join Proxy                   January 2025
               RFC 9031, DOI 10.17487/RFC9031, May 2021,
               <https://www.rfc-editor.org/rfc/rfc9031>.
 
+
+
+
+
+
+Richardson, et al.        Expires 14 July 2025                 [Page 26]
+
+Internet-Draft                 Join Proxy                   January 2025
+
+
 Appendix A.  Stateless Proxy payload examples
 
    The examples show the request "GET coaps://192.168.1.200:5965/est/
@@ -1450,13 +1466,6 @@ Appendix A.  Stateless Proxy payload examples
    DTLS payload is not shown.
 
    The request from Join Proxy to Registrar looks like:
-
-
-
-Richardson, et al.        Expires 14 July 2025                 [Page 26]
-
-Internet-Draft                 Join Proxy                   January 2025
-
 
       85                                   # array(5)
          50                                # bytes(16)
@@ -1497,15 +1506,6 @@ Authors' Addresses
 
    Peter van der Stok
    vanderstok consultancy
-   Email: stokcons@kpnmail.nl
-
-
-   Panos Kampanakis
-   Cisco Systems
-   Email: pkampana@cisco.com
-
-
-
 
 
 
@@ -1514,17 +1514,17 @@ Richardson, et al.        Expires 14 July 2025                 [Page 27]
 Internet-Draft                 Join Proxy                   January 2025
 
 
+   Email: stokcons@kpnmail.nl
+
+
+   Panos Kampanakis
+   Cisco Systems
+   Email: pkampana@cisco.com
+
+
    Esko Dijk
    IoTconsultancy.nl
    Email: esko.dijk@iotconsultancy.nl
-
-
-
-
-
-
-
-
 
 
 
