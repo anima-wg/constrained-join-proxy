@@ -3,7 +3,7 @@ v: 3
 
 title: Join Proxy for Bootstrapping of Constrained Network Elements
 abbrev: Join Proxy
-docname: draft-ietf-anima-constrained-join-proxy-15
+docname: draft-ietf-anima-constrained-join-proxy-16
 
 # stand_alone: true
 
@@ -28,6 +28,11 @@ author:
   name: Panos Kampanakis
   org: Cisco Systems
   email: pkampana@cisco.com
+
+- ins: E. Dijk
+  name: Esko Dijk
+  org: IoTconsultancy.nl
+  email: esko.dijk@iotconsultancy.nl
 
 venue:
   group: anima
@@ -855,6 +860,3 @@ In CBOR diagnostic:
     [h'FE800000000000000000FFFFC0A801C8', 48551, 1, 0,
     h'<cacrts DTLS encrypted response>']
 ~~~
-
-
-
