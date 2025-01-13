@@ -43,6 +43,8 @@ venue:
 
 normative:
   RFC768:
+  RFC792:
+  RFC4443:
   RFC8366bis: I-D.ietf-anima-rfc8366bis
   RFC8949:
   RFC8990:
@@ -268,72 +270,123 @@ Once the Join Proxy is operational, its mode is determined by the mode of the Re
 If the Registrar offers both Stateful and Stateless mode, the Join Proxy MUST use
 the stateless mode.
 
-Independent of the mode of the Join Proxy, the Pledge first discovers (see Section 6)
-and selects the most appropriate Join Proxy. From the discovery, the Pledge learns the
-Join Proxies link-local scope IP address and UDP (join) port.  This discovery can also be
-based upon {{RFC8995}} section 4.1.  If the discovery method does not support discovery
-of the join-port, then the Pledge assumes the default CoAP over DTLS UDP port (5684).
+Independent of the mode of the Join Proxy, the Pledge first discovers (see {{discovery-by-pledge}})
+and selects the most appropriate Join Proxy.
+From the discovery, the Pledge learns the Join Proxy's link-local IP address and UDP join-port.
+Details of this discovery are defined by the onboarding protocol.
+For cBRSKI, this is defined in {{Section 10 of cBRSKI}}.
+
+## Notation {#ip-port-notation}
+
+The following notation is used in this section in both text and figures:
+
+* The colon (`:`) separates IP address and port number (`<IP>:<port>`).
+* `IP_P` denotes the link-local IP address of the Pledge. For simplicity, it is assumed here that the Pledge only has 
+   one network interface.
+* `IP_R` denotes the routable IP address of the Registrar.
+* `IP_Jl` denotes the link-local IP address of the Join Proxy on the interface that connects it to the Pledge.
+* `IP_Jr` denotes the routable IP address of the Join Proxy.
+* `p_P` denotes the UDP port used by the Pledge for its onboarding/joining protocol, which may be cBRSKI. The Pledge 
+   acts in a UDP client role, specifically as a DTLS client for the case of cBRSKI.
+* `p_Jl` denotes the join-port of the Join Proxy.
+* `p_Jr` denotes the client port of the Join Proxy that it uses to forward packets to the Registrar.
+* `p_Ra` denotes the server port of the Registrar on which it serves the onboarding protocol, such as cBRSKI.
+* `p_Rj` denotes the server port of the Registrar on which it serves the JPY protocol.
+* `JPY[H( ),C( )]` denotes a JPY message, as defined by the JPY protocol, with header H and content C indicated in 
+   between the parentheses.
 
 ## Stateful Join Proxy {#stateful}
 
-In stateful mode, the Join Proxy acts as a UDP "circuit" proxy that does not
-change the UDP payload (data octets according to {{RFC768}}) but only rewrites
-the IP and UDP headers of each packet it receives from Pledge and Registrar.
+In stateful mode, the Join Proxy acts as a UDP circuit proxy that does not
+change the UDP payload (called "data octets" in {{RFC768}}) but only rewrites
+the IP and UDP headers of each UDP packet it forwards between a Pledge and a Registrar.
 
-The stateful join proxy operates as a 'pseudo' UDP circuit proxy creating
-and utilizing connection mapping state to rewrite the IP address and UDP port number
-packet header fields of UDP packets that it forwards between Pledge and Registrar.
-{{fig-statefull2}} depiects how this state is used.
+The UDP flow mapping state maintained by the Join Proxy can be represented as a list of tuples, one for each 
+active Pledge, as follows:
+
+~~~~aasvg
+    Local connection UDP state      Routable connection UDP state
+      (IP_P:p_P, IP_Jl:p_Jl)  <===>   (IP_Jr:p_Jr, IP_R:p_r)
+~~~~
+
+In case a Join Proxy has multiple network interfaces that accept Pledges, an interface identifier needs to be added 
+on the left state item. If a Join Proxy has multiple network interfaces to connect to (one or more) Registrars, an 
+interface identifier needs to be added to the right state item. Both of these are not shown further in this section, 
+for better readability.
+
+Because UDP does not have the notion of a connection, the use of "UDP connection" in this document
+refers to a pseudo-connection, whose establishment on the Join Proxy is solely
+triggered by receipt of a UDP packet from a Pledge with an `IP_P:p_P` link-local source and `IP_Jl:p_Jl` link-local 
+destination for which no mapping state exists, and that is terminated by a connection expiry timer.
+
+{{fig-statefull2}} depicts an example DTLS session via the Join Proxy, to show how this state is used in practice.
+In this case the Join Proxy knows the IP address of the Registrar (`IP_R`) and the default CoAPS port (5684) on the 
+Registrar is used to access cBRSKI resources.
 
 ~~~~aasvg
 +------------+------------+-------------+--------------------------+
-|   Pledge   | Join Proxy |  Registrar  |          Message         |
+|   Pledge   | Join Proxy |  Registrar  |        UDP Message       |
 |    (P)     |     (J)    |    (R)      | Src_IP:port | Dst_IP:port|
 +------------+------------+-------------+-------------+------------+
-|      --ClientHello-->                 |   IP_P:p_P  | IP_Jl:p_Jl |
-|                    --ClientHello-->   |   IP_Jr:p_Jr| IP_R:5684  |
+|     ---ClientHello-->                 |   IP_P:p_P  | IP_Jl:p_Jl |
+|                   ---ClientHello-->   |   IP_Jr:p_Jr| IP_R:5684  |
 |                                       |             |            |
-|                    <--ServerHello--   |   IP_R:5684 | IP_Jr:p_Jr |
+|                    <--ServerHello---  |   IP_R:5684 | IP_Jr:p_Jr |
 |                            :          |             |            |
-|       <--ServerHello--     :          |   IP_Jl:p_Jl| IP_P:p_P   |
-|               :            :          |             |            |
+|       <--ServerHello---    :          |   IP_Jl:p_Jl| IP_P:p_P   |
+|               :            :          |       :     |    :       |
 |              [DTLS messages]          |       :     |    :       |
 |               :            :          |       :     |    :       |
-|        --Finished-->       :          |   IP_P:p_P  | IP_Jl:p_Jl |
-|                      --Finished-->    |   IP_Jr:p_Jr| IP_R:5684  |
+|       ---Finished-->       :          |   IP_P:p_P  | IP_Jl:p_Jl |
+|                     ---Finished-->    |   IP_Jr:p_Jr| IP_R:5684  |
 |                                       |             |            |
-|                      <--Finished--    |   IP_R:5684 | IP_Jr:p_Jr |
-|        <--Finished--                  |   IP_Jl:p_Jl| IP_P:p_P   |
+|                      <--Finished---   |   IP_R:5684 | IP_Jr:p_Jr |
+|        <--Finished---                 |   IP_Jl:p_Jl| IP_P:p_P   |
 |              :             :          |      :      |     :      |
 +---------------------------------------+-------------+------------+
-
-IP_P:p_P = Link-local IP address and port of Pledge (DTLS Client)
-IP_R:5684 = Routable IP address and coaps port of Registrar
-IP_Jl:p_Jl = Link-local IP address and join-port of Join Proxy
-IP_Jr:p_Jr = Routable IP address and client port of Join Proxy
 ~~~~
-{: #fig-statefull2 title='constrained stateful joining message flow with Registrar address known to Join Proxy.' align="left"}
+{: #fig-statefull2 title='Example of the message flow of a DTLS session via a stateful Join Proxy.' align="left"}
 
-Because UDP does not have the notion of a connection, this document
-calls this a 'pseudo' connection, whose establishment is solely
-triggered by receipt of a packet from a pledge with an
-IP_p%IF:p_P source for which no mapping state exists, and that is
-termined by a connection expiry timer E.
+The Join Proxy MUST allocate a unique `IP_Jr:p_Jr` for every unique Pledge that it serves. This is typically done 
+by selecting a unique available port `P_Jr` for each Pledge. 
+Doing so enables the Join Proxy to correctly map the 
+UDP packets received from the Registrar back to the corresponding Pledges. 
+Also, it enables the Registrar to correctly distinguish multiple DTLS clients by means of IP-address/port tuples.
 
-If an untrusted Pledge that can only use link-local addressing wants to contact a trusted Registrar, and the Registrar is more than one hop away, it sends its DTLS messages to the Join Proxy.
+The default timeout for clearing the state for a Pledge MUST be 30 seconds after the last relayed packet was sent on 
+a UDP connection associated to that Pledge, in either direction.
+The default timeout MAY be overridden by another value that is either configured, or discovered in some way.
+
+When a Join Proxy receives an ICMP {{RFC792}} / ICMPv6 {{RFC4443}} error from the Registrar, this may signal a 
+permanent change of the Registrar's IP address and/or port, or it may signal a temporary disruption of the network. 
+In such case, the Join Proxy SHOULD send an equivalent ICMP error message (with same Type and Code) to the Pledge.
+The specific Pledge can be determined from the IP/UDP header information that is contained in the ICMP error message 
+body, if included.
+In case the ICMP message body is empty, or insufficient information is included there, the Join Proxy does not send 
+the ICMP error message to the Pledge because the intended recipient cannot be determined.
+
+To protect itself and the Registrar against malfunctioning Pledges and/or denial of service (DoS) attacks, 
+the Join Proxy SHOULD limit the number of simultaneous state tuples for a given `IP_p` to 2, 
+and it SHOULD the number of simultaneous state tuples per network interface to 10. 
+
+When a new Pledge connection is received and the Join Proxy is unable to build new mapping state for it, for example due to 
+the above limits, the Join Proxy SHOULD return an ICMP Type 1 "Destination Unreachable" error message 
+with Code 1, "Communication with destination administratively prohibited".
 
 ## Stateless Join Proxy {#jpy-encapsulation-protocol}
 
-Stateless join proxy operation eliminates the need and complexity to
-maintain per UDP connection mapping state on the proxy and the state machinery to build, maintain and
-remove this mapping state. It also removes the need to protect this mapping state
-against DoS attacks and may also reduce memory and CPU requirements on the proxy.
+Stateless Join Proxy operation eliminates the need and complexity to
+maintain per Pledge UDP connection mapping state on the proxy and the machinery to build, maintain and
+remove this mapping state.
+It also removes the need to protect this mapping state against DoS attacks and may also reduce memory and 
+CPU requirements on the proxy.
 
-Stateless join proxy operations works by introducing a new JPY message used in communication between Proxy and Registrar, 
-which consists of two parts:
+Stateless Join Proxy operations work by introducing a new JPY message used in communication between Proxy and Registrar.
+This message will store the state. It consists of two parts:
 
-  * Header (H) field: contains context information about the Pledge (P) such as the link-local IP address, interface and UDP (source) port.
-  * Contents (C) field: the original UDP payload (data octets according to RFC768) received from the Pledge, or destined to the Pledge.
+  * Header (H) field: contains state information about the Pledge (P) such as the link-local IP address and UDP port.
+  * Contents (C) field: the original UDP payload (data octets according to {{RFC768}}) received from the Pledge, 
+    or destined to the Pledge.
 
 When the join proxy receives a UDP message from a Pledge, it encodes the Pledge's
 link-local IP address, interface and UDP (source) port of the UDP packet into the Header field
@@ -354,101 +407,105 @@ On receiving the JPY message, the Join Proxy retrieves the two parts.
 It uses the Header field information to send a UDP message containing the (DTLS) payload retrieved from the Contents field to a 
 particular Pledge.
 
-When the Registrar receives such a JPY message, it MUST treat the Header
-H as a single additional opaque identifier for all packets of a UDP connection
-from a Pledge: Whereas in the stateful proxy case, all packets with the same
-(IP_jr:p_Jr, IP_R:p_r) belong to a single Pledge's UDP connection and hence
-DTLS/CoAP connection, only the packets with the same (IP_jr:p_Jr, IP_R:p_r, H)
-belong to a single Pledge's UDP connection / DTLS/CoAP connection. The
-JPY message Content field contains the UDP payload of the packet for that UDP
-connection. Packets with different header H belong to different Pledge's UDP connections.
+When the Registrar receives such a JPY message, it MUST treat the Header H as a single additional opaque identifier 
+of all packets associated to a UDP connection with a Pledge.
+Whereas in the stateful proxy case, all packets with the same tuple `(IP_Jr:p_Jr, IP_R:p_Ra)` belong to a single 
+Pledge's UDP connection,
+in the stateless proxy case only the packets with the same tuple `(IP_Jr:p_Jr, IP_R:p_Rj, H)` belong to a single 
+Pledge's UDP connection.
+The JPY message Content field contains the UDP payload of the packet for that Pledge's UDP connection. 
+Packets with different header H belong to different Pledge's UDP connections.
 
-In the stateless join proxy mode, both the Registrar and the Join Proxy use discoverable UDP join-ports. 
-For the Join Proxy this may be a default CoAPS port (5684), or another free port.
+In the stateless mode, the Registrar MUST offer the JPY protocol on a discoverable UDP port (`p_Rj`). 
+There is no default port number available for the JPY protocol, unlike in the stateful mode where the Registrar 
+can host all its services on the CoAPS default port.
 
 ~~~~aasvg
 +--------------+------------+---------------+-----------------------+
-|    Pledge    | Join Proxy |    Registrar  |        Message        |
+|    Pledge    | Join Proxy |    Registrar  |      UDP Message      |
 |     (P)      |     (J)    |      (R)      |Src_IP:port|Dst_IP:port|
 +--------------+------------+---------------+-----------+-----------+
 |   ---ClientHello--->                      | IP_P:p_P  |IP_Jl:p_Jl |
-|                   ---JPY[H(IP_P:p_P), --> | IP_Jr:p_Jr|IP_R:p_Ra  |
+|                   ---JPY[H(IP_P:p_P), --> | IP_Jr:p_Jr|IP_R:p_Rj  |
 |                          C(ClientHello)]  |           |           |
-|                   <--JPY[H(IP_P:p_P), --- | IP_R:p_Ra |IP_Jr:p_Jr |
+|                   <--JPY[H(IP_P:p_P), --- | IP_R:p_Rj |IP_Jr:p_Jr |
 |                          C(ServerHello)]  |           |           |
 |   <---ServerHello---                      | IP_Jl:p_Jl|IP_P:p_P   |
-|              :                            |           |           |
+|              :                            |     :     |    :      |
 |          [ DTLS messages ]                |     :     |    :      |
 |              :                            |     :     |    :      |
 |   ---Finished--->                         | IP_P:p_P  |IP_Jr:p_Jr |
-|                   ---JPY[H(IP_P:p_P), --> | IP_Jl:p_Jl|IP_R:p_Ra  |
+|                   ---JPY[H(IP_P:p_P), --> | IP_Jl:p_Jl|IP_R:p_Rj  |
 |                          C(Finished)]     |           |           |
-|                   <--JPY[H(IP_P:p_P), --- | IP_R:p_Ra |IP_Jr:p_Jr |
+|                   <--JPY[H(IP_P:p_P), --- | IP_R:p_Rj |IP_Jr:p_Jr |
 |                          C(Finished)]     |           |           |
 |   <---Finished--                          | IP_Jl:p_Jl|IP_P:p_P   |
 |              :                            |     :     |    :      |
 +-------------------------------------------+-----------+-----------+
-
-IP_P:p_P = Link-local IP address and port of the Pledge
-IP_R:p_Ra = Routable IP address and join-port of Registrar
-IP_Jl:p_Jl = Link-local IP address and join-port of Join Proxy
-IP_Jr:p_Jr = Routable IP address and port of Join Proxy
-
-JPY[H( ),C( )] = Join Proxy message with header H and content C
 ~~~~
-{: #fig-stateless title='constrained stateless joining message flow.' align="left"}
+{: #fig-stateless title='Example of the message flow of a DTLS session via a stateless Join Proxy.' align="left"}
 
-## Stateless Message structure {#stateless-jpy}
+When a Join Proxy receives an ICMP {{RFC792}} / ICMPv6 {{RFC4443}} error from the Registrar, this may signal a 
+permanent change of the Registrar's IP address and/or port, or it may signal a temporary disruption of the network. 
 
-The JPY message is carried directly over the UDP layer.
-There is no CoAP or DTLS layer used between the JPY messages and the UDP layer.
+Unlike a stateful Join Proxy, the stateless Join Proxy cannot determine the Pledge to which this ICMP error should 
+be mapped, because the JPY header containing this information is not included in the ICMP error message.
+Therefore, it cannot inform the Pledge of the error that occurred.
 
-A JPY messages consists of one CBOR {{RFC8949}} array of 2 elements:
+## JPY Message Structure {#stateless-jpy}
 
-   1. The Join Proxy's context data: This is a CBOR byte string. It SHOULD be between 8 and 32 bytes in size.
-   2. The content field: This contains the binary DTLS payload being relayed, wrapped in a CBOR byte string.
+The JPY message is used by a stateless Join Proxy to carry required state information in the relayed UDP messages, 
+such that it does not need to store this state in memory.
+JPY messages are carried directly over the UDP layer.
+So, there is no CoAP or DTLS layer used between the JPY messages and the UDP layer.
+
+Each JPY message consists of one CBOR {{RFC8949}} array with 2 elements:
+
+   1. The Header (H) with the Join Proxy's per-message state data: wrapped in a CBOR byte string. 
+      The byte string including its related CBOR encoding SHOULD be at most 34 bytes.
+   2. The Content (C) field: the binary (DTLS) payload being relayed, wrapped in a CBOR byte string. 
+      The payload is encrypted. 
+      The Join Proxy cannot decrypt it and therefore has no knowledge of any transported (CoAP) messages, or the URI
+      paths or media types within the CoAP messages.
 
 Using CDDL {{RFC8610}}, the CBOR array that constitutes the JPY message can be formally defined as:
 
 ~~~
-    JPY_message =
+    jpy_message =
     [
-       jp_context : bstr,
-       content    : bstr
+       jpy_header  : bstr,
+       jpy_content : bstr
     ]
 ~~~
 {: #fig-cddl title='CDDL representation of a JPY message' align="left"}
 
-The content field is DTLS-encrypted. 
-Therefore, the Join Proxy cannot decrypt it and has no knowledge of any transported (CoAP) messages, or media types.
+The jpy_header state data is to be reflected (unmodified) by the Registrar when sending return JPY messages to the Join Proxy.
+The header's internal representation is not standardized: it can be constructed by the Join Proxy in whatever way.
+It is to be used by the Join Proxy to record state for the included jpy_content field, which includes the 
+information which Pledge the data in jpy_content came from.
 
-The context data is to be reflected (unmodified) by the Registrar when sending return data packets to the Join Proxy.
-The context data internal representation is not standardized: it can be constructed by the Join Proxy in whatever way.
-It is to be used by the Join Proxy to record the context (state) of the associated content field, for example the 
-information which Pledge the data traffic came from.
-
-The Join Proxy SHOULD encrypt the context data prior to wrapping it in a CBOR byte string. It is encrypted with a 
-symmetric key known only to the Join Proxy itself.
+The Join Proxy SHOULD encrypt the state data prior to wrapping it in a CBOR byte string in jpy_header. 
+It SHOULD be encrypted with a symmetric key known only to the Join Proxy itself.
 This key need not persist on a long-term basis, and MAY be changed periodically.
-The considerations of  {{Section 5.2 of RFC8974}} apply.
 
-This context data is intended to be identical to the "state object" mechanism described in {{Section 7.1 of RFC9031}}.
-However, since the CoAP protocol layer is inside the DTLS layer (end-to-end encrypted between the Pledge and the 
-Registrar), it is not possible for the Join Proxy to act as a CoAP proxy.
+This state data stored in the JPY message is similar to the "state object" mechanism described in {{Section 7.1 of RFC9031}}.
+However, since the CoAP protocol layer (if any) is inside the DTLS layer, so end-to-end encrypted between the Pledge and the 
+Registrar, it is not possible for the Join Proxy to act as a CoAP proxy per {{Section 5.7 of RFC7252}}.
 
-For the JPY messages relayed to the Registrar, the Join Proxy SHOULD use the same UDP source port for the JPY messages 
-of all pledges.
-A Join Proxy MAY vary the UDP source port, but doing so creates more local state.
-A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible in the future) could, for instance, use 
-different source port numbers to demultiplex connections across CPUs.
+For the JPY messages sent to the Registrar, the Join Proxy SHOULD use the same UDP source port and IP source address 
+for the JPY messages sent on behalf of all Pledges.
+Although a Join Proxy MAY vary the UDP source port, doing so creates more local state.
+A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible) could, for instance, use 
+different UDP source port numbers to demultiplex connections across CPUs.
 
-### Example format for Join Proxy context data
+### Example Format for the Join Proxy's Header Data
 
-A typical context data format might be constructed using the following CDDL grammar.
-This is illustrative only: the format of jp_context is not subject to standardization.
+A typical JPY message header format, prior to encryption, could be constructed using the following CDDL grammar.
+This is illustrative only: the format of the data inside `jpy_header` is not subject to standardization and may vary 
+across Pledges.
 
 ~~~~
-    jp_context_plaintext = [
+    jpy_header_plaintext = [
       family:  uint .bits 1,
       ifindex: uint .bits 8,
       srcport: uint .bits 16,
@@ -456,25 +513,28 @@ This is illustrative only: the format of jp_context is not subject to standardiz
     ]
 ~~~~
 
-This results in a total of 96 bits, or 12 bytes.
-The structure stores the Pledge's UDP source port (srcport), the IID bits of the Pledge's originating IPv6 link-Local 
-address (iid), the IPv4/IPv6 family (as a single bit) and an interface index (ifindex) to provide the link-local scope.
-This size fits nicely into a single AES128 CBC block for instance, resulting in a 16 byte block of context data,
-jp_context_encrypted.
-This jp_context_encrypted data block is then wrapped in a CBOR byte string to form the jp_context element.
-So for the example jp_context_plaintext of 12 bytes, we get a jp_context_encrypted of 16 bytes, and finally 
-a jp_context of 17 bytes which adds a 1-byte overhead of encoding the data as a CBOR byte string.
+This results in a total plaintext size of 96 bits, or 12 bytes.
+The data structure stores the Pledge's UDP source port (srcport), the IID bits of the Pledge's originating IPv6 link-Local 
+address (iid), the IPv4/IPv6 family (as a single bit) and an interface index (ifindex) to provide the link-local scope 
+for the case that the Join Proxy has multiple network interfaces.
+This size fits nicely into a single AES128 CBC block for instance, resulting in a 16 byte block of encrypted state data,
+`jpy_header_ciphertext`.
+This `jpy_header_ciphertext` data is then wrapped in a CBOR byte string to form the `jpy_header` element.
+So for the example `jpy_header_plaintext` of 12 bytes, we get a `jpy_header_ciphertext` of 16 bytes, and finally 
+a jpy_header of 17 bytes which adds a 1-byte overhead to encode the data as a CBOR byte string.
 
-Note: when IPv6 is used only the lower 64-bits of the origin IP need to be recorded, 
-because they are all IPv6 link-Local addresses, so the upper 64-bits are just "fe80::" and can be elided. 
-For IPv4, a link-Local IPv4 address {{RFC3927}} would be used, and it would always fit into 64 bits.
-On media where the Interface IDentifier (IID) is not 64-bits, a different field size for iid will be necessary.
+Note: when IPv6 is used only the lower 64-bits of the source IPv6 address need to be recorded,  
+because they must be by design all IPv6 link-Local addresses, so the upper 64-bits are just "fe80::" and can be elided. 
+For IPv4, a link-Local IPv4 address {{RFC3927}} would be used, and it would always fit into the 64 bits of the `iid`  
+field.
+On media where the Interface IDentifier (IID) is not 64-bits, a different field size for `iid` will be necessary.
 
-The Join Proxy MUST maintain the same context data for all communications from the same Pledge.
+The Join Proxy MUST maintain the same context data for all communications from the same Pledge UDP source port.
 This implies that the encryption key used either does not change during the onboarding attempt of the Pledge, 
 or that when it does, it is acceptable to break any onboarding connections that have not yet completed.
 
-If using a context data format as defined above, it should be easy for the Join Proxy to meet this requirement without maintaining any local state about the pledge.
+If using a header data format as defined above, it should be easy for the Join Proxy to meet this requirement 
+without maintaining any local state about the Pledge.
 
 ### Processing by Registrar
 
@@ -493,10 +553,10 @@ the CoAP blockwise options {{RFC7959}} are often used to split large payloads in
 The Registrar and the Pledge MUST select a block size that would allow the addition of the JPY\_message header 
 (including a jp_context field of up to 34 bytes) without violating MTU sizes.
 
-# Discovery {#jr-disc}
 
+# Discovery {#discovery}
 
-## Discovery operations by Join Proxy
+## Join Proxy Discovers Registrar  {#discovery-by-jp}
 
 In order to accommodate automatic configuration of the Join Proxy, it must discover the location and a capabilities of the Registar.
 This includes discovering whether stateless operation is supported, or not.
@@ -576,7 +636,7 @@ Most Registrars will announce both JPY-stateless and stateful ports, and may als
 ~~~
 {: #fig-grasp-many title='Example of Registrar announcing two services' align="left"}
 
-## Pledge discovers Join Proxy
+## Pledge discovers Join Proxy {#discovery-by-pledge}
 
 Regardless of whether the Join Proxy operates in stateful or stateless mode, the Join Proxy is discovered by the Pledge identically.
 When doing constrained onboarding with DTLS as security, the Pledge will always see an IPv6 Link-Local destination, with a single UDP port to which DTLS messages are to be sent.
