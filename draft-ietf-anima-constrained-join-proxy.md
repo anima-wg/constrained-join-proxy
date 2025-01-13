@@ -272,7 +272,7 @@ Independent of the mode of the Join Proxy, the Pledge first discovers (see Secti
 and selects the most appropriate Join Proxy. From the discovery, the Pledge learns the
 Join Proxies link-local scope IP address and UDP (join) port.  This discovery can also be
 based upon {{RFC8995}} section 4.1.  If the discovery method does not support discovery
-of the join-port, then the Pledge assumes the default CoAP over DTLS UDP port (5683).
+of the join-port, then the Pledge assumes the default CoAP over DTLS UDP port (5684).
 
 ## Stateful Join Proxy {#stateful}
 
