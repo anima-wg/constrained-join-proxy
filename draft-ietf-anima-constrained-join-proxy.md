@@ -100,66 +100,52 @@ to authenticate to the network or perform network-wide Registrar discovery befor
 
 The Bootstrapping Remote Secure Key Infrastructure (BRSKI) protocol described in {{RFC8995}}
 provides a solution for a secure zero-touch (automated) bootstrap of new (unconfigured) devices.
-In the context of BRSKI, new devices, called "Pledges", are equipped with a factory-installed Initial Device Identifier (IDevID) (see {{ieee802-1AR}}), and are enrolled into a network.
+In the context of BRSKI, new devices, called "Pledges", are equipped with a factory-installed Initial Device Identifier (IDevID) {{ieee802-1AR}}, and are enrolled into a network.
 BRSKI makes use of Enrollment over Secure Transport (EST) {{RFC7030}}
-with {{RFC8366bis}} vouchers to securely enroll devices. A Registrar provides the security anchor of the network to which a Pledge enrolls.
+with {{RFC8366bis}} signed vouchers to securely enroll devices.
+A Registrar provides the trust anchor of the network domain to which a Pledge enrolls.
 
-In this document, BRSKI is extended such that a Pledge can connect to a Registrar via a constrained Join Proxy.
+{{cBRSKI}} defines a version of BRSKI that is suitable for constrained nodes ({{RFC7228}}) and for operation 
+on constrained networks ({{RFC7228}}) including Low-Power and Lossy Networks (LLN) {{RFC7102}}.
+It uses Constrained Application Protocol (CoAP) {{RFC7252}} messages secured by  Datagram Transport Layer Security 
+(DTLS) {{RFC9147}} to implement the BRSKI functions defined by {{RFC8995}}.
+
+In this document, cBRSKI is extended such that a cBRSKI Pledge can connect to a Registrar via a constrained Join Proxy.
 In particular, this solution is intended to support 6LoWPAN mesh networks as described in {{RFC4944}}.
-However, 6TiSCH networks are not in scope since these use CoJP {{RFC9031}} mechanism already.
+6TiSCH networks are not in scope since these use CoJP {{RFC9031}} mechanism already.
 
 The Join Proxy as specified in this document is one of the Join Proxy
-options referred to in {{RFC8995}} section 2.5.2 as future work.
+options referred to in {{Section 2.5.2 of RFC8995}} as future work.
 
-A complete specification of the terminology is pointed at in {{Terminology}}.
+However, in IP networks that require node authentication, such as those using {{RFC4944}},
+data to and from the Pledge will not be IP routable over the mesh network
+until it is authenticated to the network.
+A new Pledge can initially only use a link-local IPv6 address to communicate with a
+mesh neighbor {{RFC6775}} until it receives the necessary network configuration parameters.
 
-The specified solutions in {{RFC8995}} and {{RFC7030}} are based on POST or GET requests to the EST resources 
-(`/cacerts`, `/simpleenroll`, `/simplereenroll`, `/serverkeygen`, and `/csrattrs`), and the brski resources 
-(`/requestvoucher`, `/voucher_status`, and `/enrollstatus`).
-These requests use https and may be too large (in terms of code space or bandwidth required for constrained devices).
-Constrained devices, which may be part of challenged networks {{RFC7228}}, typically implement the IPv6 over Low-Power Wireless personal Area Networks (6LoWPAN) {{RFC4944}} and Constrained Application Protocol (CoAP) {{RFC7252}}.
+Before it can receive these parameters, the Pledge needs to be authenticated and authorized for onboarding onto the 
+network. This is done in cBRSKI through an end-to-end encrypted DTLS session with a domain Registrar. 
 
-CoAP can be run with the Datagram Transport Layer Security (DTLS) {{RFC9147}} as a security protocol for authenticity and confidentiality of the messages.
-This is known as the "coaps" scheme.
-A constrained version of EST, using CoAP and DTLS, is described in {{RFC9148}}.
+When this Registrar is not a direct (link-local) neighbor of the Pledge but several hops away, the Pledge 
+needs to discover a link-local neighbor that is operating as a constrained Join Proxy, which will help to 
+forward the DTLS messages of the session between Pledge and Registrar.
 
-{{cBRSKI}} extends {{RFC9148}} with BRSKI artifacts such as voucher, request voucher, and the protocol extensions for constrained Pledges that use CoAP.
+Because the Join Proxy is a regular network node that has already been onboarded onto the network, it can send 
+IP datagrams to the Registrar which are then routed over one or more hops over the mesh network -- and potentially 
+over other IP networks too, before reaching the Registrar.
 
-However, in networks that require authentication, such as those using {{RFC4944}},
-the Pledge will not be IP routable over the mesh network
-until it is authenticated to the mesh network. A new Pledge can only
-initially use a link-local IPv6 address to communicate with a
-mesh neighbor [RFC6775] until it receives the necessary network
-configuration parameters. The Pledge receives these configuration
-parameters from the Registrar. When the Registrar is not a direct
-neighbor of the Registrar but several hops away, the Pledge
-discovers a neighbor that is operating the constrained Join Proxy, which
-forwards DTLS protected messages between Pledge and Registrar.
-The constrained Join Proxy must be enrolled
-previously such that the
-message from constrained Join Proxy to Registrar can be routed over
-one or more hops.
+Once a Pledge has enrolled onto the network in this manner, it can be itself configured as a constrained Join Proxy 
+and in this role it can help other Pledges perform the cBRSKI onboarding process.
 
-An enrolled Pledge can act as constrained Join Proxy between other Pledges and the enrolling Registrar.
+Two modes of operation for a constrained Join Proxy are specified:
 
-Two modes of the constrained Join Proxy are specified:
-
-1. A stateful Join Proxy that locally stores UDP connection state:
-IP addresses (link-local with interface and non-link-local and UDP port-numbers) during the connection.
-
-2. A stateless Join Proxy where the connection state
-is replaced by a new proxy header in the UDP messages between constrained Join Proxy and Registrar.
-
-This document is very much inspired by text published earlier in {{I-D.kumar-dice-dtls-relay}}.
-{{I-D.richardson-anima-state-for-joinrouter}} outlined the various options for building a constrained Join Proxy.
-{{RFC8995}} adopted only the Circuit Proxy method (1), leaving the other methods as future work.
+1. A stateful Join Proxy that locally stores UDP connection state per Pledge.
+2. A stateless Join Proxy that does not locally store UDP connection state, but stores it in the header of a 
+   message that is exchanged between the Join Proxy and the Registrar.
 
 Similar to the difference between storing and non-storing Modes of
 Operations (MOP) in RPL {{RFC6550}}, the stateful and stateless modes differ in the way that they store
-the state required to forward the return packet to the pledge.
-In the stateful method, the
-return forward state is stored in the Join Proxy.  In the stateless
-method, the return forward state is stored in the network.
+the state required to forward return UDP packets from the Registrar back to the Pledge.
 
 # Terminology          {#Terminology}
 
@@ -168,93 +154,142 @@ method, the return forward state is stored in the network.
 The following terms are defined in {{RFC8366bis}} and {{RFC8995}}, and are used identically in this document: 
 artifact, Circuit Proxy, Join Proxy, domain, imprint, Registrar, Pledge, and Voucher.
 
-The term "installation" refers to all devices in the network and their interconnections, including Registrar, enrolled nodes with and without constrained Join Proxy functionality and Pledges.
+The term "installation" refers to all devices in the network and their interconnections, including Registrar, 
+enrolled nodes (with and without constrained Join Proxy functionality) and Pledges (not yet enrolled).
 
-(Installation) IP addresses are assumed to be routable over the whole installation network except for link-local IP addresses.
+(Installation) IP addresses are assumed to be routable over the whole installation network, except for link-local IP addresses.
 
 The term "Join Proxy" as used in this document refers specifically to an {{RFC8995}} Join Proxy that can support 
-Pledges execute the cBRSKI protocol {{cBRSKI}} over an end-to-end secured
-channel to the cBRSKI Registrar.
+Pledges to onboard using a UDP-based protocol, such as the cBRSKI protocol {{cBRSKI}} which operates over an 
+end-to-end secured DTLS session with a cBRSKI Registrar.
+
+Details of the IP address and port notation used in the Join Proxy specification are provided in {{ip-port-notation}}.
 
 
-# Join Proxy functionality
+# Join Proxy Problem Statement and Solution
 
-As depicted in {{fig-net}}, the Pledge (P), in a network such as a Low-Power and Lossy Network (LLN) mesh
- {{RFC7102}} can be more than one hop away from the Registrar (R) and not yet authenticated into the network.
+## Problem Statement
+
+As depicted in {{fig-net}}, the Pledge (P), in a network such as a 6LoWPAN {{RFC4944}} mesh network  
+ can be more than one hop away from the Registrar (R) and it is not yet authenticated into the network.
 
 In this situation, the Pledge can only communicate one-hop to its nearest neighbor, the constrained Join Proxy (J), 
-using their link-local IPv6 addresses.
-However, the Pledge needs to communicate with end-to-end security with a Registrar to authenticate and get the relevant system/network parameters.
-If the Pledge, knowing the IP-address of the Registrar, initiates a DTLS connection to the Registrar, then the packets are dropped at the Join Proxy since the Pledge is not yet admitted to the network or there is no IP routability to the Pledge for any returned messages from the Registrar.
+using link-local IPv6 addresseses.
+However, the Pledge needs to communicate with end-to-end security with a Registrar to authenticate and obtains its 
+domain identity/credentials, which is a domain certificate in case of cBRSKI, but may also include key material for 
+network access.
 
 ~~~~ aasvg
                     multi-hop mesh
-         .---.                         IPv6
-         | R +---.    +----+    +---+ subnet +--+
-         |   |    \   |6LR +----+ J |........|P |
-         '---'     `--+    |    |   | clear  |  |
-                      +----+    +---+        +--+
-       Registrar             Join Proxy     Pledge
+         .---.                            IPv6 
+         | R +---.    +-----+    +---+  link-local  +---+
+         |   |    \   | 6LR +----+ J |..............| P |
+         '---'     `--+     |    |   |              |   |
+                      +-----+    +---+              +---+
+       Registrar                Join Proxy          Pledge
 
 
 ~~~~
-{: #fig-net title='multi-hop enrollment.' align="left"}
+{: #fig-net title='Multi-hop cBRSKI onboarding scenario' align="left"}
 
-Without a routeable IPv6 address, the Pledge (P) cannot exchange IPv6/UDP/DTLS traffic
-with the Registrar (R), over multiple hops in the network.
+So one problem is that there is no IP routability between the Pledge and the Registrar, via intermediate nodes 
+such as 6LoWPAN Routers (6LRs), despite the need for an end-to-end secured session between both.
 
-Furthermore, the Pledge may not be able to discover the IP address of the Registrar over multiple hops to initiate a DTLS connection and perform authentication.
+Furthermore, the Pledge is not be able to discover the IP address of the Registrar because it is not yet allowed onto 
+the network.
 
-To overcome the problems with non-routability of DTLS packets and/or discovery of the destination address of the Registrar, the Join Proxy is introduced.
-This Join Proxy functionality is also (auto) configured into all authenticated devices in the network that may act as a Join Proxy for Pledges.
-The Join Proxy allows for routing of the packets from the Pledge using IP routing to the intended Registrar. An authenticated Join Proxy can discover the routable IP address of the Registrar over multiple hops.
-The following {{jr-spec}} specifies the two Join Proxy modes. A comparison is presented in {{jr-comp}}.
+## Solution
 
-When a mesh network is set up using cBRSKI, it requires an active Registrar that is reachable by the nodes to be 
-onboarded into the mesh network. Typically, the first device to be set up is a 6LoWPAN Border Router (6LBR) which 
-enables cBRSKI onboarding of new devices via a 6LoWPAN network interface. 
-This 6LBR may host the cBRSKI Registrar.
+To overcome these problems, the constrained Join Proxy is introduced.
+This is specific functionality that all, or a specific subset of, authenticated nodes in an IP network can implement.
+When the Join Proxy functionality is enabled in a node, it can help a neighboring Pledge securely onboard the network.
+
+The Join Proxy performs relaying of UDP packets from the Pledge to the intended Registrar, and 
+relaying of the subsequent return packets.
+An authenticated Join Proxy can discover the routable IP address of the Registrar, as specified in this document.
+Future methods of Registrar discovery can also be easily added.
+
+The Join Proxy acts as a packet-by-packet proxy for UDP packets between Pledge and Registrar.
+The cBRSKI protocol between Pledge and Registrar {{cBRSKI}} which this Join Proxy supports
+uses UDP messages with DTLS-encrypted CoAP payloads, but the Join Proxy as described here is unaware
+of these payloads.
+The Join Proxy solution can therefore be easily extended to work for other UDP-based protocols, 
+as long as these protocols are agnostic to (or can be made to work with) the change of the IP and UDP headers 
+that is performed by the Join Proxy.
+
+In summary, the following steps are typically taken for the onboarding process of a Pledge:
+
+1. Join Proxies in the network learn the IP address and UDP port of the Registrar.
+2. A new Pledge arrives: it discovers one or more Join Proxies and selects one.
+3. The Pledge sends a link-local UDP message to the selected Join Proxy.
+4. The Join Proxy relays the message to the Registrar (and port) discovered in step 1.
+5. The Registrar sends a response UDP message back to the Join Proxy.
+6. The Join Proxy relays the message back to the Pledge.
+7. Step 3 to 6 repeat as needed, for multiple messages, to complete the onboarding protocol.
+
+To reach the Registrar in step 4, the Join Proxy needs to be either configured with a Registrar address or 
+needs to dynamically discover a Registrar as detailed in {{discovery-by-jp}}. 
+This configuration/discovery is specified here as step 1. 
+Alternatively, in case of automated discovery it can also happen in step 4 -- at the moment that the Join Proxy has 
+data to send to the Registrar.
+For step 1, this specification does not specify how a Join Proxy selects a Registrar when it discovers two or more.
+That is the subject of future work.
+
+## Solution for Mesh Networks Formed using cBRSKI
+
+The Join Proxy has been specifically designed to set up entire 6LoWPAN mesh networks using cBRSKI onboarding.
+This section outlines how this process can work and highlights the role that the Join Proxy plays in forming the mesh
+network.
+
+Typically, the first node to be set up is a 6LoWPAN Border Router (6LBR) which will form the new mesh network and 
+decide on the network's configuration. The 6LBR may be configured for this using for example one of the below methods.
+Multiple methods may be used within the scope of a single installation.
+
+1. Manual administratvie configuration
+2. Use non-constrained BRSKI {{RFC8995}} to automatically onboard over its high-speed network interface when it gets powered on.
+3. Use cBRSKI {{cBRSKI}} to automatically onboard over its high-speed network interface when it gets powered on.
+
+When a new mesh network is created by the 6LBR, it requires an active Registrar that is reachable via IP by 6LBR before 
+more Pledges can be onboarded. 
+Once cBRSKI onboarding is enabled (either administratively, or automatically) on the 6BLR, it helps     
+onboard 6LoWPAN-enabled Pledges via its 6LoWPAN network interface.
+This 6LBR may host the cBRSKI Registrar itself, but the Registrar may also be hosted 
+elsewhere on the (non-mesh) installation network.
+
 At the time the Registrar and the 6LBR are enabled, there may be zero Pledges, or there may be already one or more 
-Pledges waiting - periodically attempting to discover a Join Proxy for cBRSKI onboarding.
+installed and powered Pledges waiting - periodically attempting to discover a Join Proxy for cBRSKI onboarding over 
+their 6LoWPAN network interface.
 
-The Registrar hosted on the 6LBR will, per {{cBRSKI}}, make itself discoverable as a Join Proxy so that Pledges can 
-use it for onboarding.
-Note that only some of these Pledges may be neighbors of the Registrar/6LBR. 
-Others would need their traffic to be relayed across one or more enrolled mesh devices (6LR) to reach the Registrar.
+A Registrar hosted on the 6LBR will, per {{cBRSKI}}, make itself discoverable as a Join Proxy so that Pledges can 
+use it for cBRSKI onboarding.
+Note that only some of Pledges waiting to onboard may be direct neighbors of the Registrar/6LBR. 
+Other Pledges would need their traffic to be relayed by constrained Join Proxies across one or more enrolled mesh 
+devices (6LR) in order to reach the Registrar/6LBR.
+For this purpose, all or some of the enrolled Pledges should start to act as Join Proxies themselves.
 
-The desired state of the installation is a network with a Registrar and all Pledges successfully enrolled in the 
-network domain. 
-Some of these enrolled devices can act as Join Proxies. 
-Pledges can only employ link-local communication until they are enrolled. 
-A Pledge will regularly try to discover a Join Proxy with link-local discovery requests. 
+The desired end state of the installation includes a network with a Registrar and all Pledges successfully enrolled in the 
+network domain and connected to one of the 6LoWPAN mesh networks that are part of the domain. 
+New Pledges may also be added by future 
+network maintenance work on the installation.
+
+Pledges can only employ link-local communication until they are enrolled, at which point they stop being a "Pledge". 
+A Pledge will regularly try to discover a Join Proxy with link-local discovery requests, as defined in {{cBRSKI}}. 
 The Pledges that are neighbors of the Registrar will discover the Registrar itself (as it is posing as a Join Proxy) 
 and will be enrolled first using cBRSKI. 
-An enrolled device can then act as Join Proxy itself. 
-The Pledges that are not a neighbor of the Registrar will eventually discover a Join Proxy and be enrolled with 
-cBRSKI. 
+The Pledges that are not a neighbor of the Registrar will first wait and will eventually discover a Join Proxy so 
+that they can be enrolled also with cBRSKI. 
 While this continues, more and more Join Proxies with a larger hop distance to the Registrar will emerge. 
 The mesh network auto-configured in this way, such that at the end of the enrollment process, all Pledges are enrolled.
 
-The Join Proxy is as a packet-by-packet proxy for UDP packets between Pledge and
-Registrar. The constrained BRSKI protocol between Pledge and Registrar described in
-{{cBRSKI}} which this Join Proxy supports
-uses UDP messages with DTLS payload, but the Join Proxy as described here is unaware
-of this payload. It can therefore potentially also work for other UDP based protocols
-as long as they are agnostic to (or can be made to work with) the change of IP header
-by the Join Proxy.
 
-In both Stateless and Stateful mode, the Join Proxy needs to be configured with
-or dynamically discover a Registrar to perform its service. This specification does not
-discuss how a Join Proxy selects a Registrar when it discovers 2 or more.
-
-# Join Proxy specification {#jr-spec}
+# Join Proxy specification {#jp-spec}
 
 A Join Proxy can operate in two modes:
 
    1. Stateful mode
    2. Stateless mode
 
-The advantages and disadvantages of the two modes are presented in {{jr-comp}}.
+The advantages and disadvantages of the two modes are presented in {{jp-comparison}}.
 
 A Join Proxy MUST implement both. A Registrar MUST implement the stateful mode and SHOULD implement the Stateless mode.
 
@@ -698,7 +733,8 @@ The Enhanced Beason discovery mechanism used in 6tisch does not convey a method 
 A 6tisch network that wanted to use DTLS for security would need a new attribute for the enhanced beacon that announced the availability of a DTLS proxy as described in this document.
 Future work could provide that capability.
 
-# Comparison of stateless and stateful Join Proxy modes {#jr-comp}
+
+# Comparison of Stateless and Stateful Modes {#jp-comparison}
 
 The stateful and stateless mode of operation for the Join Proxy each have their advantages and disadvantages.
 This section should enable operators to make a choice between the two modes based on the available device resources and network bandwidth.
@@ -716,6 +752,7 @@ This section should enable operators to make a choice between the two modes base
 | Registrar Ports  | Registrar can host on a single UDP port. | Registrar must host on two UDP ports: one for DTLS, one for JPY messages. |
 |=============
 {: #fig-comparison title='Comparison between stateful and stateless mode' align="left"}
+
 
 # Security Considerations
 
@@ -745,6 +782,7 @@ key. The Registrar is not able to examine the encrypted result, but
 does not need to. The Registrar stores the encrypted header in the return packet without modifications. The Join Proxy can decrypt the contents to route the message to the right destination.
 
 In some installations, layer 2 protection is provided between all member pairs of the mesh. In such an environment encryption of the CBOR array is unnecessary because the layer 2 protection already provides it.
+
 
 # IANA Considerations
 
@@ -815,13 +853,16 @@ Number" registry.
 
 
 # Acknowledgements
+{{I-D.richardson-anima-state-for-joinrouter}} outlined the various options for building a constrained Join Proxy.
 
 Many thanks for the comments by {{{Bill Atwood}}}, {{{Carsten Bormann}}}, {{{Brian Carpenter}}}, {{{Spencer Dawkins}}}, {{{Esko Dijk}}}, {{{Toerless Eckert}}}, {{{Russ Housley}}}, {{{Ines Robles}}}, {{{Rich Salz}}}, {{{Jürgen Schönwälder}}}, {{{Mališa Vučinić}}}, and {{{Rob Wilton}}}.
 
-# Contributors
 
-{{{Sandeep Kumar}}}, {{{Sye loong Keoh}}}, and {{{Oscar Garcia-Morchon}}} are the co-authors of the draft-kumar-dice-dtls-relay-02.
+# Contributors
+This document is very much inspired by text published earlier in {{I-D.kumar-dice-dtls-relay}}.
+{{{Sandeep Kumar}}}, {{{Sye loong Keoh}}}, and {{{Oscar Garcia-Morchon}}} are the co-authors of this document.
 Their draft text has served as a basis for this document.
+
 
 # Changelog
 -15 to -16
