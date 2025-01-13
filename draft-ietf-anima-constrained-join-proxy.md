@@ -81,18 +81,17 @@ informative:
 
 --- abstract
 
-This document extends the work of Bootstrapping Remote Secure Key
-Infrastructures (BRSKI) by replacing the (stateful) TLS Circuit proxy between
-Pledge and Registrar with a stateless or stateful DTLS Circuit proxy 
-which is called the constrained Join Proxy. The Join Proxy is a mesh neighbor of the
-Pledge and can relay a DTLS session originating from a Pledge with only link-local
-addresses to a Registrar that is not a mesh neighbor of the
-Pledge.
-
-Like the BRSKI Circuit proxy, this Join Proxy eliminates the need of
-Pledges to have routeable IP addresses before enrolment by utilizing link-local
-addresses. Use of the Join Proxy also eliminates the need of the Pledge
-to authenticate to the network or perform network-wide Registrar discovery before enrolment.
+This document extends the constrained Bootstrapping Remote Secure Key Infrastructures (cBRSKI) onboarding protocol by 
+adding a new network element, called the constrained Join Proxy.
+This element acts as a circuit proxy for User Datagram Protocol (UDP) packets.
+The goal of the Join Proxy is to help new devices ("Pledges") securely onboard into a new IP network using the 
+cBRSKI protocol.
+It is easily extendible to support other UDP-based onboarding protocols.
+The Join Proxy functionality is designed for use in constrained networks, including IPv6 over Low-Power Wireless Personal Area Networks (6LoWPAN) 
+based mesh networks in which the onboarding authority ("Registrar") may be multiple IP hops away from a Pledge.
+Despite this, the Pledge only needs to use link-local UDP communication to complete cBRSKI onboarding.
+Two modes of operation are defined, stateless and stateful, to allow implementers to make different trade-offs 
+between resource usage, implementation complexity and security.
 
 --- middle
 
