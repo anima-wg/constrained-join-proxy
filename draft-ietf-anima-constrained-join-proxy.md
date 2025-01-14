@@ -302,13 +302,27 @@ A Join Proxy can operate in two modes:
 
 The advantages and disadvantages of the two modes are presented in {{jp-comparison}}.
 
-A Join Proxy MAY implement only one of the modes, or MAY implement both. 
-A cBRSKI Registrar by design necessarily implements the stateful mode, and it SHOULD implement support for 
-Join Proxies operating in the stateless mode.
+For a Join Proxy implementation on a node, there are three possible scenarios:
 
-If a Join Proxy capable node implements both modes, then it MUST use only the mode that is configured 
-(by a method or profile outside the scope of this document).
-If the mode is not configured, the device MUST NOT operate as a Join Proxy until the mode is configured.
+1. Both stateful and stateless modes are implemented. The Join Proxy can switch between these modes, depending on 
+   configuration.
+2. Only stateful mode is implemented. 
+3. Only stateless mode is implemented.
+
+An application profile or ecosystem standard that integrates the Join Proxy functionality as defined in this 
+document MAY define any of these three options. 
+In particular, option 2 or 3 has the advantage of reducing code size and testing efforts, when all devices under 
+the application profile/standard adhere to the same choice.
+
+A generic Join Proxy that is not adhering to such an application profile/standard MUST implement both modes. 
+
+A cBRSKI Registrar by design necessarily implements the stateful mode, and it SHOULD implement support for 
+Join Proxies operating in the stateless mode. The exception case here is a cBRSKI Registrar that is implemented for a 
+particular dedicated application profile/standard which specifies only the stateful mode.
+
+If a Join Proxy implements both modes, then it MUST use only the mode that is currently configured for the network  
+(by a method or profile outside the scope of this document) or individually configured for the device.
+If the mode is not configured, the device MUST NOT operate as a Join Proxy.
 
 For a Join Proxy to be operational, the node on which it is running has to be
 able to talk to a Registrar (exchange UDP messages with it). Establishing this connectivity can happen
