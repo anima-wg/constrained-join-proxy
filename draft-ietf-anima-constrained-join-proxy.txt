@@ -124,7 +124,7 @@ Internet-Draft                 Join Proxy                   January 2025
      8.1.  Resource Type Attributes registry . . . . . . . . . . . .  23
      8.2.  coaps+jpy Scheme Registration . . . . . . . . . . . . . .  23
      8.3.  Service name and port number registry . . . . . . . . . .  24
-   9.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  24
+   9.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  25
    10. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  25
    11. Changelog . . . . . . . . . . . . . . . . . . . . . . . . . .  25
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  27
@@ -1257,30 +1257,30 @@ Internet-Draft                 Join Proxy                   January 2025
 
    This specification registers two new Resource Type (rt=) Link Target
    Attributes in the "Resource Type (rt=) Link Target Attribute Values"
-   subregistry under the "Constrained RESTful Environments (CoRE)
-   Parameters" registry per the [RFC6690] procedure.
+   registry under the "Constrained RESTful Environments (CoRE)
+   Parameters" registry group, per the [RFC6690] procedure.
 
    Attribute Value: brski.jp
-   Description: This BRSKI resource type is used to query and return
-                the supported BRSKI resources of the constrained
-                Join Proxy.
-   Reference:   [this document]
+   Description: Constrained Join Proxy for cBRSKI onboarding protocol.
+   Reference:   [This RFC]
 
    Attribute Value: brski.rjp
-   Description: This BRSKI resource type is used for the constrained
-                Join Proxy to query and return Join Proxy specific
-                BRSKI resources of a Registrar.
-   Reference:   [this document]
+   Description: cBRSKI Registrar Join Proxy endpoint that supports the
+                JPY protocol.
+   Reference:   [This RFC]
 
 8.2.  coaps+jpy Scheme Registration
 
+   This specification registers a new URI scheme per [RFC7595] under the
+   IANA "Uniform Resource Identifier (URI) Schemes" registry.
 
-
-
-
-
-
-
+   Scheme name: coaps+jpy
+   Status:      permanent
+   Applications/protocols that use this scheme name:
+                cBRSKI, constrained Join Proxy
+   Contact:     ANIMA WG
+   Change controller: IESG
+   References:  [This RFC]
 
 
 
@@ -1290,24 +1290,35 @@ Richardson, et al.        Expires 18 July 2025                 [Page 23]
 Internet-Draft                 Join Proxy                   January 2025
 
 
-   Scheme name: coaps+jpy
-   Status: permanent
-   Applications/protocols that use this scheme name: cBRSKI
-   Contact: ANIMA WG
-   Change controller: IESG
-   References: [THIS RFC]
-   Scheme syntax: identical to the "coaps" scheme
-   Scheme semantics: The encapsulation mechanism described in
-      {{stateless-jpy}} is used with coaps.
-   Security considerations: The new encapsulation allows traffic to be
-      returned to a calling node behind a proxy.  The form of the
-      encapsulation can include privacy and integrity protection under
-      the control of the proxy system.
+   The scheme specification is provided below.
+
+   *  Scheme syntax: identical to the "coaps" scheme defined in
+      [RFC7252].
+
+   *  Scheme semantics: identical to the "coaps" scheme, except that the
+      JPY message encapsulation mechanism described in Section 4.4 of
+      [This RFC] is used to transport each CoAPS UDP datagram.
+
+   *  Encoding considerations: identical to the "coaps" scheme.
+
+   *  Interoperability considerations: identical to the "coaps" scheme.
+
+   *  Security considerations: all of the security considerations of the
+      "coaps" scheme apply.  Users of this scheme should be aware that
+      as part of the intended use, a UDP message that was formed using
+      the "coaps" scheme is modified by a Join Proxy as defined by [This
+      RFC] into a UDP message conforming to the "coaps+jpy" scheme
+      without the Join Proxy being able to parse/decode which CoAPS URI
+      was originally used by the sender.  Depending on the CoAP Options
+      used in the original CoAPS message, this operation may modify
+      elements of the original CoAPS URI (as will be reconstructed by
+      the receiving coaps+jpy server) in a way that is unknown to the
+      Join Proxy.
 
 8.3.  Service name and port number registry
 
-   This specification registers two service names under the "Service
-   Name and Transport Protocol Port Number" registry.
+   This specification registers two service names under the IANA
+   "Service Name and Transport Protocol Port Number" registry.
 
    Service Name: brski-jp
    Transport Protocol(s): udp
@@ -1315,7 +1326,7 @@ Internet-Draft                 Join Proxy                   January 2025
    Contact:  IESG <iesg@ietf.org>
    Description: Bootstrapping Remote Secure Key Infrastructure
                 constrained Join Proxy
-   Reference:   [this document]
+   Reference:   [This RFC]
 
    Service Name: brski-rjp
    Transport Protocol(s): udp
@@ -1324,7 +1335,16 @@ Internet-Draft                 Join Proxy                   January 2025
    Description: Bootstrapping Remote Secure Key Infrastructure
                 Registrar join-port used by stateless constrained
                 Join Proxy
-   Reference:   [this document]
+   Reference:   [This RFC]
+
+
+
+
+
+Richardson, et al.        Expires 18 July 2025                 [Page 24]
+
+Internet-Draft                 Join Proxy                   January 2025
+
 
 9.  Acknowledgements
 
@@ -1335,16 +1355,6 @@ Internet-Draft                 Join Proxy                   January 2025
    Carpenter, Spencer Dawkins, Esko Dijk, Toerless Eckert, Russ Housley,
    Ines Robles, Rich Salz, Jürgen Schönwälder, Mališa Vučinić, and Rob
    Wilton.
-
-
-
-
-
-
-Richardson, et al.        Expires 18 July 2025                 [Page 24]
-
-Internet-Draft                 Join Proxy                   January 2025
-
 
 10.  Contributors
 
@@ -1384,16 +1394,6 @@ Internet-Draft                 Join Proxy                   January 2025
 
    -10 to -11
 
-      * Join-Proxy and Registrar discovery merged
-      * GRASP discovery updated
-      * ARTART review
-      * TSVART review
-
-   -09 to -10
-
-
-
-
 
 
 
@@ -1401,6 +1401,13 @@ Richardson, et al.        Expires 18 July 2025                 [Page 25]
 
 Internet-Draft                 Join Proxy                   January 2025
 
+
+      * Join-Proxy and Registrar discovery merged
+      * GRASP discovery updated
+      * ARTART review
+      * TSVART review
+
+   -09 to -10
 
       * OPSDIR review
       * IANA review
@@ -1443,13 +1450,6 @@ Internet-Draft                 Join Proxy                   January 2025
 
      * Discovery of Join Proxy and Registrar ports
 
-   -00 to -01
-
-
-
-
-
-
 
 
 
@@ -1457,6 +1457,8 @@ Richardson, et al.        Expires 18 July 2025                 [Page 26]
 
 Internet-Draft                 Join Proxy                   January 2025
 
+
+   -00 to -01
 
       * Registrar used throughout instead of EST server
       * Emphasized Join Proxy port for Join Proxy and Registrar
@@ -1503,8 +1505,6 @@ Internet-Draft                 Join Proxy                   January 2025
    [RFC792]   Postel, J., "Internet Control Message Protocol", STD 5,
               RFC 792, DOI 10.17487/RFC0792, September 1981,
               <https://www.rfc-editor.org/rfc/rfc792>.
-
-
 
 
 
@@ -1651,6 +1651,11 @@ Internet-Draft                 Join Proxy                   January 2025
               DOI 10.17487/RFC7252, June 2014,
               <https://www.rfc-editor.org/rfc/rfc7252>.
 
+   [RFC7595]  Thaler, D., Ed., Hansen, T., and T. Hardie, "Guidelines
+              and Registration Procedures for URI Schemes", BCP 35,
+              RFC 7595, DOI 10.17487/RFC7595, June 2015,
+              <https://www.rfc-editor.org/rfc/rfc7595>.
+
    [RFC7959]  Bormann, C. and Z. Shelby, Ed., "Block-Wise Transfers in
               the Constrained Application Protocol (CoAP)", RFC 7959,
               DOI 10.17487/RFC7959, August 2016,
@@ -1667,11 +1672,6 @@ Internet-Draft                 Join Proxy                   January 2025
               (CoAP)", RFC 8974, DOI 10.17487/RFC8974, January 2021,
               <https://www.rfc-editor.org/rfc/rfc8974>.
 
-   [RFC9031]  Vučinić, M., Ed., Simon, J., Pister, K., and M.
-              Richardson, "Constrained Join Protocol (CoJP) for 6TiSCH",
-              RFC 9031, DOI 10.17487/RFC9031, May 2021,
-              <https://www.rfc-editor.org/rfc/rfc9031>.
-
 
 
 
@@ -1681,6 +1681,11 @@ Richardson, et al.        Expires 18 July 2025                 [Page 30]
 
 Internet-Draft                 Join Proxy                   January 2025
 
+
+   [RFC9031]  Vučinić, M., Ed., Simon, J., Pister, K., and M.
+              Richardson, "Constrained Join Protocol (CoJP) for 6TiSCH",
+              RFC 9031, DOI 10.17487/RFC9031, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc9031>.
 
 Appendix A.  Stateless Proxy payload examples
 
@@ -1725,11 +1730,6 @@ Authors' Addresses
 
    Michael Richardson
    Sandelman Software Works
-   Email: mcr+ietf@sandelman.ca
-
-
-   Peter van der Stok
-   vanderstok consultancy
 
 
 
@@ -1738,6 +1738,11 @@ Richardson, et al.        Expires 18 July 2025                 [Page 31]
 Internet-Draft                 Join Proxy                   January 2025
 
 
+   Email: mcr+ietf@sandelman.ca
+
+
+   Peter van der Stok
+   vanderstok consultancy
    Email: stokcons@kpnmail.nl
 
 
@@ -1749,11 +1754,6 @@ Internet-Draft                 Join Proxy                   January 2025
    Esko Dijk
    IoTconsultancy.nl
    Email: esko.dijk@iotconsultancy.nl
-
-
-
-
-
 
 
 

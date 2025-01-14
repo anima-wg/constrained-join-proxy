@@ -71,6 +71,7 @@ informative:
   RFC7102:
   RFC7228:
   RFC7252:
+  RFC7595:
   RFC7959:
   RFC8610:
   RFC8974:
@@ -798,40 +799,49 @@ In some installations, layer 2 protection is provided between all member pairs o
 ## Resource Type Attributes registry {#iana-rt}
 
 This specification registers two new Resource Type (rt=) Link Target Attributes in the 
-"Resource Type (rt=) Link Target Attribute Values" subregistry under the "Constrained RESTful Environments (CoRE)
-Parameters" registry per the {{RFC6690}} procedure.
+"Resource Type (rt=) Link Target Attribute Values" registry under the "Constrained RESTful Environments (CoRE)
+Parameters" registry group, per the {{RFC6690}} procedure.
 
     Attribute Value: brski.jp
-    Description: This BRSKI resource type is used to query and return
-                 the supported BRSKI resources of the constrained
-                 Join Proxy.
-    Reference:   [this document]
+    Description: Constrained Join Proxy for cBRSKI onboarding protocol.
+    Reference:   [This RFC]
 
     Attribute Value: brski.rjp
-    Description: This BRSKI resource type is used for the constrained
-                 Join Proxy to query and return Join Proxy specific
-                 BRSKI resources of a Registrar.
-    Reference:   [this document]
+    Description: cBRSKI Registrar Join Proxy endpoint that supports the 
+                 JPY protocol.
+    Reference:   [This RFC]
 
 ## coaps+jpy Scheme Registration {#jpyscheme}
 
+This specification registers a new URI scheme per {{RFC7595}} under the IANA "Uniform Resource Identifier (URI) Schemes"
+registry.
+
     Scheme name: coaps+jpy
-    Status: permanent
-    Applications/protocols that use this scheme name: cBRSKI
-    Contact: ANIMA WG
+    Status:      permanent
+    Applications/protocols that use this scheme name: 
+                 cBRSKI, constrained Join Proxy
+    Contact:     ANIMA WG
     Change controller: IESG
-    References: [THIS RFC]
-    Scheme syntax: identical to the "coaps" scheme
-    Scheme semantics: The encapsulation mechanism described in 
-       {{stateless-jpy}} is used with coaps.
-    Security considerations: The new encapsulation allows traffic to be 
-       returned to a calling node behind a proxy.  The form of the 
-       encapsulation can include privacy and integrity protection under 
-       the control of the proxy system.
+    References:  [This RFC]
+
+The scheme specification is provided below.
+
+* Scheme syntax: identical to the "coaps" scheme defined in {{RFC7252}}.
+* Scheme semantics: identical to the "coaps" scheme, except that the JPY message encapsulation mechanism described in 
+  {{stateless-jpy}} of \[This RFC\] is used to transport each CoAPS UDP datagram.
+* Encoding considerations: identical to the "coaps" scheme.
+* Interoperability considerations: identical to the "coaps" scheme.
+* Security considerations: all of the security considerations of the "coaps" scheme apply.
+  Users of this scheme should be aware that as part of the intended use, a UDP message that was formed using the 
+  "coaps" scheme is modified by a Join Proxy as defined by \[This RFC\] into a UDP message conforming to the 
+  "coaps+jpy" scheme without the Join Proxy being able to parse/decode which CoAPS URI was originally used by the 
+  sender.
+  Depending on the CoAP Options used in the original CoAPS message, this operation may modify elements of the original 
+  CoAPS URI (as will be reconstructed by the receiving coaps+jpy server) in a way that is unknown to the Join Proxy.
 
 ## Service name and port number registry {#dns-sd-spec}
 
-This specification registers two service names under the "Service Name and Transport Protocol Port
+This specification registers two service names under the IANA "Service Name and Transport Protocol Port
 Number" registry.
 
     Service Name: brski-jp
@@ -840,7 +850,7 @@ Number" registry.
     Contact:  IESG <iesg@ietf.org>
     Description: Bootstrapping Remote Secure Key Infrastructure
                  constrained Join Proxy
-    Reference:   [this document]
+    Reference:   [This RFC]
 
     Service Name: brski-rjp
     Transport Protocol(s): udp
@@ -849,7 +859,7 @@ Number" registry.
     Description: Bootstrapping Remote Secure Key Infrastructure
                  Registrar join-port used by stateless constrained
                  Join Proxy
-    Reference:   [this document]
+    Reference:   [This RFC]
 
 
 # Acknowledgements
