@@ -353,7 +353,7 @@ The following notation is used in this section in both text and figures:
    acts in a UDP client role, specifically as a DTLS client for the case of cBRSKI.
 * `p_Jl` denotes the join-port of the Join Proxy.
 * `p_Jr` denotes the client port of the Join Proxy that it uses to forward packets to the Registrar.
-* `p_Ra` denotes the server port of the Registrar on which it serves the onboarding protocol, such as cBRSKI.
+* `p_R` denotes the server port of the Registrar on which it serves the onboarding protocol, such as cBRSKI.
 * `p_Rj` denotes the server port of the Registrar on which it serves the JPY protocol.
 * `JPY[H( ),C( )]` denotes a JPY message, as defined by the JPY protocol, with header H and content C indicated in 
    between the parentheses.
@@ -383,8 +383,8 @@ triggered by receipt of a UDP packet from a Pledge with an `IP_P:p_P` link-local
 destination for which no mapping state exists, and that is terminated by a connection expiry timer.
 
 {{fig-statefull2}} depicts an example DTLS session via the Join Proxy, to show how this state is used in practice.
-In this case the Join Proxy knows the IP address of the Registrar (`IP_R`) and the default CoAPS port (5684) on the 
-Registrar is used to access cBRSKI resources.
+In this case the Join Proxy knows the IP address of the Registrar (`IP_R`) and the default CoAPS port (`P_R` = `5684`) 
+on the Registrar is used to access cBRSKI resources.
 
 ~~~~aasvg
 +------------+------------+-------------+--------------------------+
@@ -472,7 +472,7 @@ Contents field to a particular Pledge.
 
 When the Registrar receives such a JPY message, it MUST treat the Header H as a single additional opaque identifier 
 of all packets associated to a UDP connection with a Pledge.
-Whereas in the stateful proxy case, all packets with the same tuple `(IP_Jr:p_Jr, IP_R:p_Ra)` belong to a single 
+Whereas in the stateful proxy case, all packets with the same tuple `(IP_Jr:p_Jr, IP_R:p_R)` belong to a single 
 Pledge's UDP connection,
 in the stateless proxy case only the packets with the same tuple `(IP_Jr:p_Jr, IP_R:p_Rj, H)` belong to a single 
 Pledge's UDP connection.
