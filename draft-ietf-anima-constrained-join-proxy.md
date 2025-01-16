@@ -83,13 +83,14 @@ informative:
 --- abstract
 
 This document extends the constrained Bootstrapping Remote Secure Key Infrastructures (cBRSKI) onboarding protocol by 
-adding a new network element, called the constrained Join Proxy.
-This element acts as a circuit proxy for User Datagram Protocol (UDP) packets.
-The goal of the Join Proxy is to help new devices ("Pledges") securely onboard into a new IP network using the 
+adding a new network function, the constrained Join Proxy.
+This function can be implemented by a constrained node {{RFC7228}}. 
+The goal of the Join Proxy is to help new constrained nodes ("Pledges") securely onboard into a new IP network using the 
 cBRSKI protocol.
-It is easily extendible to support other UDP-based onboarding protocols.
-The Join Proxy functionality is designed for use in constrained networks, including IPv6 over Low-Power Wireless Personal Area Networks (6LoWPAN) 
-based mesh networks in which the onboarding authority ("Registrar") may be multiple IP hops away from a Pledge.
+It acts as a circuit proxy for (cBRSKI) User Datagram Protocol (UDP) packets.
+The solution is easily extendible to support other UDP-based onboarding protocols.
+The Join Proxy functionality is designed for use in constrained networks {{RFC7228}}, including IPv6 over Low-Power Wireless Personal Area Networks (6LoWPAN) 
+{{RFC4944}} based mesh networks in which the onboarding authority ("Registrar") may be multiple IP hops away from a Pledge.
 Despite this, the Pledge only needs to use link-local UDP communication to complete cBRSKI onboarding.
 Two modes of operation are defined, stateless and stateful, to allow implementers to make different trade-offs 
 between resource usage, implementation complexity and security.
@@ -293,7 +294,7 @@ The mesh network auto-configures in this way, such that at the end of the onboar
 into the network domain and connected to the mesh network.
 
 
-# Join Proxy specification {#jp-spec}
+# Join Proxy Specification {#jp-spec}
 
 A Join Proxy can operate in two modes:
 
@@ -413,7 +414,7 @@ The Join Proxy MUST allocate a unique `IP_Jr:p_Jr` for every unique Pledge that 
 by selecting a unique available port `P_Jr` for each Pledge. 
 Doing so enables the Join Proxy to correctly map the 
 UDP packets received from the Registrar back to the corresponding Pledges. 
-Also, it enables the Registrar to correctly distinguish multiple DTLS clients by means of IP-address/port tuples.
+Also, it enables the Registrar to correctly distinguish multiple DTLS clients by means of IP address/port tuples.
 
 The default timeout for clearing the state for a Pledge MUST be 30 seconds after the last relayed packet was sent on 
 a UDP connection associated to that Pledge, in either direction.
@@ -466,8 +467,8 @@ The Header contains the original source link-local address and port of the Pledg
 earlier and the Contents field contains the DTLS payload.
 
 On receiving the JPY message, the Join Proxy retrieves the two parts.
-It uses the Header field information to send a UDP message containing the (DTLS) payload retrieved from the Contents field to a 
-particular Pledge.
+It uses the Header field information to send a link-local UDP message containing the (DTLS) payload retrieved from the 
+Contents field to a particular Pledge.
 
 When the Registrar receives such a JPY message, it MUST treat the Header H as a single additional opaque identifier 
 of all packets associated to a UDP connection with a Pledge.
@@ -512,7 +513,7 @@ permanent change of the Registrar's IP address and/or port, or it may signal a t
 
 Unlike a stateful Join Proxy, the stateless Join Proxy cannot determine the Pledge to which this ICMP error should 
 be mapped, because the JPY header containing this information is not included in the ICMP error message.
-Therefore, it cannot inform the Pledge of the error that occurred.
+Therefore, it cannot inform the Pledge of the specific error that occurred.
 
 ## JPY Message Structure {#stateless-jpy}
 
@@ -524,7 +525,7 @@ So, there is no CoAP or DTLS layer used between the JPY messages and the UDP lay
 Each JPY message consists of one CBOR {{RFC8949}} array with 2 elements:
 
    1. The Header (H) with the Join Proxy's per-message state data: wrapped in a CBOR byte string. 
-      The byte string including its related CBOR encoding SHOULD be at most 34 bytes.
+      The state data SHOULD be at most 32 bytes.
    2. The Content (C) field: the binary (DTLS) payload being relayed, wrapped in a CBOR byte string. 
       The payload is encrypted. 
       The Join Proxy cannot decrypt it and therefore has no knowledge of any transported (CoAP) messages, or the URI
@@ -540,6 +541,13 @@ Using CDDL {{RFC8610}}, the CBOR array that constitutes the JPY message can be f
     ]
 ~~~
 {: #fig-cddl title='CDDL representation of a JPY message' align="left"}
+
+The use of this CBOR encoding adds a 3-6 byte overhead on top of the data carried within the Header and Content fields.
+The Header state data itself (up to 32 bytes) also adds an overhead on each UDP message exchanged between Join Proxy and Registrar.
+Therefore, a protocol using the stateless Join Proxy MUST use (UDP) payloads that are bounded in size, such that 
+the maximum payload length used minus the maximum overhead size (38 bytes) stays below the MTU size of the network. 
+cBRSKI is designed to work even for the minimum IPv6 MTU of 1280 bytes, by configuring the DTLS maximum fragment length 
+and using CoAP blockwise transfer for large resource transfers {{cBRSKI}}.
 
 The `jpy_header` state data is to be reflected (unmodified) by the Registrar when sending return JPY messages to the Join Proxy.
 The header's internal representation is not standardized: it can be constructed by the Join Proxy in whatever way.
@@ -560,7 +568,7 @@ Although a Join Proxy MAY vary the UDP source port, doing so creates more local 
 A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible) could, for instance, use 
 different UDP source port numbers to demultiplex connections across CPUs.
 
-### Example Format for the JPY Message Header Data
+### Example Format for JPY Header Data
 
 A typical JPY message header format, prior to encryption, could be constructed using the following CDDL grammar.
 This is illustrative only: the format of the data inside `jpy_header` is not subject to standardization and may vary 
@@ -725,7 +733,7 @@ In these examples, the Join Proxy in a specific mode of operation (stateful or s
 cBRSKI services that it minimally needs to perform the Join Proxy function.
 For this reason, wildcard queries (such as `rt=brski*`) are not sent.
 
-## Pledge discovers Join Proxy {#discovery-by-pledge}
+## Pledge Discovers Join Proxy {#discovery-by-pledge}
 
 Regardless of whether the Join Proxy operates in stateful or stateless mode, it is discovered by the Pledge identically.
 {{Section 10 of cBRSKI}} defines the details of the CoAP discovery request sent by the Pledge.
@@ -767,7 +775,7 @@ the available device resources and network bandwidth.
 |:----------- |:---------------------------|:-----------------------|
 | State Information | The Join Proxy needs additional storage to maintain mappings between the address and port number of the Pledge and those of the Registrar.  | No information is maintained by the Join Proxy. Registrar transiently stores the JPY message header.  |
 |-------------
-|Packet size  |The size of a relayed message is the same as the original message.   | Size of a relayed message is up to 34 bytes larger than the original: it includes additional context information.  |
+|Packet size  |The size of a relayed message is the same as the original message.   | Size of a relayed message is ~16-40 bytes larger than the original: due to additional context data.  |
 |-------------
 |Technical complexity |The Join Proxy needs additional functions to maintain state information, and specify the source and destination addresses and ports of relayed messages. | Requires new JPY message structure (CBOR) in Join Proxy. The Registrar requires a function to process JPY messages.|
 |------------
@@ -793,7 +801,7 @@ A malicious Join Proxy has a number of routing possibilities:
 
    * It uses the returned response of the Registrar to enroll itself in the network. With very low probability it can decrypt the response because successful enrollment is deemed  unlikely.
 
-   * It uses the request from the pledge to appropriate the pledge certificate, but then it still needs to acquire the private key of the pledge. This, too, is assumed to be highly unlikely.
+   * It uses the request from the Pledge to appropriate the Pledge certificate, but then it still needs to acquire the private key of the Pledge. This, too, is assumed to be highly unlikely.
 
    * A malicious node can construct an invalid Join Proxy message. Suppose, the destination port is the coaps port. In that case, a Join Proxy can accept the message and add the routing addresses without checking the payload. The Join Proxy then routes it to the Registrar. In all cases, the Registrar needs to receive the message at the join-port, checks that the message consists of two parts and uses the DTLS payload to start the BRSKI procedure. It is highly unlikely that this malicious payload will lead to node acceptance.
 
@@ -810,7 +818,7 @@ In some installations, layer 2 protection is provided between all member pairs o
 
 # IANA Considerations {#iana}
 
-## Resource Type Attributes registry {#iana-rt}
+## Resource Type Attributes Registry {#iana-rt}
 
 This specification registers two new Resource Type (rt=) Link Target Attributes in the 
 "Resource Type (rt=) Link Target Attribute Values" registry under the "Constrained RESTful Environments (CoRE)
@@ -853,7 +861,7 @@ The scheme specification is provided below.
   Depending on the CoAP Options used in the original CoAPS message, this operation may modify elements of the original 
   CoAPS URI (as will be reconstructed by the receiving coaps+jpy server) in a way that is unknown to the Join Proxy.
 
-## Service name and port number registry {#dns-sd-spec}
+## Service Name and Transport Protocol Port Number Registry {#dns-sd-spec}
 
 This specification registers two service names under the IANA "Service Name and Transport Protocol Port
 Number" registry.
@@ -893,6 +901,9 @@ Their draft text has served as a basis for this document.
 
        * Define CoAP discovery as default, remove GRASP/6TiSCH (#68).
        * Abstract updated to describe higher-level concepts (#47).
+       * Applied Spencer's TSVART review comment 2022-05-16 in an 
+         improved manner.
+       * Applied Russ' review comments from IOTDIR review 2023-08-09.
        * Rewrite Section 4.1 based on Russ' review (#48).
        * Applied Toerless' review comments from WGLC (#63).
        * Applied review comments of Bill Atwood of 2024-05-21.
@@ -918,7 +929,7 @@ Their draft text has served as a basis for this document.
 
 -10 to -11
 
-       * Join-Proxy and Registrar discovery merged
+       * Join Proxy and Registrar discovery merged
        * GRASP discovery updated
        * ARTART review
        * TSVART review
