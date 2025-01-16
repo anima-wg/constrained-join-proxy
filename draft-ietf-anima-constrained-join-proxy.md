@@ -515,12 +515,17 @@ Unlike a stateful Join Proxy, the stateless Join Proxy cannot determine the Pled
 be mapped, because the JPY header containing this information is not included in the ICMP error message.
 Therefore, it cannot inform the Pledge of the specific error that occurred.
 
-## JPY Message Structure {#stateless-jpy}
+## JPY Protocol and Messages {#stateless-jpy}
 
-The JPY message is used by a stateless Join Proxy to carry required state information in the relayed UDP messages, 
+JPY messages are used by a stateless Join Proxy to carry required state information in the relayed UDP messages, 
 such that it does not need to store this state in memory.
 JPY messages are carried directly over the UDP layer.
 So, there is no CoAP or DTLS layer used between the JPY messages and the UDP layer.
+
+A Registrar that supports the JPY protocol also uses JPY message to return relayed UDP messages to the stateless Join Proxy, 
+including the state information that it needs.
+
+### JPY Message Structure
 
 Each JPY message consists of one CBOR {{RFC8949}} array with 2 elements:
 
@@ -542,31 +547,38 @@ Using CDDL {{RFC8610}}, the CBOR array that constitutes the JPY message can be f
 ~~~
 {: #fig-cddl title='CDDL representation of a JPY message' align="left"}
 
-The use of this CBOR encoding adds a 3-6 byte overhead on top of the data carried within the Header and Content fields.
+The `jpy_header` state data is to be reflected (unmodified) by the Registrar when sending return JPY messages to the Join Proxy.
+The header's internal representation is not standardized: it can be constructed by the Join Proxy in whatever way.
+It is to be used by the Join Proxy to record state for the included `jpy_content` field, which includes the 
+information which Pledge the data in jpy_content came from.
+
+This state data stored in the JPY message is similar to the "state object" mechanism described in {{Section 7.1 of RFC9031}}.
+However, since the CoAP protocol layer (if any) is inside the DTLS layer, so end-to-end encrypted between the Pledge and the 
+Registrar, it is not possible for the Join Proxy to act as a CoAP proxy per {{Section 5.7 of RFC7252}}.
+
+### JPY Message Port Usage
+
+For the JPY messages sent to the Registrar, the Join Proxy SHOULD use the same UDP source port and IP source address 
+for the JPY messages sent on behalf of all Pledges.
+
+Although a Join Proxy MAY vary the UDP source port, doing so creates more local state.
+A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible) could, for instance, use 
+different UDP source port numbers to demultiplex connections across CPUs.
+
+### JPY Message Overhead and MTU Size
+
+The use of the JPY message CBOR encoding adds a 3-6 byte overhead on top of the data carried within the Header and Content fields.
 The Header state data itself (up to 32 bytes) also adds an overhead on each UDP message exchanged between Join Proxy and Registrar.
 Therefore, a protocol using the stateless Join Proxy MUST use (UDP) payloads that are bounded in size, such that 
 the maximum payload length used minus the maximum overhead size (38 bytes) stays below the MTU size of the network. 
 cBRSKI is designed to work even for the minimum IPv6 MTU of 1280 bytes, by configuring the DTLS maximum fragment length 
 and using CoAP blockwise transfer for large resource transfers {{cBRSKI}}.
 
-The `jpy_header` state data is to be reflected (unmodified) by the Registrar when sending return JPY messages to the Join Proxy.
-The header's internal representation is not standardized: it can be constructed by the Join Proxy in whatever way.
-It is to be used by the Join Proxy to record state for the included jpy_content field, which includes the 
-information which Pledge the data in jpy_content came from.
+### JPY Message Security
 
 The Join Proxy SHOULD encrypt the state data prior to wrapping it in a CBOR byte string in jpy_header. 
 It SHOULD be encrypted with a symmetric key known only to the Join Proxy itself.
 This key need not persist on a long-term basis, and MAY be changed periodically.
-
-This state data stored in the JPY message is similar to the "state object" mechanism described in {{Section 7.1 of RFC9031}}.
-However, since the CoAP protocol layer (if any) is inside the DTLS layer, so end-to-end encrypted between the Pledge and the 
-Registrar, it is not possible for the Join Proxy to act as a CoAP proxy per {{Section 5.7 of RFC7252}}.
-
-For the JPY messages sent to the Registrar, the Join Proxy SHOULD use the same UDP source port and IP source address 
-for the JPY messages sent on behalf of all Pledges.
-Although a Join Proxy MAY vary the UDP source port, doing so creates more local state.
-A Join Proxy with multiple CPUs (unlikely in a constrained system, but possible) could, for instance, use 
-different UDP source port numbers to demultiplex connections across CPUs.
 
 ### Example Format for JPY Header Data
 
@@ -609,19 +621,21 @@ without maintaining any local state about the Pledge.
 ### Processing by Registrar
 
 On reception of a JPY message by the Registrar, the Registrar MUST verify that the number of CBOR array elements is 2 or more.
-The content field must be provided as input to a DTLS library {{RFC9147}}, which along with the 5-tuple of the UDP connection 
+To implement this specification, only the first two elements are used.
+
+The data in the `jpy_content` field must be provided as input to a DTLS library {{RFC9147}}, which along with the 5-tuple of the UDP connection 
 provides enough information for the Registrar to pick an appropriate (active) client context.
 Note that the same UDP socket will need to be used for multiple DTLS flows, which is atypical for how DTLS usually uses sockets.
-The jp_context field can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of per-session context.
-The jp_context field needs to be linked to the DTLS context, and when a DTLS message need to be sent back to the client, 
-then the jp_context needs to be included in a JPY message along with the DTLS message in the content field. 
+The `jpy_context` field can be used to select an appropriate DTLS context, as DTLS headers do not contain any kind of per-session context.
+The `jpy_context` field needs to be linked to the DTLS context, and when a DTLS message need to be sent back to the client,  
+the `jpy_context` needs to be included in a JPY message along with the DTLS message in the `jpy_content` field. 
 
 Detailed examples are shown in {{examples-detailed}}.
 
 At the CoAP level, using the cBRSKI {{cBRSKI}} and the EST-CoAPS {{RFC9148}} protocols, 
 the CoAP blockwise options {{RFC7959}} are often used to split large payloads into multiple data blocks.
 The Registrar and the Pledge MUST select a block size that would allow the addition of the JPY\_message header 
-(including a jp_context field of up to 34 bytes) without violating MTU sizes.
+(including a `jpy_context` field of up to 34 bytes) without violating MTU sizes.
 
 
 # Discovery {#discovery}
