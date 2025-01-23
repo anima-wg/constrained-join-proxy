@@ -139,8 +139,8 @@ Internet-Draft                 Join Proxy                   January 2025
    12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  29
      12.1.  Normative References . . . . . . . . . . . . . . . . . .  29
      12.2.  Informative References . . . . . . . . . . . . . . . . .  31
-   Appendix A.  Stateless Proxy payload examples . . . . . . . . . .  33
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  34
+   Appendix A.  Stateless Join Proxy JPY Message Examples  . . . . .  33
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  35
 
 1.  Introduction
 
@@ -887,7 +887,7 @@ Internet-Draft                 Join Proxy                   January 2025
    possible for the Join Proxy to act as a CoAP proxy per Section 5.7 of
    [RFC7252].
 
-
+   Detailed examples of a complete JPY message are shown in Appendix A.
 
 
 
@@ -991,8 +991,7 @@ Internet-Draft                 Join Proxy                   January 2025
    IDentifier (IID) is not 64-bits, a different field size for iid will
    be necessary.
 
-   A detailed example using this format is shown in Appendix A.  (TBD:
-   update Appendix A example.)
+   Detailed examples of a complete JPY message are shown in Appendix A.
 
 4.5.6.  Processing by Registrar
 
@@ -1000,8 +999,9 @@ Internet-Draft                 Join Proxy                   January 2025
    verify that the number of CBOR array elements is 2 or more.  To
    implement this specification, only the first two elements are used.
 
-
-
+   The data in the jpy_content field must be provided as input to a DTLS
+   library [RFC9147], which along with the 5-tuple defined in
+   Section 4.4 provides enough information for the Registrar to pick an
 
 
 
@@ -1010,9 +1010,6 @@ Richardson, et al.        Expires 27 July 2025                 [Page 18]
 Internet-Draft                 Join Proxy                   January 2025
 
 
-   The data in the jpy_content field must be provided as input to a DTLS
-   library [RFC9147], which along with the 5-tuple defined in
-   Section 4.4 provides enough information for the Registrar to pick an
    appropriate (active) client context.  Note that the same UDP socket
    will need to be used for multiple DTLS flows, which is atypical for
    how DTLS usually uses sockets.  The jpy_context field can be used to
@@ -1057,6 +1054,9 @@ Internet-Draft                 Join Proxy                   January 2025
    parameter "brski.rjp".  The latter CoAP resource type is defined in
    Section 8.1.
 
+   Upon success, the return payload will contain the port of the
+   Registrar on which the JPY protocol handler is hosted.  This exchange
+   is shown below:
 
 
 
@@ -1065,10 +1065,6 @@ Richardson, et al.        Expires 27 July 2025                 [Page 19]
 
 Internet-Draft                 Join Proxy                   January 2025
 
-
-   Upon success, the return payload will contain the port of the
-   Registrar on which the JPY protocol handler is hosted.  This exchange
-   is shown below:
 
      REQ: GET coap://[ff05::fd]/.well-known/core?rt=brski.rjp
 
@@ -1115,6 +1111,10 @@ Internet-Draft                 Join Proxy                   January 2025
        Payload:
          <coaps://[ipv6_address]:port/uri_path>;rt=brski
 
+   The port field and its preceding colon are optionally included: if
+   elided, the default CoAPS port 5684 is implied.  The uri_path field
+   may be a single CoAP URI path resource label, or it may be a
+
 
 
 Richardson, et al.        Expires 27 July 2025                 [Page 20]
@@ -1122,9 +1122,6 @@ Richardson, et al.        Expires 27 July 2025                 [Page 20]
 Internet-Draft                 Join Proxy                   January 2025
 
 
-   The port field and its preceding colon are optionally included: if
-   elided, the default CoAPS port 5684 is implied.  The uri_path field
-   may be a single CoAP URI path resource label, or it may be a
    hierarchy of resources.  For efficiency, it is RECOMMENDED for the
    Registrar to configure the URI path as short as possible, for example
    b.
@@ -1169,6 +1166,9 @@ Internet-Draft                 Join Proxy                   January 2025
    Section 10 of [cBRSKI] defines the details of the CoAP discovery
    request sent by the Pledge.
 
+   A Join Proxy implementation by default MUST support this discovery
+   method.  If there is another method configured, by some means outside
+   of the scope of this document, the default method MAY be deactivated.
 
 
 
@@ -1177,10 +1177,6 @@ Richardson, et al.        Expires 27 July 2025                 [Page 21]
 
 Internet-Draft                 Join Proxy                   January 2025
 
-
-   A Join Proxy implementation by default MUST support this discovery
-   method.  If there is another method configured, by some means outside
-   of the scope of this document, the default method MAY be deactivated.
 
    The join-port of the Join Proxy is discovered by sending a multicast
    GET request to "/.well-known/core" including a resource type (rt)
@@ -1212,6 +1208,10 @@ Internet-Draft                 Join Proxy                   January 2025
    have their advantages and disadvantages.  This section helps
    operators and/or profile-specifiers to make a choice between the two
    modes based on the available device resources and network bandwidth.
+
+
+
+
 
 
 
@@ -1526,6 +1526,7 @@ Internet-Draft                 Join Proxy                   January 2025
       * Applied review comments of Bill Atwood of 2024-05-21.
       * Clarify 'context payload' terminology (#49).
       * Use shorter and consistent term for Join Proxy (#58).
+      * Appendix A corrected to use latest JPY message format.
       * Author added.
       * Update reference RFC8366 to RFC8366bis.
       * Many editorial updates.
@@ -1561,7 +1562,6 @@ Internet-Draft                 Join Proxy                   January 2025
    -07 to -09
 
        * typos
-
 
 
 
@@ -1825,23 +1825,23 @@ Internet-Draft                 Join Proxy                   January 2025
               RFC 9031, DOI 10.17487/RFC9031, May 2021,
               <https://www.rfc-editor.org/rfc/rfc9031>.
 
-Appendix A.  Stateless Proxy payload examples
+Appendix A.  Stateless Join Proxy JPY Message Examples
 
-   The examples show the request "GET coaps://192.168.1.200:5965/est/
-   crts" to a Registrar.  The header generated between Join Proxy and
-   Registrar and from Registrar to Join Proxy are shown in detail.  The
-   DTLS payload is not shown.
+   This appendix shows an example of a JPY message, sent by a stateless
+   Join Proxy to a Registrar, and an example of the return JPY message
+   sent by the Registrar.  The DTLS payload itself, carried in the
+   Content (C) field of the JPY message, is not shown in detail but
+   abbreviated.
 
-   The request from Join Proxy to Registrar looks like:
+   First, assume that a Pledge creates a CoAP request to a Join Proxy
+   that it has just discovered and selected for performing [cBRSKI]
+   onboarding.
 
-      85                                   # array(5)
-         50                                # bytes(16)
-            FE800000000000000000FFFFC0A801C8 #
-         19 BDA7                           # unsigned(48551)
-         01                                # unsigned(1) IP
-         00                                # unsigned(0)
-         58 2D                             # bytes(45)
-      <cacrts DTLS encrypted request>
+   This request may be a Pledge Voucher Request (PVR) as follows:
+
+
+
+
 
 
 
@@ -1850,26 +1850,61 @@ Richardson, et al.        Expires 27 July 2025                 [Page 33]
 Internet-Draft                 Join Proxy                   January 2025
 
 
-   In CBOR Diagnostic:
+   POST coaps://[fe80::1234:5678]:45965/.well-known/brski/rv
+     Content-Format: 836
+     Payload:
+        <bytes of the COSE-signed PVR>
 
-       [h'FE800000000000000000FFFFC0A801C8', 48551, 1, 0,
-        h'<cacrts DTLS encrypted request>']
+   Because a DTLS session is not yet established at this point, the
+   first step for the client is to send the DTLS Client Hello message to
+   the Join Proxy's join-port 45965.  When the Join Proxy receives this
+   UDP packet, it creates a JPY message with the following UDP payload:
 
-   The response is:
+   82                                      # array(2)
+      50                                   # bytes(16)
+         D01914BCC376A88FFECC50CA6017B0C1  #
+      59 01AB                              # bytes(427)
+         16FEFD0000000000000000019E ...
+         <further bytes of DTLS 1.2 Client Hello>
 
-      85                                   # array(5)
-         50                                # bytes(16)
-            FE800000000000000000FFFFC0A801C8 #
-         19 BDA7                           # unsigned(48551)
-         01                                # unsigned(1) IP
-         00                                # unsigned(0)
-      59 026A                              # bytes(618)
-         <cacrts DTLS encrypted response>
+   The same JPY message written in CBOR diagnostic notation [RFC8949]
+   is:
 
-   In CBOR diagnostic:
+   [ h'd01914bcc376a88ffecc50ca6017b0c1' ,
+     h'16fefd0000000000000000019e' ... '3d45' ]
 
-       [h'FE800000000000000000FFFFC0A801C8', 48551, 1, 0,
-       h'<cacrts DTLS encrypted response>']
+   Above, the ellipsis ("...") notation in a CBOR diagnostic byte string
+   denotes a further sequence of bytes that is not shown for brevity.
+
+   The first CBOR byte string wraps the 16 bytes of encrypted state
+   information of the Header (H) field.  The second CBOR byte string
+   wraps the 427 bytes of the received DTLS message.
+
+   After the Registrar has processed the received JPY message, it sends
+   a DTLS 1.2 Hello Verify Request in response to the received Client
+   Hello message.  This Hello Verify Request is wrapped in a new JPY
+   message that it sends back to the Join Proxy:
+
+   82                                      # array(2)
+      50                                   # bytes(16)
+         D01914BCC376A88FFECC50CA6017B0C1  #
+      58 3C                                # bytes(60)
+         16FEFD0000000000000000002F ...
+         <further bytes of DTLS 1.2 Hello Verify Request>
+
+   The same JPY message in CBOR diagnostic notation is:
+
+       [ h'd01914bcc376a88ffecc50ca6017b0c1' ,
+         h'16fefd0000000000000000002f' ... '66c1' ]
+
+
+
+
+
+Richardson, et al.        Expires 27 July 2025                 [Page 34]
+
+Internet-Draft                 Join Proxy                   January 2025
+
 
 Authors' Addresses
 
@@ -1901,4 +1936,25 @@ Authors' Addresses
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 34]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Richardson, et al.        Expires 27 July 2025                 [Page 35]
