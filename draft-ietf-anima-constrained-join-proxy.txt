@@ -5,12 +5,12 @@
 anima Working Group                                        M. Richardson
 Internet-Draft                                  Sandelman Software Works
 Intended status: Standards Track                         P. van der Stok
-Expires: 20 July 2025                             vanderstok consultancy
+Expires: 27 July 2025                             vanderstok consultancy
                                                            P. Kampanakis
                                                            Cisco Systems
                                                                  E. Dijk
                                                        IoTconsultancy.nl
-                                                         16 January 2025
+                                                         23 January 2025
 
 
       Join Proxy for Bootstrapping of Constrained Network Elements
@@ -53,7 +53,7 @@ About This Document
 
 
 
-Richardson, et al.        Expires 20 July 2025                  [Page 1]
+Richardson, et al.        Expires 27 July 2025                  [Page 1]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -76,7 +76,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 July 2025.
+   This Internet-Draft will expire on 27 July 2025.
 
 Copyright Notice
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Richardson, et al.        Expires 20 July 2025                  [Page 2]
+Richardson, et al.        Expires 27 July 2025                  [Page 2]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -165,7 +165,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                  [Page 3]
+Richardson, et al.        Expires 27 July 2025                  [Page 3]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -221,7 +221,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                  [Page 4]
+Richardson, et al.        Expires 27 July 2025                  [Page 4]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -277,7 +277,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                  [Page 5]
+Richardson, et al.        Expires 27 July 2025                  [Page 5]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -333,7 +333,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                  [Page 6]
+Richardson, et al.        Expires 27 July 2025                  [Page 6]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -389,7 +389,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                  [Page 7]
+Richardson, et al.        Expires 27 July 2025                  [Page 7]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -445,7 +445,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                  [Page 8]
+Richardson, et al.        Expires 27 July 2025                  [Page 8]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -501,7 +501,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                  [Page 9]
+Richardson, et al.        Expires 27 July 2025                  [Page 9]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -557,7 +557,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 10]
+Richardson, et al.        Expires 27 July 2025                 [Page 10]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -613,7 +613,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 11]
+Richardson, et al.        Expires 27 July 2025                 [Page 11]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -669,7 +669,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 12]
+Richardson, et al.        Expires 27 July 2025                 [Page 12]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -725,7 +725,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 13]
+Richardson, et al.        Expires 27 July 2025                 [Page 13]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -781,7 +781,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 14]
+Richardson, et al.        Expires 27 July 2025                 [Page 14]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -837,7 +837,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 15]
+Richardson, et al.        Expires 27 July 2025                 [Page 15]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -893,7 +893,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 16]
+Richardson, et al.        Expires 27 July 2025                 [Page 16]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -949,7 +949,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 17]
+Richardson, et al.        Expires 27 July 2025                 [Page 17]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1005,7 +1005,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 18]
+Richardson, et al.        Expires 27 July 2025                 [Page 18]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1061,7 +1061,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 19]
+Richardson, et al.        Expires 27 July 2025                 [Page 19]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1117,7 +1117,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 20]
+Richardson, et al.        Expires 27 July 2025                 [Page 20]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1173,7 +1173,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 21]
+Richardson, et al.        Expires 27 July 2025                 [Page 21]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1229,7 +1229,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 22]
+Richardson, et al.        Expires 27 July 2025                 [Page 22]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1285,7 +1285,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 23]
+Richardson, et al.        Expires 27 July 2025                 [Page 23]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1341,7 +1341,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 24]
+Richardson, et al.        Expires 27 July 2025                 [Page 24]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1397,7 +1397,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 25]
+Richardson, et al.        Expires 27 July 2025                 [Page 25]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1453,7 +1453,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 26]
+Richardson, et al.        Expires 27 July 2025                 [Page 26]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1509,7 +1509,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 27]
+Richardson, et al.        Expires 27 July 2025                 [Page 27]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1565,7 +1565,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 28]
+Richardson, et al.        Expires 27 July 2025                 [Page 28]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1621,7 +1621,7 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 29]
+Richardson, et al.        Expires 27 July 2025                 [Page 29]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1632,11 +1632,6 @@ Internet-Draft                 Join Proxy                   January 2025
               Draft, draft-ietf-anima-constrained-voucher-26, 8 January
               2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
               anima-constrained-voucher-26>.
-
-   [ieee802-1AR]
-              "IEEE 802.1AR Secure Device Identity", IEEE Standards
-              Association, 2018,
-              <https://standards.ieee.org/ieee/802.1AR/6995/>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1674,23 +1669,18 @@ Internet-Draft                 Join Proxy                   January 2025
               DOI 10.17487/RFC8949, December 2020,
               <https://www.rfc-editor.org/rfc/rfc8949>.
 
-
-
-
-Richardson, et al.        Expires 20 July 2025                 [Page 30]
-
-Internet-Draft                 Join Proxy                   January 2025
-
-
-   [RFC8990]  Bormann, C., Carpenter, B., Ed., and B. Liu, Ed., "GeneRic
-              Autonomic Signaling Protocol (GRASP)", RFC 8990,
-              DOI 10.17487/RFC8990, May 2021,
-              <https://www.rfc-editor.org/rfc/rfc8990>.
-
    [RFC8995]  Pritikin, M., Richardson, M., Eckert, T., Behringer, M.,
               and K. Watsen, "Bootstrapping Remote Secure Key
               Infrastructure (BRSKI)", RFC 8995, DOI 10.17487/RFC8995,
               May 2021, <https://www.rfc-editor.org/rfc/rfc8995>.
+
+
+
+
+Richardson, et al.        Expires 27 July 2025                 [Page 30]
+
+Internet-Draft                 Join Proxy                   January 2025
+
 
    [RFC9147]  Rescorla, E., Tschofenig, H., and N. Modadugu, "The
               Datagram Transport Layer Security (DTLS) Protocol Version
@@ -1727,21 +1717,26 @@ Internet-Draft                 Join Proxy                   January 2025
               <https://datatracker.ietf.org/doc/html/draft-richardson-
               anima-state-for-joinrouter-03>.
 
+   [ieee802-1AR]
+              "IEEE 802.1AR Secure Device Identity", IEEE Standards
+              Association, 2018,
+              <https://standards.ieee.org/ieee/802.1AR/6995/>.
+
    [RFC3610]  Whiting, D., Housley, R., and N. Ferguson, "Counter with
               CBC-MAC (CCM)", RFC 3610, DOI 10.17487/RFC3610, September
               2003, <https://www.rfc-editor.org/rfc/rfc3610>.
-
-
-
-Richardson, et al.        Expires 20 July 2025                 [Page 31]
-
-Internet-Draft                 Join Proxy                   January 2025
-
 
    [RFC3927]  Cheshire, S., Aboba, B., and E. Guttman, "Dynamic
               Configuration of IPv4 Link-Local Addresses", RFC 3927,
               DOI 10.17487/RFC3927, May 2005,
               <https://www.rfc-editor.org/rfc/rfc3927>.
+
+
+
+Richardson, et al.        Expires 27 July 2025                 [Page 31]
+
+Internet-Draft                 Join Proxy                   January 2025
+
 
    [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
               Resource Identifier (URI): Generic Syntax", STD 66,
@@ -1784,20 +1779,20 @@ Internet-Draft                 Join Proxy                   January 2025
               DOI 10.17487/RFC7228, May 2014,
               <https://www.rfc-editor.org/rfc/rfc7228>.
 
-
-
-
-
-
-Richardson, et al.        Expires 20 July 2025                 [Page 32]
-
-Internet-Draft                 Join Proxy                   January 2025
-
-
    [RFC7252]  Shelby, Z., Hartke, K., and C. Bormann, "The Constrained
               Application Protocol (CoAP)", RFC 7252,
               DOI 10.17487/RFC7252, June 2014,
               <https://www.rfc-editor.org/rfc/rfc7252>.
+
+
+
+
+
+
+Richardson, et al.        Expires 27 July 2025                 [Page 32]
+
+Internet-Draft                 Join Proxy                   January 2025
+
 
    [RFC7595]  Thaler, D., Ed., Hansen, T., and T. Hardie, "Guidelines
               and Registration Procedures for URI Schemes", BCP 35,
@@ -1819,6 +1814,11 @@ Internet-Draft                 Join Proxy                   January 2025
               Stateless Clients in the Constrained Application Protocol
               (CoAP)", RFC 8974, DOI 10.17487/RFC8974, January 2021,
               <https://www.rfc-editor.org/rfc/rfc8974>.
+
+   [RFC8990]  Bormann, C., Carpenter, B., Ed., and B. Liu, Ed., "GeneRic
+              Autonomic Signaling Protocol (GRASP)", RFC 8990,
+              DOI 10.17487/RFC8990, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc8990>.
 
    [RFC9031]  Vučinić, M., Ed., Simon, J., Pister, K., and M.
               Richardson, "Constrained Join Protocol (CoJP) for 6TiSCH",
@@ -1845,7 +1845,7 @@ Appendix A.  Stateless Proxy payload examples
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 33]
+Richardson, et al.        Expires 27 July 2025                 [Page 33]
 
 Internet-Draft                 Join Proxy                   January 2025
 
@@ -1901,4 +1901,4 @@ Authors' Addresses
 
 
 
-Richardson, et al.        Expires 20 July 2025                 [Page 34]
+Richardson, et al.        Expires 27 July 2025                 [Page 34]

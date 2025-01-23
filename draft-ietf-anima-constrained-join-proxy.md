@@ -47,17 +47,10 @@ normative:
   RFC4443:
   RFC8366bis: I-D.ietf-anima-rfc8366bis
   RFC8949:
-  RFC8990:
   RFC8995:
   RFC9147:
   RFC9148:
   cBRSKI: I-D.ietf-anima-constrained-voucher
-  ieee802-1AR:
-    target: "https://standards.ieee.org/ieee/802.1AR/6995/"
-    title: "IEEE 802.1AR Secure Device Identity"
-    author:
-    rc: "IEEE Standards Association"
-    date: 2018
   
 informative:
   RFC3610:
@@ -74,11 +67,18 @@ informative:
   RFC7595:
   RFC7959:
   RFC8610:
+  RFC8990:
   RFC8974:
   RFC9031:
   I-D.ietf-anima-brski-discovery:
   I-D.kumar-dice-dtls-relay:
   I-D.richardson-anima-state-for-joinrouter:
+  ieee802-1AR:
+    target: "https://standards.ieee.org/ieee/802.1AR/6995/"
+    title: "IEEE 802.1AR Secure Device Identity"
+    author:
+    rc: "IEEE Standards Association"
+    date: 2018
 
 --- abstract
 
