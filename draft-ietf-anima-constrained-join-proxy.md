@@ -1,3 +1,4 @@
+
 ---
 v: 3
 
@@ -42,6 +43,7 @@ venue:
   github: anima-wg/constrained-join-proxy
 
 normative:
+  RFC5288:
   RFC768:
   RFC792:
   RFC4443:
@@ -68,6 +70,7 @@ informative:
   RFC7959:
   RFC8610:
   RFC8990:
+  RFC8994:
   RFC8974:
   RFC9031:
   I-D.ietf-anima-brski-discovery:
@@ -595,7 +598,23 @@ without violating MTU sizes.
 
 ### JPY Message Security
 
-The Join Proxy SHOULD encrypt the state data prior to wrapping it in a CBOR byte string in jpy_header. 
+Application or ecosystem standards adopting Join Proxy need to determine if there is the potential
+for attacks against stateless join proxies: Senders other than a trustworthy registrar sending
+packets to the Join Proxy with the source address of a trustworthy registrar. In many well designed
+solutions, this attack vector can be excluded. For example, in ANI networks, the ACP ({{RFC8994}})
+ensures that only trustworthy nodes can communicate amonst each other, and impairment of any such
+node may be as complex as impairing a registrar. Likewise in many wifi mesh networks, layer 2 security
+claims to achieve similar levels of secure and trusted communications.
+
+In such secured environments, it can be sufficient for the Join Proxy to only accept reply
+packets from the registrar IP address that it (is configured to) also send Join Proxy packets to
+but not use additional encryption of the JPY header. 
+
+Generic Join Proxies on the other hand can not assume any such additional security measures from the
+network to the Registrar. For example, their connection to a registrar may pass through the Internet without 
+dditional security.  Therefore, a generic Join Proxy SHOULD encrypt the state data prior to wrapping it in
+a CBOR byte string in jpy_header. 
+
 It SHOULD be encrypted with a symmetric key known only to the Join Proxy itself.
 This key need not persist on a long-term basis, and MAY be changed periodically.
 
@@ -615,15 +634,15 @@ across Pledges.
       ifindex: uint .bits 8,
       srcport: uint .bits 16,
       iid:     bstr .bits 64,
+      zero:    bstr .bits 32,
     ]
 ~~~~
 
-This results in a total plaintext size of 96 bits, or 12 bytes.
+This results in a total plaintext size of 128 bits, or 16 bytes.
 The data structure stores the Pledge's UDP source port (srcport), the IID bits of the Pledge's originating IPv6 link-Local 
 address (iid), the IPv4/IPv6 family (as a single bit) and an interface index (ifindex) to provide the link-local scope 
-for the case that the Join Proxy has multiple network interfaces.
-This size fits nicely into a single AES128 CBC block for instance, resulting in a 16 byte block of encrypted state data,
-`jpy_header_ciphertext`.
+for the case that the Join Proxy has multiple network interfaces. Zero is for integrity protection. It is always zero (before encryption) on sending and MUST be zero after decryption on reception.
+This size fits exactly into a single AES128 CBC block for instance, resulting in a 16 byte block of encrypted state data, `jpy_header_ciphertext`.
 This `jpy_header_ciphertext` data is then wrapped in a CBOR byte string to form the `jpy_header` element.
 So for the example `jpy_header_plaintext` of 12 bytes, we get a `jpy_header_ciphertext` of 16 bytes, and finally 
 a `jpy_header` CBOR element of 17 bytes which includes a 1-byte overhead to encode the data as a CBOR byte string of 
@@ -632,8 +651,11 @@ length 16.
 Note: when IPv6 is used only the lower 64-bits of the source IPv6 address need to be recorded,  
 because they must be by design all IPv6 link-Local addresses, so the upper 64-bits are just "fe80::" and can be elided. 
 For IPv4, a link-Local IPv4 address {{RFC3927}} would be used, and it would always fit into the 64 bits of the `iid` 
-field.
-On media where the Interface IDentifier (IID) is not 64-bits, a different field size for `iid` will be necessary.
+field.  On media where the Interface IDentifier (IID) is not 64-bits, a different field size for `iid` will be necessary.
+
+Replay protection is not included in this example security because cBRSKI or BRSKI TCP connections
+do also not protect against such an attack. If replay attack protection is desired, AES with GCM, {{RFC5288}}
+SHOULD be used.
 
 Detailed examples of a complete JPY message are shown in {{appendix-examples-detailed}}.
 
