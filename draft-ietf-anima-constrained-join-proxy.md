@@ -316,30 +316,32 @@ The advantages and disadvantages of the two modes are presented in {{jp-comparis
 For a Join Proxy implementation on a node, there are three possible scenarios:
 
 1. Both stateful and stateless modes are implemented. The Join Proxy can switch between these modes, depending on 
-   configuration.
+   configuration and/or auto-discovery of registrar(s) for each option.
 2. Only stateful mode is implemented. 
 3. Only stateless mode is implemented.
 
-An application profile or ecosystem standard that integrates the Join Proxy functionality as defined in this 
-document MAY define any of these three options. 
-In particular, option 2 or 3 has the advantage of reducing code size and testing efforts, when all devices under 
-the application profile/standard adhere to the same choice.
+Option 2 and 3 have the advantage of reducing code size, testing efforts and deployment complexity,
+but requires for all devices in the deployment to standardize on the same choice.
 
-A generic Join Proxy that is not adhering to such an application profile/standard MUST implement both modes. 
+An standard for a network-wide application or ecosystem profile integrates the Join Proxy functionality
+as defined in this document MAY specify the use of any of these three options. It is expected that most
+deployments of constrained Join Proxies will be in the context of such standards and that they will be able
+to pick either 2 or 3 based on considerations such as those from {{jp-comparison}}.
 
-A cBRSKI Registrar by design necessarily implements the stateful mode, and it SHOULD implement support for 
-Join Proxies operating in the stateless mode. The exception case here is a cBRSKI Registrar that is implemented for a 
-particular dedicated application profile/standard which specifies only the stateful mode.
+A Join Proxy that is not adhering to such an additionals standard MUST implement both modes. 
+A Join Proxy or Registrar not complying to such additional standards are called "generic".
 
-If a Join Proxy implements both modes, then it MUST use only the mode that is currently configured for the network 
-(by a method or profile outside the scope of this document) or the mode individually configured for the device.
-If the mode is not configured, the device MUST NOT operate as a Join Proxy.
+If a Join Proxy implements both modes and does not implement methods to discover available registrar
+for either method which are outside the scope of this document, then it MUST use only the mode that is
+currently configured for the network by a method or profile outside the scope of this document or the
+mode individually configured for the device.  If the mode is not configured, the device MUST NOT operate as
+a Join Proxy.
 
 For a Join Proxy to be operational, the node on which it is running has to be
 able to talk to a Registrar (exchange UDP messages with it). Establishing this connectivity can happen
 fully automatically if the Join Proxy node first enrolls itself as a Pledge,
-and then discovers the Registrar IP address/port and if applicable its desired mode of operation (stateful or stateless), 
-through a discovery mechanism (see {{discovery}}).
+and then discovers the Registrar IP address/port and if applicable its desired mode of operation
+(stateful or stateless), through a discovery mechanism (see {{discovery}}).
 Other methods, such as provisioning the Join Proxy are out of scope for this document
 but equally feasible.
 
@@ -348,6 +350,12 @@ and selects the most appropriate Join Proxy.
 From the discovery result, the Pledge learns a Join Proxy's link-local IP address and UDP join-port.
 Details of this discovery are defined by the onboarding protocol and are not in scope of this document.
 For cBRSKI, this is defined in {{Section 10 of cBRSKI}}.
+
+A generic cBRSKI Registrar by design necessarily implements the stateful mode, and it SHOULD implement support for 
+Join Proxies operating in the stateless mode. Support for only the stateless mode is considered not to bring
+significant simplifications to a generic cBRSKI Registrar implementation.  cBRSKI Registrar only implemented
+in support of an aforementioned network-wide application or ecosystem profile MAY implement stateful and/or
+stateless mode.
 
 ## Notation {#ip-port-notation}
 
@@ -797,6 +805,15 @@ in the &lt;URI-Reference&gt; of the link (see {{Section 5.1 of RFC6690}} for det
 The stateful and stateless mode of operation for the Join Proxy each have their advantages and disadvantages.
 This section helps operators and/or profile-specifiers to make a choice between the two modes based on 
 the available device resources and network bandwidth.
+
+Stateful mode introduces the complexity of maintaining per-connection state, which can increase processing and memory requirements on the proxy compared to stateless mode under ideal conditions. Additionally, it opens up a wider range of potential implementation challenges in the presence of misbehaving or malicious pledges. For example: How can state be effectively limited? How can malicious pledges be detected—or at least prevented from negatively impacting non-malicious nodes? And so on.
+
+If the proxy is deployed on nodes that support frequent and reliable software updates, then tailoring software enhancements based on the observed attack profile of the deployment scenario is an effective way to improve and harden the implementation. However, many constrained devices either lack this software agility or intentionally avoid it. In such environments, stateless mode becomes advantageous, as it offloads most of the complex hardening responsibilities to the registrar, allowing the proxy implementation to remain as lightweight as possible. Ultimately, a stateless proxy requires no more protective mechanisms than a basic packet-forwarding router.
+
+The main concern for a stateless proxy is the risk of forwarding an excessive number of packets to the registrar, particularly over low-bandwidth connections such as LPWAN links. Therefore, rate-limiting forwarded packets is the primary defense mechanism in such cases. All other pledge-specific protections can be delegated to the registrar, which is expected to have the necessary software agility to handle them.
+
+The following table summarizes more comparison details.
+
 
 | Properties  |         Stateful mode      |     Stateless mode     |
 |:----------- |:---------------------------|:-----------------------|
