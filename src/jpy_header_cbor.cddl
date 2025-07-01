@@ -1,0 +1,6 @@
+    jpy_header_plaintext = [
+      family:  0..1,
+      ifindex: uint .size 1,
+      srcport: uint .size 2,
+      iid:     bstr .size 8,
+    ]

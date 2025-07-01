@@ -1,22 +1,16 @@
-
 ---
 v: 3
 
 title: Join Proxy for Bootstrapping of Constrained Network Elements
 abbrev: Join Proxy
 docname: draft-ietf-anima-constrained-join-proxy-16
-
-# stand_alone: true
-
 ipr: trust200902
-area: Internet
-wg: anima Working Group
-kw: Internet-Draft
+area: int
+wg: anima
 cat: std
 stream: IETF
 
 author:
-
 - ins: M. Richardson
   name: Michael Richardson
   org: Sandelman Software Works
@@ -39,6 +33,7 @@ author:
 
 venue:
   group: anima
+  type: Working Group
   mail: anima@ietf.org
   github: anima-wg/constrained-join-proxy
 
@@ -598,64 +593,82 @@ without violating MTU sizes.
 
 ### JPY Message Security
 
-Application or ecosystem standards adopting Join Proxy need to determine if there is the potential
-for attacks against stateless join proxies: Senders other than a trustworthy registrar sending
-packets to the Join Proxy with the source address of a trustworthy registrar. In many well designed
-solutions, this attack vector can be excluded. For example, in ANI networks, the ACP ({{RFC8994}})
-ensures that only trustworthy nodes can communicate amonst each other, and impairment of any such
-node may be as complex as impairing a registrar. Likewise in many wifi mesh networks, layer 2 security
-claims to achieve similar levels of secure and trusted communications.
+Application or ecosystem standards adopting the stateless Join Proxy need to determine if there is the potential
+for attacks originating from the trusted network side of the Join Proxy.
+Such attacks would involve senders other than a trustworthy Registrar sending packets to the Join Proxy, impersonating
+the trusted Registrar by using its source address and port. 
+In many well-designed solutions, this attack vector can be excluded because IP source addresses are verified.
+For example, in Autonomic Networking Infrastructure (ANI) networks, the Autonomic Control Plane (ACP) ({{RFC8994}})
+ensures that only trustworthy nodes can communicate amongst each other.
+In an ACP, compromising an ACP node may be as hard as compromising the Registrar itself.
+Likewise, in many Wi-Fi mesh networks and 6LoWPAN mesh networks, link-layer security is applied and claimed to achieve
+similar levels of secure and trusted communication within the scope of the mesh.
 
-In such secured environments, it can be sufficient for the Join Proxy to only accept reply
-packets from the registrar IP address that it (is configured to) also send Join Proxy packets to
-but not use additional encryption of the JPY header. 
+For stateless Join Proxies that only operate in such secured network environments, it can be sufficient to only
+accept JPY messages originating from a Registrar's IP address and port, and not use any additional encryption 
+or integrity protection of the JPY header. 
+The Registrar's IP address and port are configured on the Join Proxy, or discovered by the Join Proxy,
+for sending JPY messages.
 
-Generic Join Proxies on the other hand can not assume any such additional security measures from the
-network to the Registrar. For example, their connection to a registrar may pass through the Internet without 
-dditional security.  Therefore, a generic Join Proxy SHOULD encrypt the state data prior to wrapping it in
-a CBOR byte string in jpy_header. 
+Generic stateless Join Proxies on the other hand can not assume any such additional security measures for the
+network that connects the Proxy to the Registrar.
+For example, a generic Join Proxy's network connection to a Registrar may pass through a lightly protected enterprise network, 
+such as a university or campus network, without additional security.
+Therefore, a generic stateless Join Proxy SHOULD encrypt and integrity-protect the state data prior to wrapping it in
+a CBOR byte string in `jpy_header`. 
 
 It SHOULD be encrypted with a symmetric key known only to the Join Proxy itself.
-This key need not persist on a long-term basis, and MAY be changed periodically.
+When the Join Proxy attempts to decrypt a receiver `jpy_header` byte string, and either the decryption or the
+integrity check fails, it MUST silently discard the JPY message.
 
-The Join Proxy MUST maintain identical `jpy_header` data for all communications from the same Pledge and same UDP source port.
-This implies that the encryption key used either does not change during the onboarding attempt of the Pledge, 
-or that when it does, it is acceptable to break any onboarding connections that have not yet completed.
+The symmetric key need not persist on a long-term basis, and MAY be changed periodically.
+Because a key change during an onboarding attempt of a Pledge could lead to DTLS retransmissions, or even failure of
+the onboarding attempt, it is RECOMMENDED to change the key infrequently: for example every 24 hours.
 
 ### Example Format for JPY Header Data
 
-A typical JPY message header format, prior to encryption, could be constructed using the following CDDL grammar.
+A typical JPY message header format, prior to encryption, could be constructed using the following binary
+data structure (expressed in C style notation):
+
+~~~~
+struct jpy_header_plaintext {
+    uint8_t  family;   // Only valid in the range 0...1
+    uint8_t  ifindex;  // Only valid in the range 0...MAX_INTERFACES
+    uint16_t srcport;  // Only valid > 0
+    uint8_t  iid[8];
+    uint32_t zero;     // Only valid == 0
+};
+~~~~
+
 This is illustrative only: the format of the data inside `jpy_header` is not subject to standardization and may vary 
 across Pledges.
+It may for example use a CBOR array encoding, formally defined and constrained using CDDL {{RFC8610}}.
 
-~~~~
-    jpy_header_plaintext = [
-      family:  uint .bits 1,
-      ifindex: uint .bits 8,
-      srcport: uint .bits 16,
-      iid:     bstr .bits 64,
-      zero:    bstr .bits 32,
-    ]
-~~~~
+The data structure stores the Pledge's UDP source port (`srcport`), the IID bits of the Pledge's originating IPv6 link-Local 
+address (`iid`), the IPv4/IPv6 `family` (as a `uint8` value 0 or 1) and an interface index (`ifindex`) to provide the link-local scope 
+for the case that the Join Proxy has multiple network interfaces.
+The `zero` field is both for integrity protection and padding.
+It is always value zero (before encryption) on sending and MUST be zero after decryption on reception.
 
-This results in a total plaintext size of 128 bits, or 16 bytes.
-The data structure stores the Pledge's UDP source port (srcport), the IID bits of the Pledge's originating IPv6 link-Local 
-address (iid), the IPv4/IPv6 family (as a single bit) and an interface index (ifindex) to provide the link-local scope 
-for the case that the Join Proxy has multiple network interfaces. Zero is for integrity protection. It is always zero (before encryption) on sending and MUST be zero after decryption on reception.
-This size fits exactly into a single AES128 CBC block for instance, resulting in a 16 byte block of encrypted state data, `jpy_header_ciphertext`.
+The resulting plaintext size is 16 bytes.
+This size fits into a single AES128 CBC block for instance, resulting in a 16 byte block of encrypted state data, `jpy_header_ciphertext`.
+Due to the way that CBC encryption mixes all the contents of a block together, an attacker that modifies any bit of
+this block will most likely change one of the zero bits in the `family` and/or `zero` fields as well.
+
 This `jpy_header_ciphertext` data is then wrapped in a CBOR byte string to form the `jpy_header` element.
-So for the example `jpy_header_plaintext` of 12 bytes, we get a `jpy_header_ciphertext` of 16 bytes, and finally 
-a `jpy_header` CBOR element of 17 bytes which includes a 1-byte overhead to encode the data as a CBOR byte string of 
-length 16.
+This results in a `jpy_header` CBOR element of 17 bytes which includes a 1-byte overhead to encode the data as a
+CBOR byte string of length 16.
 
 Note: when IPv6 is used only the lower 64-bits of the source IPv6 address need to be recorded,  
 because they must be by design all IPv6 link-Local addresses, so the upper 64-bits are just "fe80::" and can be elided. 
 For IPv4, a link-Local IPv4 address {{RFC3927}} would be used, and it would always fit into the 64 bits of the `iid` 
-field.  On media where the Interface IDentifier (IID) is not 64-bits, a different field size for `iid` will be necessary.
+field.
+On link types where the Interface IDentifier (IID) is not 64-bits, a different field size for `iid` will be necessary.
 
-Replay protection is not included in this example security because cBRSKI or BRSKI TCP connections
-do also not protect against such an attack. If replay attack protection is desired, AES with GCM, {{RFC5288}}
-SHOULD be used.
+Replay protection is not included in this example security solution, because the regular transport layers of cBRSKI 
+and BRSKI, respectively UDP and TCP, also do not provide replay protection.
+Rather, replay protection is handled by the higher layer protocol, respectively DTLS and TLS.
+If replay attack protection is desired, AES with GCM {{RFC5288}} SHOULD be used.
 
 Detailed examples of a complete JPY message are shown in {{appendix-examples-detailed}}.
 
@@ -1081,7 +1094,7 @@ The DTLS payload itself, carried in the Content (C) field of the JPY message, is
 abbreviated.
 
 First, assume that a Pledge creates a CoAP request to a Join Proxy that it has just discovered and selected for 
-performing [cBRSKI] onboarding. 
+performing {{cBRSKI}} onboarding. 
 
 This request may be a Pledge Voucher Request (PVR) as follows:
 
@@ -1111,7 +1124,7 @@ When the Join Proxy receives this UDP packet, it creates a JPY message with the 
       <further bytes of DTLS 1.2 Client Hello>
 ~~~
 
-The same JPY message written in CBOR diagnostic notation [RFC8949] is:
+The same JPY message written in CBOR diagnostic notation {{RFC8949}} is:
 
 ~~~ cbor-diag
 [ h'd01914bcc376a88ffecc50ca6017b0c1' , 
