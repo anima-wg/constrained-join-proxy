@@ -810,11 +810,27 @@ The stateful and stateless mode of operation for the Join Proxy each have their 
 This section helps operators and/or profile-specifiers to make a choice between the two modes based on 
 the available device resources and network bandwidth.
 
-Stateful mode introduces the complexity of maintaining per-connection state, which can increase processing and memory requirements on the proxy compared to stateless mode under ideal conditions. Additionally, it opens up a wider range of potential implementation challenges in the presence of misbehaving or malicious pledges. For example: How can state be effectively limited? How can malicious pledges be detected—or at least prevented from negatively impacting non-malicious nodes? And so on.
+Stateful mode introduces the complexity of maintaining per-connection state, which can increase processing and memory
+requirements on the proxy compared to the stateless mode under ideal conditions.
+Additionally, it opens up a wider range of potential implementation challenges in the presence of misbehaving or
+malicious Pledges.
+For example: How can state be effectively limited?
+How can malicious Pledges be detected—or at least prevented from negatively impacting non-malicious nodes?
+And so on.
 
-If the proxy is deployed on nodes that support frequent and reliable software updates, then tailoring software enhancements based on the observed attack profile of the deployment scenario is an effective way to improve and harden the implementation. However, many constrained devices either lack this software agility or intentionally avoid it. In such environments, stateless mode becomes advantageous, as it offloads most of the complex hardening responsibilities to the registrar, allowing the proxy implementation to remain as lightweight as possible. Ultimately, a stateless proxy requires no more protective mechanisms than a basic packet-forwarding router.
+If the proxy is deployed on nodes that support frequent and reliable software updates, then tailoring software
+enhancements based on the observed attack profile(s) in the deployment scenario is an effective way to improve and
+harden the implementation.
+However, many constrained devices either lack this software agility or intentionally avoid it.
+In such environments, stateless mode becomes advantageous, as it offloads most of the complex hardening responsibilities
+to the Registrar, allowing the proxy implementation to remain as lightweight as possible.
+Ultimately, a stateless proxy requires no more protective mechanisms than a basic packet-forwarding router.
 
-The main concern for a stateless Join Proxy is the risk of forwarding an excessive number of packets to the Registrar, particularly over low-bandwidth connections such as 6LoWPAN links. Rate-limiting forwarded packets is the primary defense mechanism in such cases. All other pledge-specific protections can be delegated to the Registrar, which is expected to have the necessary software agility to handle these.
+The main concern for a stateless Join Proxy is the risk of forwarding an excessive number of packets to the Registrar,
+particularly over low-bandwidth connections such as 6LoWPAN links.
+Rate-limiting forwarded packets is the primary defense mechanism in such cases.
+All other Pledge-specific protections can be delegated to the Registrar, which is expected to have the necessary
+software agility to handle these.
 
 The following table summarizes more comparison details.
 
