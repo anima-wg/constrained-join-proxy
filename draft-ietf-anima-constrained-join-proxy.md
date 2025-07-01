@@ -331,11 +331,11 @@ to pick either 2 or 3 based on considerations such as those from {{jp-comparison
 A Join Proxy that is not adhering to such an additionals standard MUST implement both modes. 
 A Join Proxy or Registrar not complying to such additional standards are called "generic".
 
-If a Join Proxy implements both modes and does not implement methods to discover available registrar
-for either method which are outside the scope of this document, then it MUST use only the mode that is
-currently configured for the network by a method or profile outside the scope of this document or the
-mode individually configured for the device.  If the mode is not configured, the device MUST NOT operate as
-a Join Proxy.
+If a Join Proxy implements both modes but does not implement methods to discover available Registrars
+(for either method), then it MUST use only the mode that is currently configured for the network, or configured
+individually for the device.
+The method or profile that defines such configuration is outside the scope of this document. 
+If the mode is not configured and also can not be discovered automatically, then the device MUST NOT operate as a Join Proxy.
 
 For a Join Proxy to be operational, the node on which it is running has to be
 able to talk to a Registrar (exchange UDP messages with it). Establishing this connectivity can happen
