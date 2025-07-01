@@ -316,34 +316,35 @@ The advantages and disadvantages of the two modes are presented in {{jp-comparis
 For a Join Proxy implementation on a node, there are three possible scenarios:
 
 1. Both stateful and stateless modes are implemented. The Join Proxy can switch between these modes, depending on 
-   configuration and/or auto-discovery of registrar(s) for each option.
+   configuration and/or auto-discovery of Registrar(s) for each option.
 2. Only stateful mode is implemented. 
 3. Only stateless mode is implemented.
 
 Option 2 and 3 have the advantage of reducing code size, testing efforts and deployment complexity,
-but requires for all devices in the deployment to standardize on the same choice.
+but requires all devices in the deployment to standardize on the same choice.
 
-An standard for a network-wide application or ecosystem profile integrates the Join Proxy functionality
-as defined in this document MAY specify the use of any of these three options. It is expected that most
-deployments of constrained Join Proxies will be in the context of such standards and that they will be able
-to pick either 2 or 3 based on considerations such as those from {{jp-comparison}}.
+A standard for a network-wide application or ecosystem profile, that integrates the Join Proxy functionality
+as defined in this document, MAY specify the use of any of these three options.
+It is expected that most deployments of constrained Join Proxies will be in the context of such standards and
+that these standards will be able to pick either option 2 or 3 based on considerations such as those in {{jp-comparison}}.
 
-A Join Proxy that is not adhering to such an additionals standard MUST implement both modes. 
-A Join Proxy or Registrar not complying to such additional standards are called "generic".
+A Join Proxy that is not adhering to such an additional standard MUST implement both modes (option 1). 
+A Join Proxy or Registrar not adhering to such additional standards is called "generic".
 
 If a Join Proxy implements both modes but does not implement methods to discover available Registrars
 (for either method), then it MUST use only the mode that is currently configured for the network, or configured
 individually for the device.
-The method or profile that defines such configuration is outside the scope of this document. 
+The method or profile that defines such a configuration is outside the scope of this document. 
 If the mode is not configured and also can not be discovered automatically, then the device MUST NOT operate as a Join Proxy.
 
 For a Join Proxy to be operational, the node on which it is running has to be
-able to talk to a Registrar (exchange UDP messages with it). Establishing this connectivity can happen
-fully automatically if the Join Proxy node first enrolls itself as a Pledge,
-and then discovers the Registrar IP address/port and if applicable its desired mode of operation
+able to communicate with a Registrar (that is, exchange UDP messages with it).
+Establishing this connectivity can happen fully automatically if the Join Proxy node first enrolls itself as a Pledge,
+and then discovers the Registrar IP address/port, and if applicable its desired mode of operation
 (stateful or stateless), through a discovery mechanism (see {{discovery}}).
 Other methods, such as provisioning the Join Proxy are out of scope for this document
 but equally feasible.
+Such methods would typically be defined by a standard or ecosystem profile that integrates Join Proxy functionality.
 
 Independent of the mode of the Join Proxy, the Pledge first discovers (see {{discovery-by-pledge}})
 and selects the most appropriate Join Proxy.
@@ -352,10 +353,13 @@ Details of this discovery are defined by the onboarding protocol and are not in 
 For cBRSKI, this is defined in {{Section 10 of cBRSKI}}.
 
 A generic cBRSKI Registrar by design necessarily implements the stateful mode, and it SHOULD implement support for 
-Join Proxies operating in the stateless mode. Support for only the stateless mode is considered not to bring
-significant simplifications to a generic cBRSKI Registrar implementation.  cBRSKI Registrar only implemented
-in support of an aforementioned network-wide application or ecosystem profile MAY implement stateful and/or
-stateless mode.
+Join Proxies operating in the stateless mode.
+Support for only the stateless mode is considered not to bring significant simplifications to a generic cBRSKI
+Registrar implementation.
+However, the generic cBRSKI Registrar MAY offer a configuration option to disable either the stateful or stateless
+mode, which can be useful in a particular deployment.
+A cBRSKI Registrar that is only implemented to support an aforementioned network-wide application or ecosystem profile
+MAY implement either stateful and/or stateless mode.
 
 ## Notation {#ip-port-notation}
 
