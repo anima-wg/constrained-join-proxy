@@ -223,8 +223,8 @@ When the Join Proxy functionality is enabled in a node, it can help a neighborin
 
 The Join Proxy performs relaying of UDP packets from the Pledge to the intended Registrar, and
 relaying of the subsequent return packets.
-An authenticated Join Proxy can discover the routable IP address of the Registrar, as specified in this document.
-Future methods of Registrar discovery can also be easily added.
+An authenticated Join Proxy can either be configured with the routable IP address of the Registrar, or it can discover this address as specified in this document.
+Other methods of Registrar discovery (not yet specified in this document) can also be easily added.
 
 The Join Proxy acts as a packet-by-packet proxy for UDP packets between Pledge and Registrar.
 The cBRSKI protocol between Pledge and Registrar {{cBRSKI}} which this Join Proxy supports
@@ -239,7 +239,7 @@ In summary, the following steps are typically taken for the onboarding process o
 1. Join Proxies in the network learn the IP address and UDP port of the Registrar.
 2. A new Pledge arrives: it discovers one or more Join Proxies and selects one.
 3. The Pledge sends a link-local UDP message to the selected Join Proxy.
-4. The Join Proxy relays the message to the Registrar (and port) discovered in step 1.
+4. The Join Proxy relays the message to the Registrar (and port) of step 1.
 5. The Registrar sends a response UDP message back to the Join Proxy.
 6. The Join Proxy relays the message back to the Pledge.
 7. Step 3 to 6 repeat as needed, for multiple messages, to complete the onboarding protocol.
@@ -250,8 +250,9 @@ needs to dynamically discover a Registrar as detailed in {{discovery-by-jp}}.
 This configuration/discovery is specified here as step 1.
 Alternatively, in case of automated discovery it can also happen on-demand in step 4, at the moment that the Join Proxy has
 data to send to the Registrar.
-For step 1, it is out of scope how a Join Proxy selects a Registrar when it discovers two or more.
+For step 1 using discovery, it is out of scope how a Join Proxy selects a Registrar when it discovers two or more.
 That is the subject of future work.
+For the present specification, this selection is up to the implementation.
 
 ## Forming 6LoWPAN Mesh Networks with cBRSKI
 
@@ -343,9 +344,9 @@ and then discovers the Registrar IP address/port, and if applicable its desired 
 Other methods, such as provisioning the Join Proxy are out of scope for this document
 but equally feasible.
 Such methods would typically be defined by a standard or ecosystem profile that integrates Join Proxy functionality.
+Such provisioning can also be fully automated, for example if the Registrar IP address/port are included in the network configuration parameters that are disseminated to each trusted network node.
 
-Independent of the mode of the Join Proxy, the Pledge first discovers (see {{discovery-by-pledge}})
-and selects the most appropriate Join Proxy.
+Independent of the mode of the Join Proxy or its discovery/configuration methods, the Pledge first discovers (see {{discovery-by-pledge}}) and selects the most appropriate Join Proxy.
 From the discovery result, the Pledge learns a Join Proxy's link-local IP address and UDP join-port.
 Details of this discovery are defined by the onboarding protocol and are not in scope of this document.
 For cBRSKI, this is defined in {{Section 10 of cBRSKI}}.
@@ -503,7 +504,7 @@ Packets with different header H belong to different Pledge's UDP connections.
 
 In the stateless mode, the Registrar MUST offer the JPY protocol on a discoverable UDP port (`p_Rj`).
 There is no default port number available for the JPY protocol, unlike in the stateful mode where the Registrar
-can host all its services on the CoAPS default port.
+can host all its services on the CoAPS default port (5684).
 
 ~~~~aasvg
 +--------------+------------+---------------+-----------------------+
@@ -708,16 +709,17 @@ of the Registrar, in case this information is not configured already.
 In BRSKI {{RFC8995}} the GeneRic Autonomic Signaling Protocol (GRASP) {{RFC8990}} protocol is supported for discovery
 of a BRSKI Registrar in an Autonomic Control Plane (ACP).
 However, this document does not target the ACP context of use.
-Therefore, the definition of how to use GRASP for discovering a cBRSKI Registrar is left to future work such as
+Therefore, the definition of how to use GRASP for discovering a cBRSKI Registrar in an ACP is left to future work such as
 {{I-D.ietf-anima-brski-discovery}}.
 
 Although multiple discovery methods can be supported in principle by a single Join Proxy, this document only defines
 one default method for a Join Proxy to discover a Registrar: using CoAP resource discovery queries {{RFC6690}} {{RFC7252}}.
 
-The CoAP discovery query to use depends on the intended mode of operation of the Join Proxy, stateless or stateful.
-A stateless Join Proxy needs to discover a UDP endpoint (address and port) that can accept JPY messages.
-On the other hand, a stateful Join Proxy needs to discover a single CoAPS endpoint that offers the full set of
-cBRSKI Registrar resources.
+The CoAP discovery query to use depends on the intended mode of operation of the Join Proxy: stateless or stateful.
+A stateless Join Proxy needs to discover a UDP endpoint (address and port) that can accept JPY messages, supporting
+the `coaps+jpy` scheme.
+On the other hand, a stateful Join Proxy needs to discover a single CoAPS endpoint supporting the `coaps` scheme that
+offers the full set of cBRSKI Registrar resources.
 
 ### Stateless Case
 
@@ -816,12 +818,12 @@ A Join Proxy implementation by default MUST support this discovery method.
 If there is another method configured, by some means outside of the scope of this document, the default method MAY
 be deactivated.
 
-The join-port of the Join Proxy is discovered by
-sending a multicast GET request to "/.well-known/core" including a resource type (rt) parameter with the value "brski.jp".
+The join-port of the Join Proxy is discovered by sending a multicast GET request to "/.well-known/core" including a
+resource type (rt) parameter with the value "brski.jp".
 This value is defined in {{iana-rt}}.
 Upon success, the return payload will contain the join-port.
 
-The example below shows the discovery of the join-port (field `join_port`) of the Join Proxy:
+The meta-example below shows the discovery of the join-port (field `join_port`) of the Join Proxy:
 
 ~~~~
   REQ: GET coap://[ff02::fd]/.well-known/core?rt=brski.jp
@@ -831,6 +833,9 @@ The example below shows the discovery of the join-port (field `join_port`) of th
     Payload:
       <coaps://[IP_address]:join_port>;rt=brski.jp
 ~~~~
+
+In actual examples based on this, the field `IP_address` would contain the link-local IP address of the Join Proxy and
+the field `join_port` would contain the join-port value as a decimal number.
 
 Note that the `join_port` field and preceding colon MAY be absent in the discovery response: this indicates that
 the join-port is the default CoAPS port 5684.
