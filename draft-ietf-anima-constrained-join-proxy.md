@@ -948,11 +948,13 @@ The scheme specification is provided below.
 * Interoperability considerations: identical to the "coaps" scheme.
 * Security considerations: all of the security considerations of the "coaps" scheme apply.
   Users of this scheme should be aware that as part of the intended use, a UDP message that was formed using the 
-  "coaps" scheme is modified by a Join Proxy as defined by \[This RFC\] into a UDP message conforming to the 
+  "coaps" scheme is embedded by a Join Proxy as defined by \[This RFC\] into a UDP message conforming to the 
   "coaps+jpy" scheme without the Join Proxy being able to parse/decode which CoAPS URI was originally used by the 
-  sender.
-  Depending on the CoAP Options used in the original CoAPS message, this operation may modify elements of the original 
-  CoAPS URI (as will be reconstructed by the receiving coaps+jpy server) in a way that is unknown to the Join Proxy.
+  sender, since that information is stored as DTLS-protected data.
+  The receiving server can transform the "coaps+jpy" scheme back to the original "coaps" scheme by decoding the JPY
+  message payload.
+  However, any CoAP-related information not stored in the DTLS-protected data (such as in the UDP/IP headers) may be
+  changed by these scheme transforms.
 
 ## Service Name and Transport Protocol Port Number Registry {#dns-sd-spec}
 
@@ -972,8 +974,8 @@ Number" registry.
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
     Description: Bootstrapping Remote Secure Key Infrastructure
-                 Registrar join-port used by stateless constrained
-                 Join Proxy
+                 Registrar join-port, supporting the coaps+jpy
+                 scheme, used by stateless constrained Join Proxy
     Reference:   [This RFC]
 
 
