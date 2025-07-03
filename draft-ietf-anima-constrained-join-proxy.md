@@ -99,7 +99,7 @@ regarding resource usage, implementation complexity and security.
 # Introduction
 
 The Bootstrapping Remote Secure Key Infrastructure (BRSKI) protocol described in {{RFC8995}}
-provides a solution for a secure zero-touch (automated) bootstrap of new, unconfigured devices.
+provides a solution for a secure zero-touch (automated) onboarding of new, unconfigured devices.
 In the context of BRSKI, new devices, called "Pledges", are equipped with a factory-installed
 Initial Device Identifier (IDevID) {{ieee802-1AR}}, and are enrolled into a network.
 BRSKI makes use of Enrollment over Secure Transport (EST) {{RFC7030}}
@@ -217,7 +217,7 @@ such as 6LoWPAN Routers (6LRs), despite the need for an end-to-end secured sessi
 Furthermore, the Pledge is not be able to discover the IP address of the Registrar because it is not yet allowed onto
 the network.
 
-## Solution
+## Solution {#solution}
 
 To overcome these problems, the constrained Join Proxy is introduced.
 This is specific functionality that all, or a specific subset of, authenticated nodes in an IP network can implement.
@@ -253,9 +253,21 @@ needs to dynamically discover a Registrar as detailed in {{discovery-by-jp}}.
 This configuration/discovery is specified here as step 1.
 Alternatively, in case of automated discovery it can also happen on-demand in step 4, at the moment that the Join Proxy
 has data to send to the Registrar.
-For step 1 using discovery, it is out of scope how a Join Proxy selects a Registrar when it discovers two or more.
-That is the subject of future work.
-For the present specification, this selection is up to the implementation.
+
+## Solution for Multiple Registrars {#solution-multi}
+
+The solution description in {{solution}} assumes there is only one Registrar service configured or discovered by a
+Join Proxy, defined by a single IP address and single UDP port.
+
+However, there may be multiple Registrars present in a network deployment.
+There may be multiple Registrars supporting the exact same onboarding protocol, or multiple
+Registrars supporting different onboarding protocols, or a combination of both.
+Such cases are all supported by this specification, to enable redundancy, backward-compatibility, and
+introduction of new variants of onboarding protocols over time.
+Further information about the "BRSKI variants" concept can be found in {{I-D.ietf-anima-brski-discovery}}.
+
+See {{spec-multi}} for the specific requirements on the Join Proxy for supporting multiple Registrars or multiple
+onboarding protocol variants.
 
 ## Forming 6LoWPAN Mesh Networks with cBRSKI
 
@@ -710,6 +722,37 @@ of per-session context.
 The `jpy_context` field needs to be linked to the DTLS context, and when a DTLS message need to be sent back to the
 client, the `jpy_context` needs to be included in a JPY message along with the DTLS message in the `jpy_content` field.
 
+## Handling Multiple Registrars {#spec-multi}
+
+In a network deployment there MAY be multiple Registrar hosts present, each host operating one or more
+Registrar service(s).
+Regardless of the number of (physical or logical) hosts, each of these Registrar services is considered a
+separate Registrar.
+One or more of these Registrars MAY be configured in a Join Proxy, by a method out of scope of this specification.
+Also one or more of these Registrars MAY be found by a Join Proxy using its discovery method(s).
+
+The Join Proxy is not necessarily aware of all onboarding protocol variants that are enabled in its network.
+Specifically, it may not be aware of the expected communication timing characteristics for the onboarding protocol
+that it is providing its proxy function for.
+Therefore, the final selection of onboarding protocol and Registrar is left to the Pledge and not to the Join Proxy.
+Also the determination of "onboarding progress" and whether the Registrar is considered responsive or not is left to
+the Pledge performing the onboarding protocol.
+This is consistent with {{Section 4.1 of RFC8995}} which defines how a BRSKI Pledge attempts onboarding via
+multiple Join Proxies and defines the related retry and switching behaviors.
+
+If a Join Proxy discovers more Registrars than it can simultaneously offer to Pledges,
+given its resource limits or implementation-defined limits, then the Join Proxy MUST select from the discovered
+Registrars in an implementation-defined manner.
+Future work such as {{I-D.ietf-anima-brski-discovery}} may define a selection process for this case.
+
+As an example, a network deployment might include a single Registrar host that offers two Registrar services:
+cBRSKI and a hypothetical "future BRSKI" (fuBRSKI).
+Both services are hosted on different UDP ports.
+Each Join Proxy is configured with these two Registrar services, and when a Pledge is sending CoAP discovery requests
+each Join Proxy in range will respond with both services in a CoAP discovery response.
+The Join Proxy is able to distinguish the properties of the two Registrar services by the differences in the
+CoRE Link Format parameters included in the two responded onboarding service descriptions.
+
 
 # Discovery {#discovery}
 
@@ -855,6 +898,47 @@ the join-port is the default CoAPS port 5684.
 
 In the returned CoRE link format document, discoverable port numbers are usually returned for the Join Proxy resource
 in the &lt;URI-Reference&gt; of the link (see {{Section 5.1 of RFC6690}} for details).
+
+## Pledge Discovers Multiple Join Ports {#discovery-by-pledge-multi}
+
+A Pledge MUST be able to handle multiple join-ports being returned in a discovery response sent by a Join Proxy.
+This can happen if the network supports multiple Registrars and/or multiple Registrar-services as defined in
+{{spec-multi}}.
+Then, each Registrar gets assigned its own join-port (up to a limit imposed by Join Proxy implementation) so
+that a Pledge is enabled to failover to another Registrar if a prior onboarding attempt fails.
+
+How the Pledge selects between the onboarding services matching its query, is implementation-specific and out of
+scope of this document.
+
+Discovery of multiple Registrars works in the same way as discovery of a single Registrar as defined in
+{{discovery-by-pledge}}, except that multiple links are returned in the CoRE Link Format document.
+
+The meta-example below shows the discovery of two join-ports (fields `join_port1` and `join_port2`) on a Join Proxy,
+each associated to a different cBRSKI protocol variant, defined by two CoRE Link Format links:
+
+~~~~
+  REQ: GET coap://[ff02::fd]/.well-known/core?rt=brski.jp
+
+  RES: 2.05 Content
+    Content-Format: 40
+    Payload:
+      <coaps://[IP_address]:join_port1>;rt=brski.jp,
+      <coaps://[IP_address]:join_port2>;rt=brski.jp;
+                            param1=value1;param2=value2
+~~~~
+
+In actual examples based on this, the field `IP_address` would contain the link-local IP address of the Join Proxy and
+the fields `join_port1` and `join_port2` would contain distinct decimal port number values.
+
+The parameter values (`param1` and `param2`) are included for illustrative purposes.
+In a real example, these would contain Link Format parameters specifically defined for the `brski.jp` resource type.
+Such parameters may be defined in future work ({{I-D.ietf-anima-brski-discovery}}.
+These parameters, if understood by the Pledge, help in selecting the optimal matching onboarding protocol variant
+of cBRSKI.
+If the Pledge does not understand these parameters, it can select any one of the two join-ports for cBRSKI
+onboarding.
+If the attempt subsequently fails, the Pledge repeats the attempt using the other discovered join-port as defined
+by {{cBRSKI}}.
 
 
 # Comparison of Stateless and Stateful Modes {#jp-comparison}
