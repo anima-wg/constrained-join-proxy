@@ -314,38 +314,50 @@ The advantages and disadvantages of the two modes are presented in {{jp-comparis
 For a Join Proxy implementation on a node, there are three possible scenarios:
 
 1. Both stateful and stateless modes are implemented. The Join Proxy can switch between these modes, depending on 
-   configuration.
+   configuration and/or auto-discovery of Registrar(s) for each option.
 2. Only stateful mode is implemented. 
 3. Only stateless mode is implemented.
 
-An application profile or ecosystem standard that integrates the Join Proxy functionality as defined in this 
-document MAY define any of these three options. 
-In particular, option 2 or 3 has the advantage of reducing code size and testing efforts, when all devices under 
-the application profile/standard adhere to the same choice.
+Option 2 and 3 have the advantage of reducing code size, testing efforts and deployment complexity,
+but requires all devices in the deployment to standardize on the same choice.
 
-A generic Join Proxy that is not adhering to such an application profile/standard MUST implement both modes. 
+A standard for a network-wide application or ecosystem profile, that integrates the Join Proxy functionality
+as defined in this document, MAY specify the use of any of these three options.
+It is expected that most deployments of constrained Join Proxies will be in the context of such standards and
+that these standards will be able to pick either option 2 or 3 based on considerations such as those in {{jp-comparison}}.
 
-A cBRSKI Registrar by design necessarily implements the stateful mode, and it SHOULD implement support for 
-Join Proxies operating in the stateless mode. The exception case here is a cBRSKI Registrar that is implemented for a 
-particular dedicated application profile/standard which specifies only the stateful mode.
+A Join Proxy that is not adhering to such an additional standard MUST implement both modes (option 1). 
+A Join Proxy or Registrar not adhering to such additional standards is called "generic".
 
-If a Join Proxy implements both modes, then it MUST use only the mode that is currently configured for the network 
-(by a method or profile outside the scope of this document) or the mode individually configured for the device.
-If the mode is not configured, the device MUST NOT operate as a Join Proxy.
+If a Join Proxy implements both modes but does not implement methods to discover available Registrars
+(for either method), then it MUST use only the mode that is currently configured for the network, or configured
+individually for the device.
+The method or profile that defines such a configuration is outside the scope of this document. 
+If the mode is not configured and also can not be discovered automatically, then the device MUST NOT operate as a Join Proxy.
 
 For a Join Proxy to be operational, the node on which it is running has to be
-able to talk to a Registrar (exchange UDP messages with it). Establishing this connectivity can happen
-fully automatically if the Join Proxy node first enrolls itself as a Pledge,
-and then discovers the Registrar IP address/port and if applicable its desired mode of operation (stateful or stateless), 
-through a discovery mechanism (see {{discovery}}).
+able to communicate with a Registrar (that is, exchange UDP messages with it).
+Establishing this connectivity can happen fully automatically if the Join Proxy node first enrolls itself as a Pledge,
+and then discovers the Registrar IP address/port, and if applicable its desired mode of operation
+(stateful or stateless), through a discovery mechanism (see {{discovery}}).
 Other methods, such as provisioning the Join Proxy are out of scope for this document
 but equally feasible.
+Such methods would typically be defined by a standard or ecosystem profile that integrates Join Proxy functionality.
 
 Independent of the mode of the Join Proxy, the Pledge first discovers (see {{discovery-by-pledge}})
 and selects the most appropriate Join Proxy.
 From the discovery result, the Pledge learns a Join Proxy's link-local IP address and UDP join-port.
 Details of this discovery are defined by the onboarding protocol and are not in scope of this document.
 For cBRSKI, this is defined in {{Section 10 of cBRSKI}}.
+
+A generic cBRSKI Registrar by design necessarily implements the stateful mode, and it SHOULD implement support for 
+Join Proxies operating in the stateless mode.
+Support for only the stateless mode is considered not to bring significant simplifications to a generic cBRSKI
+Registrar implementation.
+However, the generic cBRSKI Registrar MAY offer a configuration option to disable either the stateful or stateless
+mode, which can be useful in a particular deployment.
+A cBRSKI Registrar that is only implemented to support an aforementioned network-wide application or ecosystem profile
+MAY implement either stateful and/or stateless mode.
 
 ## Notation {#ip-port-notation}
 
@@ -833,6 +845,31 @@ The stateful and stateless mode of operation for the Join Proxy each have their 
 This section helps operators and/or profile-specifiers to make a choice between the two modes based on 
 the available device resources and network bandwidth.
 
+Stateful mode introduces the complexity of maintaining per-connection state, which can increase processing and memory
+requirements on the proxy compared to the stateless mode under ideal conditions.
+Additionally, it opens up a wider range of potential implementation challenges in the presence of misbehaving or
+malicious Pledges.
+For example: How can state be effectively limited?
+How can malicious Pledges be detected—or at least prevented from negatively impacting non-malicious nodes?
+And so on.
+
+If the proxy is deployed on nodes that support frequent and reliable software updates, then tailoring software
+enhancements based on the observed attack profile(s) in the deployment scenario is an effective way to improve and
+harden the implementation.
+However, many constrained devices either lack this software agility or intentionally avoid it.
+In such environments, stateless mode becomes advantageous, as it offloads most of the complex hardening responsibilities
+to the Registrar, allowing the proxy implementation to remain as lightweight as possible.
+Ultimately, a stateless proxy requires no more protective mechanisms than a basic packet-forwarding router.
+
+The main concern for a stateless Join Proxy is the risk of forwarding an excessive number of packets to the Registrar,
+particularly over low-bandwidth connections such as 6LoWPAN links.
+Rate-limiting forwarded packets is the primary defense mechanism in such cases.
+All other Pledge-specific protections can be delegated to the Registrar, which is expected to have the necessary
+software agility to handle these.
+
+The following table summarizes more comparison details.
+
+
 | Properties  |         Stateful mode      |     Stateless mode     |
 |:----------- |:---------------------------|:-----------------------|
 | State Information | The Join Proxy needs additional storage to maintain mappings between the address and port number of the Pledge and those of the Registrar.  | No information is maintained by the Join Proxy. Registrar transiently stores the JPY message header.  |
@@ -946,11 +983,13 @@ The scheme specification is provided below.
 * Interoperability considerations: identical to the "coaps" scheme.
 * Security considerations: all of the security considerations of the "coaps" scheme apply.
   Users of this scheme should be aware that as part of the intended use, a UDP message that was formed using the 
-  "coaps" scheme is modified by a Join Proxy as defined by \[This RFC\] into a UDP message conforming to the 
+  "coaps" scheme is embedded by a Join Proxy as defined by \[This RFC\] into a UDP message conforming to the 
   "coaps+jpy" scheme without the Join Proxy being able to parse/decode which CoAPS URI was originally used by the 
-  sender.
-  Depending on the CoAP Options used in the original CoAPS message, this operation may modify elements of the original 
-  CoAPS URI (as will be reconstructed by the receiving coaps+jpy server) in a way that is unknown to the Join Proxy.
+  sender, since that information is stored as DTLS-protected data.
+  The receiving server can transform the "coaps+jpy" scheme back to the original "coaps" scheme by decoding the JPY
+  message payload.
+  However, any CoAP-related information not stored in the DTLS-protected data (such as in the UDP/IP headers) may be
+  changed by these scheme transforms.
 
 ## Service Name and Transport Protocol Port Number Registry {#dns-sd-spec}
 
@@ -970,8 +1009,8 @@ Number" registry.
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
     Description: Bootstrapping Remote Secure Key Infrastructure
-                 Registrar join-port used by stateless constrained
-                 Join Proxy
+                 Registrar join-port, supporting the coaps+jpy
+                 scheme, used by stateless constrained Join Proxy
     Reference:   [This RFC]
 
 
