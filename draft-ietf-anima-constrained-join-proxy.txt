@@ -2,15 +2,15 @@
 
 
 
-anima Working Group                                        M. Richardson
+anima                                                      M. Richardson
 Internet-Draft                                  Sandelman Software Works
 Intended status: Standards Track                         P. van der Stok
-Expires: 27 July 2025                             vanderstok consultancy
+Expires: 2 January 2026                           vanderstok consultancy
                                                            P. Kampanakis
                                                            Cisco Systems
                                                                  E. Dijk
                                                        IoTconsultancy.nl
-                                                         23 January 2025
+                                                             1 July 2025
 
 
       Join Proxy for Bootstrapping of Constrained Network Elements
@@ -53,9 +53,9 @@ About This Document
 
 
 
-Richardson, et al.        Expires 27 July 2025                  [Page 1]
+Richardson, et al.       Expires 2 January 2026                 [Page 1]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    Source for this draft and an issue tracker can be found at
@@ -76,7 +76,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 July 2025.
+   This Internet-Draft will expire on 2 January 2026.
 
 Copyright Notice
 
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Richardson, et al.        Expires 27 July 2025                  [Page 2]
+Richardson, et al.       Expires 2 January 2026                 [Page 2]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
        4.5.1.  JPY Message Structure . . . . . . . . . . . . . . . .  16
@@ -119,28 +119,28 @@ Internet-Draft                 Join Proxy                   January 2025
        4.5.3.  JPY Message Overhead and MTU Size . . . . . . . . . .  17
        4.5.4.  JPY Message Security  . . . . . . . . . . . . . . . .  17
        4.5.5.  Example Format for JPY Header Data  . . . . . . . . .  18
-       4.5.6.  Processing by Registrar . . . . . . . . . . . . . . .  18
-   5.  Discovery . . . . . . . . . . . . . . . . . . . . . . . . . .  19
-     5.1.  Join Proxy Discovers Registrar  . . . . . . . . . . . . .  19
-       5.1.1.  Stateless Case  . . . . . . . . . . . . . . . . . . .  19
-       5.1.2.  Stateful Case . . . . . . . . . . . . . . . . . . . .  20
-       5.1.3.  Examples  . . . . . . . . . . . . . . . . . . . . . .  21
-     5.2.  Pledge Discovers Join Proxy . . . . . . . . . . . . . . .  21
-   6.  Comparison of Stateless and Stateful Modes  . . . . . . . . .  22
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  23
-   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  25
-     8.1.  Resource Type Attributes Registry . . . . . . . . . . . .  25
-     8.2.  coaps+jpy Scheme Registration . . . . . . . . . . . . . .  25
+       4.5.6.  Processing by Registrar . . . . . . . . . . . . . . .  19
+   5.  Discovery . . . . . . . . . . . . . . . . . . . . . . . . . .  20
+     5.1.  Join Proxy Discovers Registrar  . . . . . . . . . . . . .  20
+       5.1.1.  Stateless Case  . . . . . . . . . . . . . . . . . . .  20
+       5.1.2.  Stateful Case . . . . . . . . . . . . . . . . . . . .  21
+       5.1.3.  Examples  . . . . . . . . . . . . . . . . . . . . . .  22
+     5.2.  Pledge Discovers Join Proxy . . . . . . . . . . . . . . .  22
+   6.  Comparison of Stateless and Stateful Modes  . . . . . . . . .  23
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  24
+   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  26
+     8.1.  Resource Type Attributes Registry . . . . . . . . . . . .  26
+     8.2.  coaps+jpy Scheme Registration . . . . . . . . . . . . . .  26
      8.3.  Service Name and Transport Protocol Port Number
-           Registry  . . . . . . . . . . . . . . . . . . . . . . . .  26
-   9.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  27
-   10. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  27
-   11. Changelog . . . . . . . . . . . . . . . . . . . . . . . . . .  27
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  29
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  29
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  31
-   Appendix A.  Stateless Join Proxy JPY Message Examples  . . . . .  33
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  35
+           Registry  . . . . . . . . . . . . . . . . . . . . . . . .  27
+   9.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  28
+   10. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  28
+   11. Changelog . . . . . . . . . . . . . . . . . . . . . . . . . .  28
+   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  30
+     12.1.  Normative References . . . . . . . . . . . . . . . . . .  30
+     12.2.  Informative References . . . . . . . . . . . . . . . . .  32
+   Appendix A.  Stateless Join Proxy JPY Message Examples  . . . . .  34
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  36
 
 1.  Introduction
 
@@ -165,9 +165,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                  [Page 3]
+Richardson, et al.       Expires 2 January 2026                 [Page 3]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    In this document, cBRSKI is extended such that a cBRSKI Pledge can
@@ -221,9 +221,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                  [Page 4]
+Richardson, et al.       Expires 2 January 2026                 [Page 4]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    2.  A stateless Join Proxy that does not locally store UDP connection
@@ -277,9 +277,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                  [Page 5]
+Richardson, et al.       Expires 2 January 2026                 [Page 5]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    The terms "6LoWPAN Router" (6LR), "6LoWPAN Border Router" (6LBR) and
@@ -333,9 +333,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                  [Page 6]
+Richardson, et al.       Expires 2 January 2026                 [Page 6]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
 3.2.  Solution
@@ -389,9 +389,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                  [Page 7]
+Richardson, et al.       Expires 2 January 2026                 [Page 7]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    8.  The Pledge uses its obtained domain identity/credentials to join
@@ -445,9 +445,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                  [Page 8]
+Richardson, et al.       Expires 2 January 2026                 [Page 8]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    A Registrar hosted on the 6LBR will, per [cBRSKI], make itself
@@ -501,9 +501,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                  [Page 9]
+Richardson, et al.       Expires 2 January 2026                 [Page 9]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    1.  Both stateful and stateless modes are implemented.  The Join
@@ -557,9 +557,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 10]
+Richardson, et al.       Expires 2 January 2026                [Page 10]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    *  The colon (:) separates IP address and port number (<IP>:<port>).
@@ -613,9 +613,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 11]
+Richardson, et al.       Expires 2 January 2026                [Page 11]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    In case a Join Proxy has multiple network interfaces that accept
@@ -669,9 +669,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 12]
+Richardson, et al.       Expires 2 January 2026                [Page 12]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    The Join Proxy MUST allocate a unique IP_Jr:p_Jr for every unique
@@ -725,9 +725,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 13]
+Richardson, et al.       Expires 2 January 2026                [Page 13]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    Stateless Join Proxy operations work by introducing a new JPY message
@@ -781,9 +781,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 14]
+Richardson, et al.       Expires 2 January 2026                [Page 14]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    In the stateless mode, the Registrar MUST offer the JPY protocol on a
@@ -837,9 +837,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 15]
+Richardson, et al.       Expires 2 January 2026                [Page 15]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    A Registrar that supports the JPY protocol also uses JPY message to
@@ -893,9 +893,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 16]
+Richardson, et al.       Expires 2 January 2026                [Page 16]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
 4.5.2.  JPY Message Port Usage
@@ -932,64 +932,120 @@ Internet-Draft                 Join Proxy                   January 2025
 
 4.5.4.  JPY Message Security
 
-   The Join Proxy SHOULD encrypt the state data prior to wrapping it in
-   a CBOR byte string in jpy_header.  It SHOULD be encrypted with a
-   symmetric key known only to the Join Proxy itself.  This key need not
-   persist on a long-term basis, and MAY be changed periodically.
+   Application or ecosystem standards adopting the stateless Join Proxy
+   need to determine if there is the potential for attacks originating
+   from the trusted network side of the Join Proxy.  Such attacks would
+   involve senders other than a trustworthy Registrar sending packets to
+   the Join Proxy, impersonating the trusted Registrar by using its
+   source address and port.  In many well-designed solutions, this
+   attack vector can be excluded because IP source addresses are
+   verified.  For example, in Autonomic Networking Infrastructure (ANI)
+   networks, the Autonomic Control Plane (ACP) ([RFC8994]) ensures that
+   only trustworthy nodes can communicate amongst each other.  In an
+   ACP, compromising an ACP node may be as hard as compromising the
+   Registrar itself.  Likewise, in many Wi-Fi mesh networks and 6LoWPAN
+   mesh networks, link-layer security is applied and claimed to achieve
+   similar levels of secure and trusted communication within the scope
 
-   The Join Proxy MUST maintain identical jpy_header data for all
-   communications from the same Pledge and same UDP source port.  This
-   implies that the encryption key used either does not change during
-   the onboarding attempt of the Pledge, or that when it does, it is
-   acceptable to break any onboarding connections that have not yet
-   completed.
 
 
-
-
-
-
-Richardson, et al.        Expires 27 July 2025                 [Page 17]
+Richardson, et al.       Expires 2 January 2026                [Page 17]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
+
+   of the mesh.
+
+   For stateless Join Proxies that only operate in such secured network
+   environments, it can be sufficient to only accept JPY messages
+   originating from a Registrar's IP address and port, and not use any
+   additional encryption or integrity protection of the JPY header.  The
+   Registrar's IP address and port are configured on the Join Proxy, or
+   discovered by the Join Proxy, for sending JPY messages.
+
+   Generic stateless Join Proxies on the other hand can not assume any
+   such additional security measures for the network that connects the
+   Proxy to the Registrar.  For example, a generic Join Proxy's network
+   connection to a Registrar may pass through a lightly protected
+   enterprise network, such as a university or campus network, without
+   additional security.  Therefore, a generic stateless Join Proxy
+   SHOULD encrypt and integrity-protect the state data prior to wrapping
+   it in a CBOR byte string in jpy_header.
+
+   It SHOULD be encrypted with a symmetric key known only to the Join
+   Proxy itself.  When the Join Proxy attempts to decrypt a receiver
+   jpy_header byte string, and either the decryption or the integrity
+   check fails, it MUST silently discard the JPY message.
+
+   The symmetric key need not persist on a long-term basis, and MAY be
+   changed periodically.  Because a key change during an onboarding
+   attempt of a Pledge could lead to DTLS retransmissions, or even
+   failure of the onboarding attempt, it is RECOMMENDED to change the
+   key infrequently: for example every 24 hours.
 
 4.5.5.  Example Format for JPY Header Data
 
    A typical JPY message header format, prior to encryption, could be
-   constructed using the following CDDL grammar.  This is illustrative
-   only: the format of the data inside jpy_header is not subject to
-   standardization and may vary across Pledges.
+   constructed using the following binary data structure (expressed in C
+   style notation):
 
-       jpy_header_plaintext = [
-         family:  uint .bits 1,
-         ifindex: uint .bits 8,
-         srcport: uint .bits 16,
-         iid:     bstr .bits 64,
-       ]
+   struct jpy_header_plaintext {
+       uint8_t  family;   // Only valid in the range 0...1
+       uint8_t  ifindex;  // Only valid in the range 0...MAX_INTERFACES
+       uint16_t srcport;  // Only valid > 0
+       uint8_t  iid[8];
+       uint32_t zero;     // Only valid == 0
+   };
 
-   This results in a total plaintext size of 96 bits, or 12 bytes.  The
-   data structure stores the Pledge's UDP source port (srcport), the IID
-   bits of the Pledge's originating IPv6 link-Local address (iid), the
-   IPv4/IPv6 family (as a single bit) and an interface index (ifindex)
-   to provide the link-local scope for the case that the Join Proxy has
-   multiple network interfaces.  This size fits nicely into a single
-   AES128 CBC block for instance, resulting in a 16 byte block of
-   encrypted state data, jpy_header_ciphertext.  This
-   jpy_header_ciphertext data is then wrapped in a CBOR byte string to
-   form the jpy_header element.  So for the example jpy_header_plaintext
-   of 12 bytes, we get a jpy_header_ciphertext of 16 bytes, and finally
-   a jpy_header CBOR element of 17 bytes which includes a 1-byte
-   overhead to encode the data as a CBOR byte string of length 16.
+   This is illustrative only: the format of the data inside jpy_header
+   is not subject to standardization and may vary across Pledges.  It
+   may for example use a CBOR array encoding, formally defined and
+   constrained using CDDL [RFC8610].
+
+
+
+
+Richardson, et al.       Expires 2 January 2026                [Page 18]
+
+Internet-Draft                 Join Proxy                      July 2025
+
+
+   The data structure stores the Pledge's UDP source port (srcport), the
+   IID bits of the Pledge's originating IPv6 link-Local address (iid),
+   the IPv4/IPv6 family (as a uint8 value 0 or 1) and an interface index
+   (ifindex) to provide the link-local scope for the case that the Join
+   Proxy has multiple network interfaces.  The zero field is both for
+   integrity protection and padding.  It is always value zero (before
+   encryption) on sending and MUST be zero after decryption on
+   reception.
+
+   The resulting plaintext size is 16 bytes.  This size fits into a
+   single AES128 CBC block for instance, resulting in a 16 byte block of
+   encrypted state data, jpy_header_ciphertext.  Due to the way that CBC
+   encryption mixes all the contents of a block together, an attacker
+   that modifies any bit of this block will most likely change one of
+   the zero bits in the family and/or zero fields as well.
+
+   This jpy_header_ciphertext data is then wrapped in a CBOR byte string
+   to form the jpy_header element.  This results in a jpy_header CBOR
+   element of 17 bytes which includes a 1-byte overhead to encode the
+   data as a CBOR byte string of length 16.
 
    Note: when IPv6 is used only the lower 64-bits of the source IPv6
    address need to be recorded,
    because they must be by design all IPv6 link-Local addresses, so the
    upper 64-bits are just "fe80::" and can be elided.  For IPv4, a link-
    Local IPv4 address [RFC3927] would be used, and it would always fit
-   into the 64 bits of the iid field.  On media where the Interface
+   into the 64 bits of the iid field.  On link types where the Interface
    IDentifier (IID) is not 64-bits, a different field size for iid will
    be necessary.
+
+   Replay protection is not included in this example security solution,
+   because the regular transport layers of cBRSKI and BRSKI,
+   respectively UDP and TCP, also do not provide replay protection.
+   Rather, replay protection is handled by the higher layer protocol,
+   respectively DTLS and TLS.  If replay attack protection is desired,
+   AES with GCM [RFC5288] SHOULD be used.
 
    Detailed examples of a complete JPY message are shown in Appendix A.
 
@@ -1005,9 +1061,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 18]
+Richardson, et al.       Expires 2 January 2026                [Page 19]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    appropriate (active) client context.  Note that the same UDP socket
@@ -1061,9 +1117,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 19]
+Richardson, et al.       Expires 2 January 2026                [Page 20]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
      REQ: GET coap://[ff05::fd]/.well-known/core?rt=brski.rjp
@@ -1117,9 +1173,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 20]
+Richardson, et al.       Expires 2 January 2026                [Page 21]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    hierarchy of resources.  For efficiency, it is RECOMMENDED for the
@@ -1173,9 +1229,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 21]
+Richardson, et al.       Expires 2 January 2026                [Page 22]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    The join-port of the Join Proxy is discovered by sending a multicast
@@ -1229,9 +1285,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 22]
+Richardson, et al.       Expires 2 January 2026                [Page 23]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    +=============+=============================+=======================+
@@ -1285,9 +1341,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 23]
+Richardson, et al.       Expires 2 January 2026                [Page 24]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    A malicious Join Proxy has a number of relay/routing options for
@@ -1341,9 +1397,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 24]
+Richardson, et al.       Expires 2 January 2026                [Page 25]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    *  It can construct an invalid JPY message.  In that case, a Join
@@ -1397,9 +1453,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 25]
+Richardson, et al.       Expires 2 January 2026                [Page 26]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    Scheme name: coaps+jpy
@@ -1453,9 +1509,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 26]
+Richardson, et al.       Expires 2 January 2026                [Page 27]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    Service Name: brski-jp
@@ -1509,9 +1565,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 27]
+Richardson, et al.       Expires 2 January 2026                [Page 28]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
       * Security considerations text reviewed and expanded with more
@@ -1565,9 +1621,9 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 28]
+Richardson, et al.       Expires 2 January 2026                [Page 29]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    -06 to -07
@@ -1621,17 +1677,17 @@ Internet-Draft                 Join Proxy                   January 2025
 
 
 
-Richardson, et al.        Expires 27 July 2025                 [Page 29]
+Richardson, et al.       Expires 2 January 2026                [Page 30]
 
-Internet-Draft                 Join Proxy                   January 2025
+Internet-Draft                 Join Proxy                      July 2025
 
 
    [cBRSKI]   Richardson, M., Van der Stok, P., Kampanakis, P., and E.
               Dijk, "Constrained Bootstrapping Remote Secure Key
               Infrastructure (cBRSKI)", Work in Progress, Internet-
-              Draft, draft-ietf-anima-constrained-voucher-26, 8 January
+              Draft, draft-ietf-anima-constrained-voucher-27, 3 March
               2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              anima-constrained-voucher-26>.
+              anima-constrained-voucher-27>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1643,6 +1699,11 @@ Internet-Draft                 Join Proxy                   January 2025
               Protocol Version 6 (IPv6) Specification", STD 89,
               RFC 4443, DOI 10.17487/RFC4443, March 2006,
               <https://www.rfc-editor.org/rfc/rfc4443>.
+
+   [RFC5288]  Salowey, J., Choudhury, A., and D. McGrew, "AES Galois
+              Counter Mode (GCM) Cipher Suites for TLS", RFC 5288,
+              DOI 10.17487/RFC5288, August 2008,
+              <https://www.rfc-editor.org/rfc/rfc5288>.
 
    [RFC768]   Postel, J., "User Datagram Protocol", STD 6, RFC 768,
               DOI 10.17487/RFC0768, August 1980,
@@ -1660,27 +1721,27 @@ Internet-Draft                 Join Proxy                   January 2025
               Watsen, K., Richardson, M., Pritikin, M., Eckert, T. T.,
               and Q. Ma, "A Voucher Artifact for Bootstrapping
               Protocols", Work in Progress, Internet-Draft, draft-ietf-
-              anima-rfc8366bis-12, 8 July 2024,
+              anima-rfc8366bis-14, 1 April 2025,
               <https://datatracker.ietf.org/doc/html/draft-ietf-anima-
-              rfc8366bis-12>.
+              rfc8366bis-14>.
 
    [RFC8949]  Bormann, C. and P. Hoffman, "Concise Binary Object
               Representation (CBOR)", STD 94, RFC 8949,
               DOI 10.17487/RFC8949, December 2020,
               <https://www.rfc-editor.org/rfc/rfc8949>.
 
+
+
+
+Richardson, et al.       Expires 2 January 2026                [Page 31]
+
+Internet-Draft                 Join Proxy                      July 2025
+
+
    [RFC8995]  Pritikin, M., Richardson, M., Eckert, T., Behringer, M.,
               and K. Watsen, "Bootstrapping Remote Secure Key
               Infrastructure (BRSKI)", RFC 8995, DOI 10.17487/RFC8995,
               May 2021, <https://www.rfc-editor.org/rfc/rfc8995>.
-
-
-
-
-Richardson, et al.        Expires 27 July 2025                 [Page 30]
-
-Internet-Draft                 Join Proxy                   January 2025
-
 
    [RFC9147]  Rescorla, E., Tschofenig, H., and N. Modadugu, "The
               Datagram Transport Layer Security (DTLS) Protocol Version
@@ -1726,17 +1787,17 @@ Internet-Draft                 Join Proxy                   January 2025
               CBC-MAC (CCM)", RFC 3610, DOI 10.17487/RFC3610, September
               2003, <https://www.rfc-editor.org/rfc/rfc3610>.
 
+
+
+Richardson, et al.       Expires 2 January 2026                [Page 32]
+
+Internet-Draft                 Join Proxy                      July 2025
+
+
    [RFC3927]  Cheshire, S., Aboba, B., and E. Guttman, "Dynamic
               Configuration of IPv4 Link-Local Addresses", RFC 3927,
               DOI 10.17487/RFC3927, May 2005,
               <https://www.rfc-editor.org/rfc/rfc3927>.
-
-
-
-Richardson, et al.        Expires 27 July 2025                 [Page 31]
-
-Internet-Draft                 Join Proxy                   January 2025
-
 
    [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform
               Resource Identifier (URI): Generic Syntax", STD 66,
@@ -1779,20 +1840,20 @@ Internet-Draft                 Join Proxy                   January 2025
               DOI 10.17487/RFC7228, May 2014,
               <https://www.rfc-editor.org/rfc/rfc7228>.
 
+
+
+
+
+
+Richardson, et al.       Expires 2 January 2026                [Page 33]
+
+Internet-Draft                 Join Proxy                      July 2025
+
+
    [RFC7252]  Shelby, Z., Hartke, K., and C. Bormann, "The Constrained
               Application Protocol (CoAP)", RFC 7252,
               DOI 10.17487/RFC7252, June 2014,
               <https://www.rfc-editor.org/rfc/rfc7252>.
-
-
-
-
-
-
-Richardson, et al.        Expires 27 July 2025                 [Page 32]
-
-Internet-Draft                 Join Proxy                   January 2025
-
 
    [RFC7595]  Thaler, D., Ed., Hansen, T., and T. Hardie, "Guidelines
               and Registration Procedures for URI Schemes", BCP 35,
@@ -1820,6 +1881,11 @@ Internet-Draft                 Join Proxy                   January 2025
               DOI 10.17487/RFC8990, May 2021,
               <https://www.rfc-editor.org/rfc/rfc8990>.
 
+   [RFC8994]  Eckert, T., Ed., Behringer, M., Ed., and S. Bjarnason, "An
+              Autonomic Control Plane (ACP)", RFC 8994,
+              DOI 10.17487/RFC8994, May 2021,
+              <https://www.rfc-editor.org/rfc/rfc8994>.
+
    [RFC9031]  Vučinić, M., Ed., Simon, J., Pister, K., and M.
               Richardson, "Constrained Join Protocol (CoJP) for 6TiSCH",
               RFC 9031, DOI 10.17487/RFC9031, May 2021,
@@ -1833,22 +1899,18 @@ Appendix A.  Stateless Join Proxy JPY Message Examples
    Content (C) field of the JPY message, is not shown in detail but
    abbreviated.
 
+
+
+Richardson, et al.       Expires 2 January 2026                [Page 34]
+
+Internet-Draft                 Join Proxy                      July 2025
+
+
    First, assume that a Pledge creates a CoAP request to a Join Proxy
    that it has just discovered and selected for performing [cBRSKI]
    onboarding.
 
    This request may be a Pledge Voucher Request (PVR) as follows:
-
-
-
-
-
-
-
-Richardson, et al.        Expires 27 July 2025                 [Page 33]
-
-Internet-Draft                 Join Proxy                   January 2025
-
 
    POST coaps://[fe80::1234:5678]:45965/.well-known/brski/rv
      Content-Format: 836
@@ -1892,19 +1954,18 @@ Internet-Draft                 Join Proxy                   January 2025
          16FEFD0000000000000000002F ...
          <further bytes of DTLS 1.2 Hello Verify Request>
 
+
+
+
+Richardson, et al.       Expires 2 January 2026                [Page 35]
+
+Internet-Draft                 Join Proxy                      July 2025
+
+
    The same JPY message in CBOR diagnostic notation is:
 
        [ h'd01914bcc376a88ffecc50ca6017b0c1' ,
          h'16fefd0000000000000000002f' ... '66c1' ]
-
-
-
-
-
-Richardson, et al.        Expires 27 July 2025                 [Page 34]
-
-Internet-Draft                 Join Proxy                   January 2025
-
 
 Authors' Addresses
 
@@ -1952,9 +2013,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-Richardson, et al.        Expires 27 July 2025                 [Page 35]
+Richardson, et al.       Expires 2 January 2026                [Page 36]
