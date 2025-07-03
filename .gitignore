@@ -1,0 +1,10 @@
+# id-template build system stored here - created by 'make'
+lib/
+.refcache/
+
+# draft build results not kept in repo
+draft-ietf-anima-constrained-join-proxy.html
+draft-ietf-anima-constrained-join-proxy.xml
+
+# IDEs
+.idea/

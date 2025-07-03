@@ -5,16 +5,16 @@
 anima                                                      M. Richardson
 Internet-Draft                                  Sandelman Software Works
 Intended status: Standards Track                         P. van der Stok
-Expires: 2 January 2026                           vanderstok consultancy
+Expires: 4 January 2026                           vanderstok consultancy
                                                            P. Kampanakis
                                                            Cisco Systems
                                                                  E. Dijk
                                                        IoTconsultancy.nl
-                                                             1 July 2025
+                                                             3 July 2025
 
 
       Join Proxy for Bootstrapping of Constrained Network Elements
-               draft-ietf-anima-constrained-join-proxy-16
+             draft-ietf-anima-constrained-join-proxy-latest
 
 Abstract
 
@@ -50,14 +50,6 @@ About This Document
    https://mailarchive.ietf.org/arch/browse/anima/.  Subscribe at
    https://www.ietf.org/mailman/listinfo/anima/.
 
-
-
-
-Richardson, et al.       Expires 2 January 2026                 [Page 1]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    Source for this draft and an issue tracker can be found at
    https://github.com/anima-wg/constrained-join-proxy.
 
@@ -76,7 +68,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 2 January 2026.
+   This Internet-Draft will expire on 4 January 2026.
 
 Copyright Notice
 
@@ -94,53 +86,44 @@ Copyright Notice
 
 Table of Contents
 
-   1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
-   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   5
-   3.  Join Proxy Problem Statement and Solution . . . . . . . . . .   6
-     3.1.  Problem Statement . . . . . . . . . . . . . . . . . . . .   6
-     3.2.  Solution  . . . . . . . . . . . . . . . . . . . . . . . .   7
-     3.3.  Forming 6LoWPAN Mesh Networks with cBRSKI . . . . . . . .   8
-   4.  Join Proxy Specification  . . . . . . . . . . . . . . . . . .   9
-     4.1.  Mode Implementation and Configuration Requirements  . . .   9
-     4.2.  Notation  . . . . . . . . . . . . . . . . . . . . . . . .  10
-     4.3.  Stateful Join Proxy . . . . . . . . . . . . . . . . . . .  11
-     4.4.  Stateless Join Proxy  . . . . . . . . . . . . . . . . . .  13
-     4.5.  JPY Protocol and Messages . . . . . . . . . . . . . . . .  15
-
-
-
-Richardson, et al.       Expires 2 January 2026                 [Page 2]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
-       4.5.1.  JPY Message Structure . . . . . . . . . . . . . . . .  16
-       4.5.2.  JPY Message Port Usage  . . . . . . . . . . . . . . .  17
-       4.5.3.  JPY Message Overhead and MTU Size . . . . . . . . . .  17
-       4.5.4.  JPY Message Security  . . . . . . . . . . . . . . . .  17
-       4.5.5.  Example Format for JPY Header Data  . . . . . . . . .  18
-       4.5.6.  Processing by Registrar . . . . . . . . . . . . . . .  19
-   5.  Discovery . . . . . . . . . . . . . . . . . . . . . . . . . .  20
-     5.1.  Join Proxy Discovers Registrar  . . . . . . . . . . . . .  20
-       5.1.1.  Stateless Case  . . . . . . . . . . . . . . . . . . .  20
-       5.1.2.  Stateful Case . . . . . . . . . . . . . . . . . . . .  21
-       5.1.3.  Examples  . . . . . . . . . . . . . . . . . . . . . .  22
-     5.2.  Pledge Discovers Join Proxy . . . . . . . . . . . . . . .  22
-   6.  Comparison of Stateless and Stateful Modes  . . . . . . . . .  23
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  24
-   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  26
-     8.1.  Resource Type Attributes Registry . . . . . . . . . . . .  26
-     8.2.  coaps+jpy Scheme Registration . . . . . . . . . . . . . .  26
-     8.3.  Service Name and Transport Protocol Port Number
-           Registry  . . . . . . . . . . . . . . . . . . . . . . . .  27
-   9.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  28
-   10. Contributors  . . . . . . . . . . . . . . . . . . . . . . . .  28
-   11. Changelog . . . . . . . . . . . . . . . . . . . . . . . . . .  28
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  30
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  30
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  32
-   Appendix A.  Stateless Join Proxy JPY Message Examples  . . . . .  34
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  36
+   1.  Introduction
+   2.  Terminology
+   3.  Join Proxy Problem Statement and Solution
+     3.1.  Problem Statement
+     3.2.  Solution
+     3.3.  Forming 6LoWPAN Mesh Networks with cBRSKI
+   4.  Join Proxy Specification
+     4.1.  Mode Implementation and Configuration Requirements
+     4.2.  Notation
+     4.3.  Stateful Join Proxy
+     4.4.  Stateless Join Proxy
+     4.5.  JPY Protocol and Messages
+       4.5.1.  JPY Message Structure
+       4.5.2.  JPY Message Port Usage
+       4.5.3.  JPY Message Overhead and MTU Size
+       4.5.4.  JPY Message Security
+       4.5.5.  Example Format for JPY Header Data
+       4.5.6.  Processing by Registrar
+   5.  Discovery
+     5.1.  Join Proxy Discovers Registrar
+       5.1.1.  Stateless Case
+       5.1.2.  Stateful Case
+       5.1.3.  Examples
+     5.2.  Pledge Discovers Join Proxy
+   6.  Comparison of Stateless and Stateful Modes
+   7.  Security Considerations
+   8.  IANA Considerations
+     8.1.  Resource Type Attributes Registry
+     8.2.  coaps+jpy Scheme Registration
+     8.3.  Service Name and Transport Protocol Port Number Registry
+   9.  Acknowledgements
+   10. Contributors
+   11. Changelog
+   12. References
+     12.1.  Normative References
+     12.2.  Informative References
+   Appendix A.  Stateless Join Proxy JPY Message Examples
+   Authors' Addresses
 
 1.  Introduction
 
@@ -161,15 +144,6 @@ Internet-Draft                 Join Proxy                      July 2025
    secured by Datagram Transport Layer Security (DTLS) [RFC9147] to
    implement the BRSKI functions defined by [RFC8995].
 
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                 [Page 3]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    In this document, cBRSKI is extended such that a cBRSKI Pledge can
    connect to a Registrar via a constrained Join Proxy.  In particular,
    this solution is intended to support IPv6 over Low-Power Wireless
@@ -188,15 +162,14 @@ Internet-Draft                 Join Proxy                      July 2025
    receives the necessary network configuration parameters.
 
    Before it can receive these parameters, the Pledge needs to be
-   authenticated and authorized to onboard the
-   network.  This is done in cBRSKI through an end-to-end encrypted DTLS
-   session with a domain Registrar.
+   authenticated and authorized to onboard the network.  This is done in
+   cBRSKI through an end-to-end encrypted DTLS session with a domain
+   Registrar.
 
    When this Registrar is not a direct (link-local) neighbor of the
    Pledge but several hops away, the Pledge needs to discover a link-
    local neighbor that is operating as a constrained Join Proxy, which
-   helps
-   forward the DTLS messages of the session between Pledge and
+   helps forward the DTLS messages of the session between Pledge and
    Registrar.
 
    Because the Join Proxy is a regular network node that has already
@@ -216,15 +189,6 @@ Internet-Draft                 Join Proxy                      July 2025
 
    1.  A stateful Join Proxy that locally stores UDP connection state
        per Pledge.
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                 [Page 4]
-
-Internet-Draft                 Join Proxy                      July 2025
-
 
    2.  A stateless Join Proxy that does not locally store UDP connection
        state, but stores it in the header of a message that is exchanged
@@ -274,14 +238,6 @@ Internet-Draft                 Join Proxy                      July 2025
 
    The term "endpoint" is used as defined in [RFC7252].
 
-
-
-
-Richardson, et al.       Expires 2 January 2026                 [Page 5]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    The terms "6LoWPAN Router" (6LR), "6LoWPAN Border Router" (6LBR) and
    "6LoWPAN link" are used as defined in [RFC6775].
 
@@ -293,10 +249,10 @@ Internet-Draft                 Join Proxy                      July 2025
 3.1.  Problem Statement
 
    As depicted in Figure 1, the Pledge (P), in a network such as a
-   6LoWPAN [RFC4944] mesh network
-   can be more than one hop away from the Registrar (R) and it is not
-   yet authenticated to the network.  Also, the Pledge does not possess
-   any key material to encrypt or decrypt link-layer data transmissions.
+   6LoWPAN [RFC4944] mesh network can be more than one hop away from the
+   Registrar (R) and it is not yet authenticated to the network.  Also,
+   the Pledge does not possess any key material to encrypt or decrypt
+   link-layer data transmissions.
 
    In this situation, the Pledge can only communicate one-hop to its
    neighbors, such as the constrained Join Proxy (J), using link-local
@@ -325,19 +281,6 @@ Internet-Draft                 Join Proxy                      July 2025
    Furthermore, the Pledge is not be able to discover the IP address of
    the Registrar because it is not yet allowed onto the network.
 
-
-
-
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                 [Page 6]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
 3.2.  Solution
 
    To overcome these problems, the constrained Join Proxy is introduced.
@@ -359,8 +302,8 @@ Internet-Draft                 Join Proxy                      July 2025
    here is unaware of these payloads.  The Join Proxy solution can
    therefore be easily extended to work for other UDP-based protocols,
    as long as these protocols are agnostic to (or can be made to work
-   with) the change of the IP and UDP headers
-   performed by the Join Proxy.
+   with) the change of the IP and UDP headers performed by the Join
+   Proxy.
 
    In summary, the following steps are typically taken for the
    onboarding process of a Pledge:
@@ -384,15 +327,6 @@ Internet-Draft                 Join Proxy                      July 2025
 
    7.  Step 3 to 6 repeat as needed, for multiple messages, to complete
        the onboarding protocol.
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                 [Page 7]
-
-Internet-Draft                 Join Proxy                      July 2025
-
 
    8.  The Pledge uses its obtained domain identity/credentials to join
        the domain network.
@@ -430,25 +364,15 @@ Internet-Draft                 Join Proxy                      July 2025
    Once the 6LBR is enabled, it requires an active Registrar reachable
    via IP communication to onboard any Pledges.  Once cBRSKI onboarding
    is enabled (either administratively, or automatically) on the 6BLR,
-   it can support
-   the onboarding of 6LoWPAN-enabled Pledges, via its 6LoWPAN network
-   interface.  This 6LBR may host the cBRSKI Registrar itself, but the
-   Registrar may also be hosted elsewhere on the installation network.
+   it can support the onboarding of 6LoWPAN-enabled Pledges, via its
+   6LoWPAN network interface.  This 6LBR may host the cBRSKI Registrar
+   itself, but the Registrar may also be hosted elsewhere on the
+   installation network.
 
    At the time the Registrar and the 6LBR are enabled, there may be zero
    Pledges, or there may be already one or more installed and powered
    Pledges waiting - periodically attempting to discover a Join Proxy
    over their 6LoWPAN network interface.
-
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                 [Page 8]
-
-Internet-Draft                 Join Proxy                      July 2025
-
 
    A Registrar hosted on the 6LBR will, per [cBRSKI], make itself
    discoverable as a Join Proxy so that Pledges can use it for cBRSKI
@@ -497,51 +421,49 @@ Internet-Draft                 Join Proxy                      July 2025
    For a Join Proxy implementation on a node, there are three possible
    scenarios:
 
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                 [Page 9]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    1.  Both stateful and stateless modes are implemented.  The Join
-       Proxy can switch between these modes, depending on configuration.
+       Proxy can switch between these modes, depending on configuration
+       and/or auto-discovery of Registrar(s) for each option.
 
    2.  Only stateful mode is implemented.
 
    3.  Only stateless mode is implemented.
 
-   An application profile or ecosystem standard that integrates the Join
-   Proxy functionality as defined in this document MAY define any of
-   these three options.  In particular, option 2 or 3 has the advantage
-   of reducing code size and testing efforts, when all devices under the
-   application profile/standard adhere to the same choice.
+   Option 2 and 3 have the advantage of reducing code size, testing
+   efforts and deployment complexity, but requires all devices in the
+   deployment to standardize on the same choice.
 
-   A generic Join Proxy that is not adhering to such an application
-   profile/standard MUST implement both modes.
+   A standard for a network-wide application or ecosystem profile, that
+   integrates the Join Proxy functionality as defined in this document,
+   MAY specify the use of any of these three options.  It is expected
+   that most deployments of constrained Join Proxies will be in the
+   context of such standards and that these standards will be able to
+   pick either option 2 or 3 based on considerations such as those in
+   Section 6.
 
-   A cBRSKI Registrar by design necessarily implements the stateful
-   mode, and it SHOULD implement support for Join Proxies operating in
-   the stateless mode.  The exception case here is a cBRSKI Registrar
-   that is implemented for a particular dedicated application profile/
-   standard which specifies only the stateful mode.
+   A Join Proxy that is not adhering to such an additional standard MUST
+   implement both modes (option 1).  A Join Proxy or Registrar not
+   adhering to such additional standards is called "generic".
 
-   If a Join Proxy implements both modes, then it MUST use only the mode
-   that is currently configured for the network (by a method or profile
-   outside the scope of this document) or the mode individually
-   configured for the device.  If the mode is not configured, the device
-   MUST NOT operate as a Join Proxy.
+   If a Join Proxy implements both modes but does not implement methods
+   to discover available Registrars (for either method), then it MUST
+   use only the mode that is currently configured for the network, or
+   configured individually for the device.  The method or profile that
+   defines such a configuration is outside the scope of this document.
+   If the mode is not configured and also can not be discovered
+   automatically, then the device MUST NOT operate as a Join Proxy.
 
    For a Join Proxy to be operational, the node on which it is running
-   has to be able to talk to a Registrar (exchange UDP messages with
-   it).  Establishing this connectivity can happen fully automatically
-   if the Join Proxy node first enrolls itself as a Pledge, and then
-   discovers the Registrar IP address/port and if applicable its desired
-   mode of operation (stateful or stateless), through a discovery
-   mechanism (see Section 5).  Other methods, such as provisioning the
-   Join Proxy are out of scope for this document but equally feasible.
+   has to be able to communicate with a Registrar (that is, exchange UDP
+   messages with it).  Establishing this connectivity can happen fully
+   automatically if the Join Proxy node first enrolls itself as a
+   Pledge, and then discovers the Registrar IP address/port, and if
+   applicable its desired mode of operation (stateful or stateless),
+   through a discovery mechanism (see Section 5).  Other methods, such
+   as provisioning the Join Proxy are out of scope for this document but
+   equally feasible.  Such methods would typically be defined by a
+   standard or ecosystem profile that integrates Join Proxy
+   functionality.
 
    Independent of the mode of the Join Proxy, the Pledge first discovers
    (see Section 5.2) and selects the most appropriate Join Proxy.  From
@@ -550,17 +472,21 @@ Internet-Draft                 Join Proxy                      July 2025
    the onboarding protocol and are not in scope of this document.  For
    cBRSKI, this is defined in Section 10 of [cBRSKI].
 
+   A generic cBRSKI Registrar by design necessarily implements the
+   stateful mode, and it SHOULD implement support for Join Proxies
+   operating in the stateless mode.  Support for only the stateless mode
+   is considered not to bring significant simplifications to a generic
+   cBRSKI Registrar implementation.  However, the generic cBRSKI
+   Registrar MAY offer a configuration option to disable either the
+   stateful or stateless mode, which can be useful in a particular
+   deployment.  A cBRSKI Registrar that is only implemented to support
+   an aforementioned network-wide application or ecosystem profile MAY
+   implement either stateful and/or stateless mode.
+
 4.2.  Notation
 
    The following notation is used in this section in both text and
    figures:
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 10]
-
-Internet-Draft                 Join Proxy                      July 2025
-
 
    *  The colon (:) separates IP address and port number (<IP>:<port>).
 
@@ -608,16 +534,6 @@ Internet-Draft                 Join Proxy                      July 2025
      Local UDP state              Routable UDP state     Time state
     (IP_P:p_P, IP_Jl:p_Jl) <===> (IP_Jr:p_Jr, IP_R:p_R)  (Exp-timer)
 
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 11]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    In case a Join Proxy has multiple network interfaces that accept
    Pledges, an interface identifier needs to be added on the leftmost
    tuple component.  If a Join Proxy has multiple network interfaces to
@@ -660,19 +576,6 @@ Internet-Draft                 Join Proxy                      July 2025
 
        Figure 2: Example of the message flow of a DTLS session via a
                             stateful Join Proxy.
-
-
-
-
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 12]
-
-Internet-Draft                 Join Proxy                      July 2025
-
 
    The Join Proxy MUST allocate a unique IP_Jr:p_Jr for every unique
    Pledge that it serves.  This is typically done by selecting a unique
@@ -719,16 +622,6 @@ Internet-Draft                 Join Proxy                      July 2025
    machinery to build, maintain and remove this mapping state.  It also
    removes the need to protect this mapping state against DoS attacks
    and may also reduce memory and CPU requirements on the proxy.
-
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 13]
-
-Internet-Draft                 Join Proxy                      July 2025
-
 
    Stateless Join Proxy operations work by introducing a new JPY message
    used in communication between Proxy and Registrar.  This message will
@@ -779,13 +672,6 @@ Internet-Draft                 Join Proxy                      July 2025
    of the packet for that Pledge's UDP connection.  Packets with
    different header H belong to different Pledge's UDP connections.
 
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 14]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    In the stateless mode, the Registrar MUST offer the JPY protocol on a
    discoverable UDP port (p_Rj).  There is no default port number
    available for the JPY protocol, unlike in the stateful mode where the
@@ -835,13 +721,6 @@ Internet-Draft                 Join Proxy                      July 2025
    directly over the UDP layer.  So, there is no CoAP or DTLS layer used
    between the JPY messages and the UDP layer.
 
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 15]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    A Registrar that supports the JPY protocol also uses JPY message to
    return relayed UDP messages to the stateless Join Proxy, including
    the state information that it needs.
@@ -889,15 +768,6 @@ Internet-Draft                 Join Proxy                      July 2025
 
    Detailed examples of a complete JPY message are shown in Appendix A.
 
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 16]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
 4.5.2.  JPY Message Port Usage
 
    For the JPY messages sent to the Registrar, the Join Proxy SHOULD use
@@ -918,7 +788,7 @@ Internet-Draft                 Join Proxy                      July 2025
    Therefore, a protocol using the stateless Join Proxy MUST use (UDP)
    payloads that are bounded in size, such that the maximum payload
    length used minus the maximum overhead size (38 bytes) stays below
-   the MTU size of the network.  cBRSKI is designed to work even for the
+   the MTU size of the network. cBRSKI is designed to work even for the
    minimum IPv6 MTU of 1280 bytes, by configuring the DTLS maximum
    fragment length and using CoAP blockwise transfer for large resource
    transfers [cBRSKI].
@@ -927,8 +797,8 @@ Internet-Draft                 Join Proxy                      July 2025
    [RFC9148] protocols, the CoAP blockwise options [RFC7959] are often
    used to split large payloads into multiple data blocks.  The
    Registrar and the Pledge MUST select a block size that would allow
-   the addition of the JPY message structure
-   without violating MTU sizes.
+   the addition of the JPY message structure without violating MTU
+   sizes.
 
 4.5.4.  JPY Message Security
 
@@ -946,14 +816,6 @@ Internet-Draft                 Join Proxy                      July 2025
    Registrar itself.  Likewise, in many Wi-Fi mesh networks and 6LoWPAN
    mesh networks, link-layer security is applied and claimed to achieve
    similar levels of secure and trusted communication within the scope
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 17]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    of the mesh.
 
    For stateless Join Proxies that only operate in such secured network
@@ -1002,14 +864,6 @@ Internet-Draft                 Join Proxy                      July 2025
    may for example use a CBOR array encoding, formally defined and
    constrained using CDDL [RFC8610].
 
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 18]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    The data structure stores the Pledge's UDP source port (srcport), the
    IID bits of the Pledge's originating IPv6 link-Local address (iid),
    the IPv4/IPv6 family (as a uint8 value 0 or 1) and an interface index
@@ -1032,13 +886,12 @@ Internet-Draft                 Join Proxy                      July 2025
    data as a CBOR byte string of length 16.
 
    Note: when IPv6 is used only the lower 64-bits of the source IPv6
-   address need to be recorded,
-   because they must be by design all IPv6 link-Local addresses, so the
-   upper 64-bits are just "fe80::" and can be elided.  For IPv4, a link-
-   Local IPv4 address [RFC3927] would be used, and it would always fit
-   into the 64 bits of the iid field.  On link types where the Interface
-   IDentifier (IID) is not 64-bits, a different field size for iid will
-   be necessary.
+   address need to be recorded, because they must be by design all IPv6
+   link-Local addresses, so the upper 64-bits are just "fe80::" and can
+   be elided.  For IPv4, a link-Local IPv4 address [RFC3927] would be
+   used, and it would always fit into the 64 bits of the iid field.  On
+   link types where the Interface IDentifier (IID) is not 64-bits, a
+   different field size for iid will be necessary.
 
    Replay protection is not included in this example security solution,
    because the regular transport layers of cBRSKI and BRSKI,
@@ -1058,14 +911,6 @@ Internet-Draft                 Join Proxy                      July 2025
    The data in the jpy_content field must be provided as input to a DTLS
    library [RFC9147], which along with the 5-tuple defined in
    Section 4.4 provides enough information for the Registrar to pick an
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 19]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    appropriate (active) client context.  Note that the same UDP socket
    will need to be used for multiple DTLS flows, which is atypical for
    how DTLS usually uses sockets.  The jpy_context field can be used to
@@ -1114,14 +959,6 @@ Internet-Draft                 Join Proxy                      July 2025
    Registrar on which the JPY protocol handler is hosted.  This exchange
    is shown below:
 
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 20]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
      REQ: GET coap://[ff05::fd]/.well-known/core?rt=brski.rjp
 
      RES: 2.05 Content
@@ -1151,10 +988,9 @@ Internet-Draft                 Join Proxy                      July 2025
 5.1.2.  Stateful Case
 
    The stateful Join Proxy can discover the Registrar's cBRSKI resource
-   set by sending a multicast CoAP GET
-   discovery query to the "/.well-known/core" resource including a
-   resource type (rt) query parameter "brski".  The latter CoAP resource
-   type is defined in [cBRSKI].
+   set by sending a multicast CoAP GET discovery query to the "/.well-
+   known/core" resource including a resource type (rt) query parameter
+   "brski".  The latter CoAP resource type is defined in [cBRSKI].
 
    Upon success, the return payload will contain the URI path and port
    of the Registrar on which the cBRSKI resources are hosted.  This
@@ -1170,14 +1006,6 @@ Internet-Draft                 Join Proxy                      July 2025
    The port field and its preceding colon are optionally included: if
    elided, the default CoAPS port 5684 is implied.  The uri_path field
    may be a single CoAP URI path resource label, or it may be a
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 21]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    hierarchy of resources.  For efficiency, it is RECOMMENDED for the
    Registrar to configure the URI path as short as possible, for example
    b.
@@ -1226,14 +1054,6 @@ Internet-Draft                 Join Proxy                      July 2025
    method.  If there is another method configured, by some means outside
    of the scope of this document, the default method MAY be deactivated.
 
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 22]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    The join-port of the Join Proxy is discovered by sending a multicast
    GET request to "/.well-known/core" including a resource type (rt)
    parameter with the value "brski.jp".  This value is defined in
@@ -1265,30 +1085,36 @@ Internet-Draft                 Join Proxy                      July 2025
    operators and/or profile-specifiers to make a choice between the two
    modes based on the available device resources and network bandwidth.
 
+   Stateful mode introduces the complexity of maintaining per-connection
+   state, which can increase processing and memory requirements on the
+   proxy compared to the stateless mode under ideal conditions.
+   Additionally, it opens up a wider range of potential implementation
+   challenges in the presence of misbehaving or malicious Pledges.  For
+   example: How can state be effectively limited?  How can malicious
+   Pledges be detected—or at least prevented from negatively impacting
+   non-malicious nodes?  And so on.
 
+   If the proxy is deployed on nodes that support frequent and reliable
+   software updates, then tailoring software enhancements based on the
+   observed attack profile(s) in the deployment scenario is an effective
+   way to improve and harden the implementation.  However, many
+   constrained devices either lack this software agility or
+   intentionally avoid it.  In such environments, stateless mode becomes
+   advantageous, as it offloads most of the complex hardening
+   responsibilities to the Registrar, allowing the proxy implementation
+   to remain as lightweight as possible.  Ultimately, a stateless proxy
+   requires no more protective mechanisms than a basic packet-forwarding
+   router.
 
+   The main concern for a stateless Join Proxy is the risk of forwarding
+   an excessive number of packets to the Registrar, particularly over
+   low-bandwidth connections such as 6LoWPAN links.  Rate-limiting
+   forwarded packets is the primary defense mechanism in such cases.
+   All other Pledge-specific protections can be delegated to the
+   Registrar, which is expected to have the necessary software agility
+   to handle these.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 23]
-
-Internet-Draft                 Join Proxy                      July 2025
-
+   The following table summarizes more comparison details.
 
    +=============+=============================+=======================+
    | Properties  | Stateful mode               | Stateless mode        |
@@ -1337,15 +1163,6 @@ Internet-Draft                 Join Proxy                      July 2025
    The subsequent communication of a Pledge with a Registrar that flows
    via the Join Proxy is end-to-end protected by DTLS.
 
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 24]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    A malicious Join Proxy has a number of relay/routing options for
    messages sent by a Pledge:
 
@@ -1392,15 +1209,6 @@ Internet-Draft                 Join Proxy                      July 2025
 
    A malicious node has a number of options to craft a JPY message and
    send it to a stateless Join Proxy:
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 25]
-
-Internet-Draft                 Join Proxy                      July 2025
-
 
    *  It can construct an invalid JPY message.  In that case, a Join
       Proxy might accept the message and send the Content field data to
@@ -1451,13 +1259,6 @@ Internet-Draft                 Join Proxy                      July 2025
    This specification registers a new URI scheme per [RFC7595] under the
    IANA "Uniform Resource Identifier (URI) Schemes" registry.
 
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 26]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    Scheme name: coaps+jpy
    Status:      permanent
    Applications/protocols that use this scheme name:
@@ -1482,37 +1283,20 @@ Internet-Draft                 Join Proxy                      July 2025
    *  Security considerations: all of the security considerations of the
       "coaps" scheme apply.  Users of this scheme should be aware that
       as part of the intended use, a UDP message that was formed using
-      the "coaps" scheme is modified by a Join Proxy as defined by [This
+      the "coaps" scheme is embedded by a Join Proxy as defined by [This
       RFC] into a UDP message conforming to the "coaps+jpy" scheme
       without the Join Proxy being able to parse/decode which CoAPS URI
-      was originally used by the sender.  Depending on the CoAP Options
-      used in the original CoAPS message, this operation may modify
-      elements of the original CoAPS URI (as will be reconstructed by
-      the receiving coaps+jpy server) in a way that is unknown to the
-      Join Proxy.
+      was originally used by the sender, since that information is
+      stored as DTLS-protected data.  The receiving server can transform
+      the "coaps+jpy" scheme back to the original "coaps" scheme by
+      decoding the JPY message payload.  However, any CoAP-related
+      information not stored in the DTLS-protected data (such as in the
+      UDP/IP headers) may be changed by these scheme transforms.
 
 8.3.  Service Name and Transport Protocol Port Number Registry
 
    This specification registers two service names under the IANA
    "Service Name and Transport Protocol Port Number" registry.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 27]
-
-Internet-Draft                 Join Proxy                      July 2025
-
 
    Service Name: brski-jp
    Transport Protocol(s): udp
@@ -1527,8 +1311,8 @@ Internet-Draft                 Join Proxy                      July 2025
    Assignee:  IESG <iesg@ietf.org>
    Contact:  IESG <iesg@ietf.org>
    Description: Bootstrapping Remote Secure Key Infrastructure
-                Registrar join-port used by stateless constrained
-                Join Proxy
+                Registrar join-port, supporting the coaps+jpy
+                scheme, used by stateless constrained Join Proxy
    Reference:   [This RFC]
 
 9.  Acknowledgements
@@ -1551,24 +1335,6 @@ Internet-Draft                 Join Proxy                      July 2025
 11.  Changelog
 
    -15 to -16
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 28]
-
-Internet-Draft                 Join Proxy                      July 2025
-
 
       * Security considerations text reviewed and expanded with more
         attack types.
@@ -1619,13 +1385,6 @@ Internet-Draft                 Join Proxy                      July 2025
 
        * typos
 
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 29]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    -06 to -07
 
        * AD review changes
@@ -1675,13 +1434,6 @@ Internet-Draft                 Join Proxy                      July 2025
 
 12.1.  Normative References
 
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 30]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    [cBRSKI]   Richardson, M., Van der Stok, P., Kampanakis, P., and E.
               Dijk, "Constrained Bootstrapping Remote Secure Key
               Infrastructure (cBRSKI)", Work in Progress, Internet-
@@ -1729,14 +1481,6 @@ Internet-Draft                 Join Proxy                      July 2025
               Representation (CBOR)", STD 94, RFC 8949,
               DOI 10.17487/RFC8949, December 2020,
               <https://www.rfc-editor.org/rfc/rfc8949>.
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 31]
-
-Internet-Draft                 Join Proxy                      July 2025
-
 
    [RFC8995]  Pritikin, M., Richardson, M., Eckert, T., Behringer, M.,
               and K. Watsen, "Bootstrapping Remote Secure Key
@@ -1787,13 +1531,6 @@ Internet-Draft                 Join Proxy                      July 2025
               CBC-MAC (CCM)", RFC 3610, DOI 10.17487/RFC3610, September
               2003, <https://www.rfc-editor.org/rfc/rfc3610>.
 
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 32]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    [RFC3927]  Cheshire, S., Aboba, B., and E. Guttman, "Dynamic
               Configuration of IPv4 Link-Local Addresses", RFC 3927,
               DOI 10.17487/RFC3927, May 2005,
@@ -1839,16 +1576,6 @@ Internet-Draft                 Join Proxy                      July 2025
               Constrained-Node Networks", RFC 7228,
               DOI 10.17487/RFC7228, May 2014,
               <https://www.rfc-editor.org/rfc/rfc7228>.
-
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 33]
-
-Internet-Draft                 Join Proxy                      July 2025
-
 
    [RFC7252]  Shelby, Z., Hartke, K., and C. Bormann, "The Constrained
               Application Protocol (CoAP)", RFC 7252,
@@ -1899,13 +1626,6 @@ Appendix A.  Stateless Join Proxy JPY Message Examples
    Content (C) field of the JPY message, is not shown in detail but
    abbreviated.
 
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 34]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    First, assume that a Pledge creates a CoAP request to a Join Proxy
    that it has just discovered and selected for performing [cBRSKI]
    onboarding.
@@ -1954,14 +1674,6 @@ Internet-Draft                 Join Proxy                      July 2025
          16FEFD0000000000000000002F ...
          <further bytes of DTLS 1.2 Hello Verify Request>
 
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 35]
-
-Internet-Draft                 Join Proxy                      July 2025
-
-
    The same JPY message in CBOR diagnostic notation is:
 
        [ h'd01914bcc376a88ffecc50ca6017b0c1' ,
@@ -1987,30 +1699,3 @@ Authors' Addresses
    Esko Dijk
    IoTconsultancy.nl
    Email: esko.dijk@iotconsultancy.nl
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Richardson, et al.       Expires 2 January 2026                [Page 36]
