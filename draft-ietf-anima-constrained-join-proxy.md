@@ -996,56 +996,78 @@ The subsequent communication of a Pledge with a Registrar that flows via the Joi
 
 A malicious Join Proxy has a number of relay/routing options for messages sent by a Pledge:
 
-   * It relays messages to a malicious Registrar. This is the same case as the presence of a "malicious Registrar"
-     discussed in {{RFC8995}}.
+   * It relays messages to a malicious Registrar.
+     This is the same case as the presence of a "malicious Registrar" discussed in {{RFC8995}}.
 
    * It does not relay messages, or does not return the responses from the Registrar to the Pledge.
-     This is equivalent to the case of a non-responding Registrar discussed in {{RFC8995}}.
+     This is equivalent to the case of a non-responding Registrar discussed in {{Section 4.1 of RFC8995}}
+     and {{Section 5.1 of RFC8995}}.
 
-   * It uses the returned responses of the Registrar for itself. This is very unlikely due to the DTLS security.
+   * It uses the returned responses of the Registrar for its own (attack) purposes.
+     This is very unlikely due to the DTLS security.
 
-   * It uses the request from the Pledge to take the Pledge certificate and impersonate the Pledge. This is very
-     unlikely because that requires it to acquire the private key of the Pledge.
+   * It uses the request from the Pledge to take the Pledge certificate and impersonate the Pledge. 
+     This is very unlikely because that requires it to acquire the private key of the Pledge, for an attack to be
+     effective.
 
 A malicious Pledge may also craft and send messages to a Join Proxy:
 
    * It can construct an invalid DTLS or UDP message and send it to the open join-port of the Join Proxy.
     A Join Proxy will accept the message and relay to the Registrar without checking the payload.
     The Registrar will now parse the invalid message as DTLS protocol payload.
-    Due to the security properties of DTLS, it is highly unlikely that this malicious payload will lead to node
-    acceptance or to Registrar malfunctioning.
+    Due to the security properties of DTLS, it is highly unlikely that this malicious payload will lead to message
+    acceptance or to the Registrar's malfunctioning.
     The Registrar of course MUST be prepared to receive invalid and/or non-DTLS payloads in this way.
     If the Pledge uses large UDP payloads, the attacker is able to misuse network resources.
     This way, a DoS attack could be performed by using multiple malicious Pledges, or using a single device posing as
     multiple Pledges.
 
-For a malicious node that is a neighbor of a Join Proxy, or is a router on the path to the Registrar:
+For a malicious node that is either a neighbor of a Join Proxy, or is a router on the network path to the Registrar,
+and the node is part of the trusted network:
 
-   * It may sniff the messages routed by the Join Proxy. It is very unlikely that the malicious node can decrypt
-    the DTLS payload.
-    The malicious node may be able to read the inner data structure in the Header field, if that is not encrypted.
+   * It may sniff the messages routed by the Join Proxy.
+    It is very unlikely that the malicious node can decrypt the DTLS payload.
+    The malicious node may be able to read the inner data structure in the JPY Header field, if that is not encrypted.
     This does expose some information about the Pledge attempting to join, but this can be mitigated by the Pledge
     using a new (random) link-local address for each onboarding attempt.
 
-A malicious node has a number of options to craft a JPY message and send it to a stateless Join Proxy:
+In case the JPY Header is not encrypted, a malicious node has a number of options to craft a JPY message and
+send it to a stateless Join Proxy:
 
-   * It can construct an invalid JPY message. In that case, a Join Proxy might accept the message and send the Content
-     field data to a Pledge as a UDP message. Such a message could disrupt an ongoing DTLS session.
+   * It can craft a JPY message with header fields of its choice based on earlier observed contents of JPY messages
+     sent by a stateless Join Proxy.
+     In that case, the Join Proxy would accept the message and send the Content field data to a Pledge as a UDP message.
+     Such a message could disrupt an ongoing DTLS session.
      It could also allow the attacker to access an unsecured UDP port that a Pledge may have exposed.
      For this reason, a Pledge MUST NOT accept messages on other UDP ports than its port used for onboarding while
      an onboarding attempt is ongoing.
 
-It should be noted here that the JPY message CBOR array and the Header field are not DTLS protected.
+It should be noted here that the JPY message CBOR array and the JPY Header field are not DTLS protected.
 When the communication between stateless Join Proxy and Registrar passes over an unsecure network, an attacker can
 change the CBOR array, and change the Header field if no encryption is used there.
 These concerns are also expressed in {{RFC8974}}.
-It is also pointed out that the encryption by the source is a local matter.
+It is also pointed out here that the encryption by the source of the JPY Header, the Join Proxy, is a local matter.
 Similar to {{RFC8974}}, the use of AES-CCM {{RFC3610}} with a 64-bit tag is recommended, combined with a sequence
 number and a replay window.
 
+A "malicious Registrar" (see {{RFC8995}}) may also be unknowingly selected by a genuine (non-compromised) Join Proxy.
+This may happen when the malicious Registrar either modifies the network's Registrar address configuration or presents
+itself as a Registrar using the discovery method used in the network.
+If the discovery of Registrars is performed in an unsecured manner within the trusted network, it would allow
+the malicious Registrar to present itself as a Registrar candidate.
+CoAP discovery defined in {{discovery}}) is, for example, defined without any transport-layer or application-layer
+security.
+A trusted Join Proxy may therefore relay a Pledge's messages to it.
+
+It is the responsibility of a Pledge to monitor if an onboarding attempt with the selected Join Proxy and selected
+join-port on this Proxy (in case of multiple) is proceeding sufficiently quickly.
+If this is not the case, the Pledge needs to switch to another join-port and/or another Join Proxy to retry its
+onboarding attempt.
+See {{spec-multi}} for specification details on this.
+
 In some installations, layer 2 (link layer) security is provided between all node pairs of a mesh network.
 In such an environment, in case all mesh nodes are trusted, and the Registrar is also located on the mesh network,
-and on-mesh attackers are not considered, then encryption of the Header field as specified in this document is not
+and on-mesh attackers are not considered, then encryption of the JPY Header field as specified in this document is not
 necessary because the layer 2 security already protects it.
 
 
