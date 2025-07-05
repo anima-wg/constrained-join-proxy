@@ -1006,7 +1006,7 @@ A malicious Join Proxy has a number of relay/routing options for messages sent b
    * It uses the returned responses of the Registrar for its own (attack) purposes.
      This is very unlikely due to the DTLS security.
 
-   * It uses the request from the Pledge to take the Pledge certificate and impersonate the Pledge. 
+   * It uses the request from the Pledge to take the Pledge certificate and impersonate the Pledge.
      This is very unlikely because that requires it to acquire the private key of the Pledge, for an attack to be
      effective.
 
