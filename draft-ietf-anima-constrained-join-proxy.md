@@ -1156,6 +1156,21 @@ Their draft text has served as a basis for this document.
 
 
 # Changelog
+-16 to -17
+
+       * Added security consideration that a genuine Join Proxy may
+         relay to a malicious Registrar (#33, #77).
+       * Added solution and specification sections on the use of
+         multiple Registrars (#45, #65, #76).
+       * Added clarification that Registrar address(es) can be
+         configured, or discovered (#76).
+       * Define conditions for implementing only a single Join Proxy
+         mode - stateful or stateless (#69, #73)
+       * Improved JPY Header security by adding integrity protection
+         (#74).
+       * Fixed format definition of example JPY Header (#74).
+       * Editorial updates.
+
 -15 to -16
 
        * Security considerations text reviewed and expanded with more
