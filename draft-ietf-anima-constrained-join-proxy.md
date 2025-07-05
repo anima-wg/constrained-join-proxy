@@ -932,7 +932,7 @@ the fields `join_port1` and `join_port2` would contain distinct decimal port num
 
 The parameter values (`param1` and `param2`) are included for illustrative purposes.
 In a real example, these would contain Link Format parameters specifically defined for the `brski.jp` resource type.
-Such parameters may be defined in future work ({{I-D.ietf-anima-brski-discovery}}.
+Such parameters may be defined in future work ({{I-D.ietf-anima-brski-discovery}}).
 These parameters, if understood by the Pledge, help in selecting the optimal matching onboarding protocol variant
 of cBRSKI.
 If the Pledge does not understand these parameters, it can select any one of the two join-ports for cBRSKI
