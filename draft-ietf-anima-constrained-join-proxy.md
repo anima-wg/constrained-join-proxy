@@ -1150,14 +1150,14 @@ Many thanks for the comments by {{{Bill Atwood}}}, {{{Carsten Bormann}}}, {{{Bri
 {{{Esko Dijk}}}, {{{Toerless Eckert}}}, {{{Russ Housley}}}, {{{Ines Robles}}}, {{{Rich Salz}}},
 {{{Jürgen Schönwälder}}}, {{{Mališa Vučinić}}}, and {{{Rob Wilton}}}.
 
-
-# Contributors
 This document is very much inspired by text published earlier in {{I-D.kumar-dice-dtls-relay}}.
 {{{Sandeep Kumar}}}, {{{Sye loong Keoh}}}, and {{{Oscar Garcia-Morchon}}} are the co-authors of this document.
 Their draft text has served as a basis for this document.
 
 
 # Changelog
+{:numbered="false"}
+
 -16 to -17
 
        * Added security consideration that a genuine Join Proxy may
@@ -1271,7 +1271,7 @@ Their draft text has served as a basis for this document.
 
 --- back
 
-#Stateless Join Proxy JPY Message Examples {#appendix-examples-detailed}
+# Stateless Join Proxy JPY Message Examples {#appendix-examples-detailed}
 
 This appendix shows an example of a JPY message, sent by a stateless Join Proxy to a Registrar, and an example of the
 return JPY message sent by the Registrar.
