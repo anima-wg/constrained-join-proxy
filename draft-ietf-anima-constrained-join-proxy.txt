@@ -21,21 +21,20 @@ Abstract
    This document extends the constrained Bootstrapping Remote Secure Key
    Infrastructures (cBRSKI) onboarding protocol by adding a new network
    function, the constrained Join Proxy.  This function can be
-   implemented by a constrained node [RFC7228].  The goal of the Join
-   Proxy is to help new constrained nodes ("Pledges") securely onboard
-   into a new IP network using the cBRSKI protocol.  It acts as a
-   circuit proxy for User Datagram Protocol (UDP) packets that carry the
-   onboarding messages.  The solution is extendible to support other
-   UDP-based onboarding protocols as well.  The Join Proxy functionality
-   is designed for use in constrained networks [RFC7228], including IPv6
-   over Low-Power Wireless Personal Area Networks (6LoWPAN) [RFC4944]
-   based mesh networks in which the onboarding authority server
-   ("Registrar") may be multiple IP hops away from a Pledge.  Despite
-   this distance, the Pledge only needs to use link-local UDP
-   communication to complete cBRSKI onboarding.  Two modes of Join Proxy
-   operation are defined, stateless and stateful, to allow implementers
-   to make different trade-offs regarding resource usage, implementation
-   complexity and security.
+   implemented on a constrained node.  The goal of the Join Proxy is to
+   help new constrained nodes ("Pledges") securely onboard into a new IP
+   network using the cBRSKI protocol.  It acts as a circuit proxy for
+   User Datagram Protocol (UDP) packets that carry the onboarding
+   messages.  The solution is extensible to support other UDP-based
+   onboarding protocols as well.  The Join Proxy functionality is
+   designed for use in constrained networks, including IPv6 over Low-
+   Power Wireless Personal Area Networks (6LoWPAN) based networks in
+   which the onboarding authority server ("Registrar") may be multiple
+   IP hops away from a Pledge.  Despite this distance, the Pledge only
+   needs to use link-local communication to complete cBRSKI onboarding.
+   Two modes of Join Proxy operation are defined, stateless and
+   stateful, to allow different trade-offs regarding resource usage,
+   implementation complexity and security.
 
 About This Document
 
@@ -119,13 +118,12 @@ Table of Contents
      8.1.  Resource Type Attributes Registry
      8.2.  coaps+jpy Scheme Registration
      8.3.  Service Name and Transport Protocol Port Number Registry
-   9.  Acknowledgements
-   10. Contributors
-   11. Changelog
-   12. References
-     12.1.  Normative References
-     12.2.  Informative References
+   9.  References
+     9.1.  Normative References
+     9.2.  Informative References
    Appendix A.  Stateless Join Proxy JPY Message Examples
+   Acknowledgements
+   Changelog
    Authors' Addresses
 
 1.  Introduction
@@ -1459,139 +1457,9 @@ Table of Contents
                 scheme, used by stateless constrained Join Proxy
    Reference:   [This RFC]
 
-9.  Acknowledgements
+9.  References
 
-   [I-D.richardson-anima-state-for-joinrouter] outlined the various
-   options for building a constrained Join Proxy.
-
-   Many thanks for the comments by Bill Atwood, Carsten Bormann, Brian
-   Carpenter, Spencer Dawkins, Esko Dijk, Toerless Eckert, Russ Housley,
-   Ines Robles, Rich Salz, Jürgen Schönwälder, Mališa Vučinić, and Rob
-   Wilton.
-
-10.  Contributors
-
-   This document is very much inspired by text published earlier in
-   [I-D.kumar-dice-dtls-relay].  Sandeep Kumar, Sye loong Keoh, and
-   Oscar Garcia-Morchon are the co-authors of this document.  Their
-   draft text has served as a basis for this document.
-
-11.  Changelog
-
-   -16 to -17
-
-      * Added security consideration that a genuine Join Proxy may
-        relay to a malicious Registrar (#33, #77).
-      * Added solution and specification sections on the use of
-        multiple Registrars (#45, #65, #76).
-      * Added clarification that Registrar address(es) can be
-        configured, or discovered (#76).
-      * Define conditions for implementing only a single Join Proxy
-        mode - stateful or stateless (#69, #73)
-      * Improved JPY Header security by adding integrity protection
-        (#74).
-      * Fixed format definition of example JPY Header (#74).
-      * Editorial updates.
-
-   -15 to -16
-
-      * Security considerations text reviewed and expanded with more
-        attack types.
-      * Define CoAP discovery as default, remove GRASP/6TiSCH (#68).
-      * Abstract updated to describe higher-level concepts (#47).
-      * Applied Spencer's TSVART review comment 2022-05-16 in an
-        improved manner.
-      * Applied Russ' review comments from IOTDIR review 2023-08-09.
-      * Rewrite Section 4.1 based on Russ' review (#48).
-      * Applied Toerless' review comments from WGLC (#63).
-      * Applied review comments of Bill Atwood of 2024-05-21.
-      * Clarify 'context payload' terminology (#49).
-      * Use shorter and consistent term for Join Proxy (#58).
-      * Appendix A corrected to use latest JPY message format.
-      * Author added.
-      * Update reference RFC8366 to RFC8366bis.
-      * Many editorial updates.
-
-   -13 to -15
-
-      * Various editorial updates and minor changes.
-
-   -12 to -13
-
-      * jpy message encrypted and no longer standardized
-
-   -11 to -12
-
-      * many typos fixed and text re-organized
-      * core of GRASP and CoAP discovery moved to constrained-voucher
-        document, only stateless extensions remain
-
-   -10 to -11
-
-      * Join Proxy and Registrar discovery merged
-      * GRASP discovery updated
-      * ARTART review
-      * TSVART review
-
-   -09 to -10
-
-      * OPSDIR review
-      * IANA review
-      * SECDIR review
-      * GENART review
-
-   -07 to -09
-
-       * typos
-
-   -06 to -07
-
-       * AD review changes
-
-   -05 to -06
-
-       * RT value change to brski.jp and brski.rjp
-       * new registry values for IANA
-       * improved handling of jpy header array
-
-   -04 to -05
-
-       * Join Proxy and join-port consistent spelling
-       * some nits removed
-       * restructured discovery
-       * section
-       * rephrased parts of security section
-
-   -03 to -04
-
-      * mail address and reference
-
-   -02 to -03
-
-      * Terminology updated
-      * Several clarifications on discovery and routability
-      * DTLS payload introduced
-
-   -01 to -02
-
-     * Discovery of Join Proxy and Registrar ports
-
-   -00 to -01
-
-      * Registrar used throughout instead of EST server
-      * Emphasized Join Proxy port for Join Proxy and Registrar
-      * updated discovery accordingly
-      * updated stateless Join Proxy JPY header
-      * JPY header described with CDDL
-      * Example simplified and corrected
-
-   -00 to -00
-
-      * copied from vanderstok-anima-constrained-join-proxy-05
-
-12.  References
-
-12.1.  Normative References
+9.1.  Normative References
 
    [cBRSKI]   Richardson, M., Van der Stok, P., Kampanakis, P., and E.
               Dijk, "Constrained Bootstrapping Remote Secure Key
@@ -1657,7 +1525,7 @@ Table of Contents
               DOI 10.17487/RFC9148, April 2022,
               <https://www.rfc-editor.org/rfc/rfc9148>.
 
-12.2.  Informative References
+9.2.  Informative References
 
    [I-D.ietf-anima-brski-discovery]
               Eckert, T. T. and E. Dijk, "BRSKI discovery and
@@ -1837,6 +1705,134 @@ Appendix A.  Stateless Join Proxy JPY Message Examples
 
        [ h'd01914bcc376a88ffecc50ca6017b0c1' ,
          h'16fefd0000000000000000002f' ... '66c1' ]
+
+Acknowledgements
+
+   [I-D.richardson-anima-state-for-joinrouter] outlined the various
+   options for building a constrained Join Proxy.
+
+   Many thanks for the comments by Bill Atwood, Carsten Bormann, Brian
+   Carpenter, Spencer Dawkins, Esko Dijk, Toerless Eckert, Russ Housley,
+   Ines Robles, Rich Salz, Jürgen Schönwälder, Mališa Vučinić, and Rob
+   Wilton.
+
+   This document is very much inspired by text published earlier in
+   [I-D.kumar-dice-dtls-relay].  Sandeep Kumar, Sye loong Keoh, and
+   Oscar Garcia-Morchon are the co-authors of this document.  Their
+   draft text has served as a basis for this document.
+
+Changelog
+
+   -16 to -17
+
+      * Added security consideration that a genuine Join Proxy may
+        relay to a malicious Registrar (#33, #77).
+      * Added solution and specification sections on the use of
+        multiple Registrars (#45, #65, #76).
+      * Added clarification that Registrar address(es) can be
+        configured, or discovered (#76).
+      * Define conditions for implementing only a single Join Proxy
+        mode - stateful or stateless (#69, #73)
+      * Improved JPY Header security by adding integrity protection
+        (#74).
+      * Fixed format definition of example JPY Header (#74).
+      * Editorial updates.
+
+   -15 to -16
+
+      * Security considerations text reviewed and expanded with more
+        attack types.
+      * Define CoAP discovery as default, remove GRASP/6TiSCH (#68).
+      * Abstract updated to describe higher-level concepts (#47).
+      * Applied Spencer's TSVART review comment 2022-05-16 in an
+        improved manner.
+      * Applied Russ' review comments from IOTDIR review 2023-08-09.
+      * Rewrite Section 4.1 based on Russ' review (#48).
+      * Applied Toerless' review comments from WGLC (#63).
+      * Applied review comments of Bill Atwood of 2024-05-21.
+      * Clarify 'context payload' terminology (#49).
+      * Use shorter and consistent term for Join Proxy (#58).
+      * Appendix A corrected to use latest JPY message format.
+      * Author added.
+      * Update reference RFC8366 to RFC8366bis.
+      * Many editorial updates.
+
+   -13 to -15
+
+      * Various editorial updates and minor changes.
+
+   -12 to -13
+
+      * jpy message encrypted and no longer standardized
+
+   -11 to -12
+
+      * many typos fixed and text re-organized
+      * core of GRASP and CoAP discovery moved to constrained-voucher
+        document, only stateless extensions remain
+
+   -10 to -11
+
+      * Join Proxy and Registrar discovery merged
+      * GRASP discovery updated
+      * ARTART review
+      * TSVART review
+
+   -09 to -10
+
+      * OPSDIR review
+      * IANA review
+      * SECDIR review
+      * GENART review
+
+   -07 to -09
+
+       * typos
+
+   -06 to -07
+
+       * AD review changes
+
+   -05 to -06
+
+       * RT value change to brski.jp and brski.rjp
+       * new registry values for IANA
+       * improved handling of jpy header array
+
+   -04 to -05
+
+       * Join Proxy and join-port consistent spelling
+       * some nits removed
+       * restructured discovery
+       * section
+       * rephrased parts of security section
+
+   -03 to -04
+
+      * mail address and reference
+
+   -02 to -03
+
+      * Terminology updated
+      * Several clarifications on discovery and routability
+      * DTLS payload introduced
+
+   -01 to -02
+
+     * Discovery of Join Proxy and Registrar ports
+
+   -00 to -01
+
+      * Registrar used throughout instead of EST server
+      * Emphasized Join Proxy port for Join Proxy and Registrar
+      * updated discovery accordingly
+      * updated stateless Join Proxy JPY header
+      * JPY header described with CDDL
+      * Example simplified and corrected
+
+   -00 to -00
+
+      * copied from vanderstok-anima-constrained-join-proxy-05
 
 Authors' Addresses
 
