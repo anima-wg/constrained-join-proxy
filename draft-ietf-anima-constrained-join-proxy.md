@@ -1141,6 +1141,84 @@ Number" registry.
     Reference:   [This RFC]
 
 
+--- back
+
+# Stateless Join Proxy JPY Message Examples {#appendix-examples-detailed}
+
+This appendix shows an example of a JPY message, sent by a stateless Join Proxy to a Registrar, and an example of the
+return JPY message sent by the Registrar.
+The DTLS payload itself, carried in the Content (C) field of the JPY message, is not shown in detail but
+abbreviated.
+
+First, assume that a Pledge creates a CoAP request to a Join Proxy that it has just discovered and selected for
+performing {{cBRSKI}} onboarding.
+
+This request may be a Pledge Voucher Request (PVR) as follows:
+
+    POST coaps://[fe80::1234:5678]:45965/.well-known/brski/rv
+      Content-Format: 836
+      Payload:
+         <bytes of the COSE-signed PVR>
+
+Because a DTLS session is not yet established at this point, the first step for the client is to send the DTLS
+Client Hello message to the Join Proxy's join-port 45965.
+When the Join Proxy receives this UDP packet, it creates a JPY message with the following UDP payload:
+
+<!--
+ Example created using cbor.me website, taking random 16 bytes to represent the encrypted Header (H) field
+ and a DTLS Client Hello from a capture file to represent the first data sent by the Pledge for its DTLS
+ handshake establishment.
+
+ [ h'd01914bcc376a88ffecc50ca6017b0c1' , h'16fefd0000000000000000019e010001920000000000000192fefde5f1be51956dfe42297b29ff9718390220c9cf85836bb97aa9393d4e6de4a45800000004c0ff00ff01000164000a000400020017000d000400020403000b000201000100014a410400116c00a83d1acc1e3a00c499eac5d1554c17bb3305a7ad0947ab84217a981c2043f6312d119bf5646553c38c5f3f8f5012d807d29a1359f6097a855c2a56c341041b1ab1551dafaf3b8b00f6e7c16c1ac20a2d84382d4a35b500e1aa40a8afd22db681768fbe78890bf3aa761ae117fe73c01855dd52eee54c597b0da62909edc92040f0189854874397c3e4599f6cdeae980685063d4f4ccd3057caea4cd1ec8a92410458e49b3ba437f989f06e2ce0199d1db29572e0c7610e4df8c4b437d73b6fc7773dc3a93d35461ca6bdc237bbf921ac386753dc7f86d8f1a729466f4b270144fb4104de9d2c5b4dcd9274a47f9ffc6ecc03e7ea2990aff147fa2eb1c77e287bcbca5970f8bbb9c204b481b6ab82caa7626c40a40495de20b803fe6ac4d675874b012e2063b637cf7952d5b19572910c425c5816e1a5b3f84c0ec7c2ee2c3294dfd13d45' ]
+-->
+
+~~~ cbor-pretty
+82                                      # array(2)
+   50                                   # bytes(16)
+      D01914BCC376A88FFECC50CA6017B0C1  #
+   59 01AB                              # bytes(427)
+      16FEFD0000000000000000019E ...
+      <further bytes of DTLS 1.2 Client Hello>
+~~~
+
+The same JPY message written in CBOR diagnostic notation {{RFC8949}} is:
+
+~~~ cbor-diag
+[ h'd01914bcc376a88ffecc50ca6017b0c1' ,
+  h'16fefd0000000000000000019e' ... '3d45' ]
+~~~
+
+Above, the ellipsis ("...") notation in a CBOR diagnostic byte string denotes a further sequence of bytes that is not
+shown for brevity.
+
+The first CBOR byte string wraps the 16 bytes of encrypted state information of the Header (H) field.
+The second CBOR byte string wraps the 427 bytes of the received DTLS message.
+
+After the Registrar has processed the received JPY message, it sends a DTLS 1.2 Hello Verify Request in response to
+the received Client Hello message.
+This Hello Verify Request is wrapped in a new JPY message that it sends back to the Join Proxy:
+
+<!--
+ [ h'd01914bcc376a88ffecc50ca6017b0c1' , h'16fefd0000000000000000002f030000230000000000000023fefd2000000000277c7678d82fde80c1f4400beb7fd390c40b49f6f2b460e21d2766c1' ]
+-->
+
+~~~ cbor-pretty
+82                                      # array(2)
+   50                                   # bytes(16)
+      D01914BCC376A88FFECC50CA6017B0C1  #
+   58 3C                                # bytes(60)
+      16FEFD0000000000000000002F ...
+      <further bytes of DTLS 1.2 Hello Verify Request>
+~~~
+
+The same JPY message in CBOR diagnostic notation is:
+
+~~~ cbor-diag
+    [ h'd01914bcc376a88ffecc50ca6017b0c1' ,
+      h'16fefd0000000000000000002f' ... '66c1' ]
+~~~
+
+
 # Acknowledgements
 {:numbered="false"}
 
@@ -1268,80 +1346,3 @@ Their draft text has served as a basis for this document.
 -00 to -00
 
        * copied from vanderstok-anima-constrained-join-proxy-05
-
---- back
-
-# Stateless Join Proxy JPY Message Examples {#appendix-examples-detailed}
-
-This appendix shows an example of a JPY message, sent by a stateless Join Proxy to a Registrar, and an example of the
-return JPY message sent by the Registrar.
-The DTLS payload itself, carried in the Content (C) field of the JPY message, is not shown in detail but
-abbreviated.
-
-First, assume that a Pledge creates a CoAP request to a Join Proxy that it has just discovered and selected for
-performing {{cBRSKI}} onboarding.
-
-This request may be a Pledge Voucher Request (PVR) as follows:
-
-    POST coaps://[fe80::1234:5678]:45965/.well-known/brski/rv
-      Content-Format: 836
-      Payload:
-         <bytes of the COSE-signed PVR>
-
-Because a DTLS session is not yet established at this point, the first step for the client is to send the DTLS
-Client Hello message to the Join Proxy's join-port 45965.
-When the Join Proxy receives this UDP packet, it creates a JPY message with the following UDP payload:
-
-<!--
- Example created using cbor.me website, taking random 16 bytes to represent the encrypted Header (H) field
- and a DTLS Client Hello from a capture file to represent the first data sent by the Pledge for its DTLS
- handshake establishment.
-
- [ h'd01914bcc376a88ffecc50ca6017b0c1' , h'16fefd0000000000000000019e010001920000000000000192fefde5f1be51956dfe42297b29ff9718390220c9cf85836bb97aa9393d4e6de4a45800000004c0ff00ff01000164000a000400020017000d000400020403000b000201000100014a410400116c00a83d1acc1e3a00c499eac5d1554c17bb3305a7ad0947ab84217a981c2043f6312d119bf5646553c38c5f3f8f5012d807d29a1359f6097a855c2a56c341041b1ab1551dafaf3b8b00f6e7c16c1ac20a2d84382d4a35b500e1aa40a8afd22db681768fbe78890bf3aa761ae117fe73c01855dd52eee54c597b0da62909edc92040f0189854874397c3e4599f6cdeae980685063d4f4ccd3057caea4cd1ec8a92410458e49b3ba437f989f06e2ce0199d1db29572e0c7610e4df8c4b437d73b6fc7773dc3a93d35461ca6bdc237bbf921ac386753dc7f86d8f1a729466f4b270144fb4104de9d2c5b4dcd9274a47f9ffc6ecc03e7ea2990aff147fa2eb1c77e287bcbca5970f8bbb9c204b481b6ab82caa7626c40a40495de20b803fe6ac4d675874b012e2063b637cf7952d5b19572910c425c5816e1a5b3f84c0ec7c2ee2c3294dfd13d45' ]
--->
-
-~~~ cbor-pretty
-82                                      # array(2)
-   50                                   # bytes(16)
-      D01914BCC376A88FFECC50CA6017B0C1  #
-   59 01AB                              # bytes(427)
-      16FEFD0000000000000000019E ...
-      <further bytes of DTLS 1.2 Client Hello>
-~~~
-
-The same JPY message written in CBOR diagnostic notation {{RFC8949}} is:
-
-~~~ cbor-diag
-[ h'd01914bcc376a88ffecc50ca6017b0c1' ,
-  h'16fefd0000000000000000019e' ... '3d45' ]
-~~~
-
-Above, the ellipsis ("...") notation in a CBOR diagnostic byte string denotes a further sequence of bytes that is not
-shown for brevity.
-
-The first CBOR byte string wraps the 16 bytes of encrypted state information of the Header (H) field.
-The second CBOR byte string wraps the 427 bytes of the received DTLS message.
-
-After the Registrar has processed the received JPY message, it sends a DTLS 1.2 Hello Verify Request in response to
-the received Client Hello message.
-This Hello Verify Request is wrapped in a new JPY message that it sends back to the Join Proxy:
-
-<!--
- [ h'd01914bcc376a88ffecc50ca6017b0c1' , h'16fefd0000000000000000002f030000230000000000000023fefd2000000000277c7678d82fde80c1f4400beb7fd390c40b49f6f2b460e21d2766c1' ]
--->
-
-~~~ cbor-pretty
-82                                      # array(2)
-   50                                   # bytes(16)
-      D01914BCC376A88FFECC50CA6017B0C1  #
-   58 3C                                # bytes(60)
-      16FEFD0000000000000000002F ...
-      <further bytes of DTLS 1.2 Hello Verify Request>
-~~~
-
-The same JPY message in CBOR diagnostic notation is:
-
-~~~ cbor-diag
-    [ h'd01914bcc376a88ffecc50ca6017b0c1' ,
-      h'16fefd0000000000000000002f' ... '66c1' ]
-~~~
