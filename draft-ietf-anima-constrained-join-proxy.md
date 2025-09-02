@@ -772,7 +772,7 @@ one default method for a Join Proxy to discover a Registrar: using CoAP resource
 
 The CoAP discovery query to use depends on the intended mode of operation of the Join Proxy: stateless or stateful.
 A stateless Join Proxy needs to discover a UDP endpoint (address and port) that can accept JPY messages, supporting
-the `coaps+jpy` scheme.
+the `jpy` scheme.
 On the other hand, a stateful Join Proxy needs to discover a single CoAPS endpoint supporting the `coaps` scheme that
 offers the full set of cBRSKI Registrar resources.
 
@@ -791,7 +791,7 @@ This exchange is shown below:
   RES: 2.05 Content
     Content-Format: 40
     Payload:
-      <coaps+jpy://[ipv6_address]:port>;rt=brski.rjp
+      <jpy://[ipv6_address]:port>;rt=brski.rjp
 ~~~~
 
 In this case, the multicast CoAP request is sent to the site-local "All CoAP Nodes" multicast IPv6 address
@@ -806,7 +806,7 @@ in the {{RFC6690}} link format, and per {{Section 3.2 of RFC3986}}, the authorit
 number but has to include also the IP address.
 
 The returned port is expected to process the encapsulated JPY messages described in {{stateless-jpy}}.
-The scheme is `coaps+jpy`, described in {{jpyscheme}}, and not regular `coaps` because the JPY messages effectively
+The scheme is `jpy`, described in {{jpyscheme}}, and not regular `coaps` because the JPY messages effectively
 form a new protocol that encapsulates CoAPS.
 
 ### Stateful Case
@@ -858,7 +858,7 @@ The same Registrar could for example reply to a multicast CoAP query of a statel
   RES: 2.05 Content
     Content-Format: 40
     Payload:
-        <coaps+jpy://[2001:db8:0:abcd::52]:7634>;rt=brski.rjp
+        <jpy://[2001:db8:0:abcd::52]:7634>;rt=brski.rjp
 ~~~~
 
 In these examples, the Join Proxy in a specific mode of operation (stateful or stateless) only queries for those
@@ -1088,35 +1088,36 @@ Parameters" registry group, per the {{RFC6690}} procedure.
                  JPY protocol.
     Reference:   [This RFC]
 
-## coaps+jpy Scheme Registration {#jpyscheme}
+## 'jpy' Scheme Registration {#jpyscheme}
 
 This specification registers a new URI scheme per {{RFC7595}} under the IANA "Uniform Resource Identifier (URI) Schemes"
 registry.
 
-    Scheme name: coaps+jpy
-    Status:      permanent
+    Scheme name: jpy
+    Status:      Permanent
     Applications/protocols that use this scheme name:
-                 cBRSKI, constrained Join Proxy
+                 cBRSKI, constrained Join Proxy, JPY protocol
     Contact:     ANIMA WG
     Change controller: IESG
     References:  [This RFC]
 
 The scheme specification is provided below.
 
-* Scheme syntax: identical to the "coaps" scheme defined in {{RFC7252}}.
-* Scheme semantics: identical to the "coaps" scheme, except that the JPY message encapsulation mechanism described in
-  {{stateless-jpy}} of \[This RFC\] is used to transport each CoAPS UDP datagram.
-* Encoding considerations: identical to the "coaps" scheme.
-* Interoperability considerations: identical to the "coaps" scheme.
-* Security considerations: all of the security considerations of the "coaps" scheme apply.
-  Users of this scheme should be aware that as part of the intended use, a UDP message that was formed using the
-  "coaps" scheme is embedded by a Join Proxy as defined by \[This RFC\] into a UDP message conforming to the
-  "coaps+jpy" scheme without the Join Proxy being able to parse/decode which CoAPS URI was originally used by the
-  sender, since that information is stored as DTLS-protected data.
-  The receiving server can transform the "coaps+jpy" scheme back to the original "coaps" scheme by decoding the JPY
-  message payload.
-  However, any CoAP-related information not stored in the DTLS-protected data (such as in the UDP/IP headers) may be
-  changed by these scheme transforms.
+* Scheme syntax: identical to the `coaps` scheme as defined in {{Section 6.1 of RFC7252}}.
+* Scheme semantics: JPY protocol as defined in {{stateless-jpy}} of \[This RFC\].
+* Encoding considerations: identical to the `coaps` scheme as defined in {{Section 12.4 of RFC7252}}.
+* Interoperability considerations: none.
+* Security considerations: all of the security considerations for the `coaps` scheme as defined in
+  {{Section 11.1 of RFC7252}} apply.
+  In addition, users of this scheme should be aware that as part of the intended use, a UDP payload that was created
+  under the `coaps` scheme is embedded by a Join Proxy into a new UDP message conforming to the
+  `jpy` scheme, without the Join Proxy being able to reconstruct which CoAPS URI was originally used by the
+  sender of the CoAPS message, since most of the URI information is stored in DTLS-protected data.
+  The receiving server can transform the JPY message sent under the `jpy` scheme back to a
+  DTLS-encrypted CoAP message that uses the `coaps` scheme, by extracting the JPY message payload.
+  However, any CoAP-related information not stored in the DTLS-protected data (such as data in UDP/IP headers) is
+  subject to modification by the Join Proxy or other proxies in the communication path to the receiver.
+  Any protocol transported in JPY messages MUST be resilient against such modifications.
 
 ## Service Name and Transport Protocol Port Number Registry {#dns-sd-spec}
 
@@ -1136,7 +1137,7 @@ Number" registry.
     Assignee:  IESG <iesg@ietf.org>
     Contact:  IESG <iesg@ietf.org>
     Description: Bootstrapping Remote Secure Key Infrastructure
-                 Registrar join-port, supporting the coaps+jpy
+                 Registrar join-port, supporting the 'jpy'
                  scheme, used by stateless constrained Join Proxy
     Reference:   [This RFC]
 
@@ -1235,6 +1236,11 @@ Their draft text has served as a basis for this document.
 
 # Changelog
 {:numbered="false"}
+
+-17 to -18
+
+       * Changed JPY protocol scheme from coaps+jpy to more generic
+         jpy and rephrased all related definitions (#80).
 
 -16 to -17
 
