@@ -783,6 +783,8 @@ discovery query to the "/.well-known/core" resource including a resource type (r
 The latter CoAP resource type is defined in {{iana-rt}}.
 
 Upon success, the return payload will contain the port of the Registrar on which the JPY protocol handler is hosted.
+The resource path returned in this payload is always the root (`/`) resource, the only resource currently defined for
+the JPY protocol.
 This exchange is shown below:
 
 ~~~~
@@ -807,7 +809,7 @@ number but has to include also the IP address.
 
 The returned port is expected to process the encapsulated JPY messages described in {{stateless-jpy}}.
 The scheme is `jpy`, described in {{jpyscheme}}, and not regular `coaps` because the JPY messages effectively
-form a new protocol that encapsulates CoAPS.
+form a new protocol that encapsulates CoAPS messages.
 
 ### Stateful Case
 
@@ -898,6 +900,11 @@ the join-port is the default CoAPS port 5684.
 
 In the returned CoRE link format document, discoverable port numbers are usually returned for the Join Proxy resource
 in the &lt;URI-Reference&gt; of the link (see {{Section 5.1 of RFC6690}} for details).
+
+Note that the CoAP resource returned in the response payload is the root resource (`/`).
+Therefore, the resource type (rt) "brski.jp" pertains to the root resource and it signals that under this root the
+BRSKI/EST resources of a remote Registrar can be found deeper down in the resource hierarchy under
+`.well-known/brski` and `.well-known/est`.
 
 ## Pledge Discovers Multiple Join Ports {#discovery-by-pledge-multi}
 
@@ -1241,6 +1248,8 @@ Their draft text has served as a basis for this document.
 
        * Changed JPY protocol scheme from coaps+jpy to more generic
          jpy and rephrased all related definitions (#80).
+       * Clarified that discovery responses from Join Proxy refer to
+         the root CoAP resource (/) or root JPY resource (#79). 
 
 -16 to -17
 
