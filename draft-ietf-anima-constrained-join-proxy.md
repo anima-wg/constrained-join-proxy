@@ -881,6 +881,10 @@ resource type (rt) parameter with the value "brski.jp".
 This value is defined in {{iana-rt}}.
 Upon success, the return payload will contain the join-port.
 
+The resource type (rt) "brski.jp" exclusively pertains the empty path resource, and signals that under this root the
+BRSKI/EST resources of a remote Registrar can be found deeper down in the resource hierarchy under
+`.well-known/brski` and `.well-known/est`.
+
 The meta-example below shows the discovery of the join-port (field `join_port`) of the Join Proxy:
 
 ~~~~
@@ -900,11 +904,6 @@ the join-port is the default CoAPS port 5684.
 
 In the returned CoRE link format document, discoverable port numbers are usually returned for the Join Proxy resource
 in the &lt;URI-Reference&gt; of the link (see {{Section 5.1 of RFC6690}} for details).
-
-Note that the CoAP resource returned in the response payload is the root resource (`/`).
-Therefore, the resource type (rt) "brski.jp" pertains to the root resource and it signals that under this root the
-BRSKI/EST resources of a remote Registrar can be found deeper down in the resource hierarchy under
-`.well-known/brski` and `.well-known/est`.
 
 ## Pledge Discovers Multiple Join Ports {#discovery-by-pledge-multi}
 
