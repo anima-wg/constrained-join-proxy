@@ -11,6 +11,12 @@ cat: std
 stream: IETF
 
 author:
+- ins: E. Dijk
+  role: editor
+  name: Esko Dijk
+  org: IoTconsultancy.nl
+  email: esko.dijk@iotconsultancy.nl
+
 - ins: M. Richardson
   name: Michael Richardson
   org: Sandelman Software Works
@@ -25,11 +31,6 @@ author:
   name: Panos Kampanakis
   org: Cisco Systems
   email: pkampana@cisco.com
-
-- ins: E. Dijk
-  name: Esko Dijk
-  org: IoTconsultancy.nl
-  email: esko.dijk@iotconsultancy.nl
 
 venue:
   group: anima
@@ -1232,7 +1233,7 @@ The same JPY message in CBOR diagnostic notation is:
 {{I-D.richardson-anima-state-for-joinrouter}} outlined the various options for building a constrained Join Proxy.
 
 Many thanks for the comments by {{{Bill Atwood}}}, {{{Carsten Bormann}}}, {{{Brian Carpenter}}}, {{{Spencer Dawkins}}},
-{{{Esko Dijk}}}, {{{Toerless Eckert}}}, {{{Russ Housley}}}, {{{Ines Robles}}}, {{{Rich Salz}}},
+{{{Toerless Eckert}}}, {{{Russ Housley}}}, {{{Ines Robles}}}, {{{Rich Salz}}},
 {{{Jürgen Schönwälder}}}, {{{Mališa Vučinić}}}, and {{{Rob Wilton}}}.
 
 This document is very much inspired by text published earlier in {{I-D.kumar-dice-dtls-relay}}.
@@ -1249,6 +1250,7 @@ Their draft text has served as a basis for this document.
          jpy and rephrased all related definitions (#80).
        * Clarified that discovery responses from Join Proxy refer to
          the root CoAP resource (/) or root JPY resource (#79).
+       * Assigned editor role (#78).
        * Editorial updates.
 
 -16 to -17
