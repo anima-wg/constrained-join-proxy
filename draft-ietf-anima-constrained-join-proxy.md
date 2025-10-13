@@ -791,7 +791,7 @@ This exchange is shown below:
   REQ: GET coap://[ff05::fd]/.well-known/core?rt=brski.rjp
 
   RES: 2.05 Content
-    Content-Format: 40
+    Content-Format: 40 (application/link-format)
     Payload:
       <jpy://[ipv6_address]:port>;rt=brski.rjp
 ~~~~
@@ -825,7 +825,7 @@ This exchange is shown below:
   REQ: GET coap://[ff05::fd]/.well-known/core?rt=brski
 
   RES: 2.05 Content
-    Content-Format: 40
+    Content-Format: 40 (application/link-format)
     Payload:
       <coaps://[ipv6_address]:port/uri_path>;rt=brski
 ~~~~
@@ -847,9 +847,9 @@ Join Proxy as follows:
   REQ: GET coap://[ff05::fd]/.well-known/core?rt=brski
 
   RES: 2.05 Content
-    Content-Format: 40
+    Content-Format: 40 (application/link-format)
     Payload:
-        <coaps://[2001:db8:0:abcd::52]/b>;rt=brski
+      <coaps://[2001:db8:0:abcd::52]/b>;rt=brski
 ~~~~
 
 The same Registrar could for example reply to a multicast CoAP query of a stateless Join Proxy as follows:
@@ -858,9 +858,9 @@ The same Registrar could for example reply to a multicast CoAP query of a statel
   REQ: GET coap://[ff05::fd]/.well-known/core?rt=brski.rjp
 
   RES: 2.05 Content
-    Content-Format: 40
+    Content-Format: 40 (application/link-format)
     Payload:
-        <jpy://[2001:db8:0:abcd::52]:7634>;rt=brski.rjp
+      <jpy://[2001:db8:0:abcd::52]:7634>;rt=brski.rjp
 ~~~~
 
 In these examples, the Join Proxy in a specific mode of operation (stateful or stateless) only queries for those
@@ -891,7 +891,7 @@ The meta-example below shows the discovery of the join-port (field `join_port`) 
   REQ: GET coap://[ff02::fd]/.well-known/core?rt=brski.jp
 
   RES: 2.05 Content
-    Content-Format: 40
+    Content-Format: 40 (application/link-format)
     Payload:
       <coaps://[IP_address]:join_port>;rt=brski.jp
 ~~~~
@@ -926,7 +926,7 @@ each associated to a different cBRSKI protocol variant, defined by two CoRE Link
   REQ: GET coap://[ff02::fd]/.well-known/core?rt=brski.jp
 
   RES: 2.05 Content
-    Content-Format: 40
+    Content-Format: 40 (application/link-format)
     Payload:
       <coaps://[IP_address]:join_port1>;rt=brski.jp,
       <coaps://[IP_address]:join_port2>;rt=brski.jp;
@@ -1248,7 +1248,8 @@ Their draft text has served as a basis for this document.
        * Changed JPY protocol scheme from coaps+jpy to more generic
          jpy and rephrased all related definitions (#80).
        * Clarified that discovery responses from Join Proxy refer to
-         the root CoAP resource (/) or root JPY resource (#79). 
+         the root CoAP resource (/) or root JPY resource (#79).
+       * Editorial updates.
 
 -16 to -17
 
