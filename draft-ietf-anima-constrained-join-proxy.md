@@ -207,10 +207,8 @@ network access.
          '---'     `--+     |    |   |              |   |
                       +-----+    +---+              +---+
        Registrar                Join Proxy          Pledge
-
-
 ~~~~
-{: #fig-net title='Multi-hop cBRSKI onboarding scenario in a 6LoWPAN mesh network' align="left"}
+{: #fig-net title='Multi-hop cBRSKI onboarding scenario in a 6LoWPAN mesh network' align="center"}
 
 So one problem is that there is no IP routability between the Pledge and the Registrar, via intermediate nodes
 such as 6LoWPAN Routers (6LRs), despite the need for an end-to-end secured session between both.
@@ -409,8 +407,8 @@ The UDP flow mapping state maintained by the Join Proxy can be represented as a 
 active Pledge, as follows:
 
 ~~~~aasvg
-  Local UDP state              Routable UDP state     Time state
- (IP_P:p_P, IP_Jl:p_Jl) <===> (IP_Jr:p_Jr, IP_R:p_R)  (Exp-timer)
+   Local UDP state              Routable UDP state     Time state
+  (IP_P:p_P, IP_Jl:p_Jl) <===> (IP_Jr:p_Jr, IP_R:p_R)  (Exp-timer)
 ~~~~
 
 In case a Join Proxy has multiple network interfaces that accept Pledges, an interface identifier needs to be added
@@ -448,7 +446,7 @@ on the Registrar is used to access cBRSKI resources.
 |              :             :          |      :      |     :      |
 +---------------------------------------+-------------+------------+
 ~~~~
-{: #fig-statefull2 title='Example of the message flow of a DTLS session via a stateful Join Proxy.' align="left"}
+{: #fig-statefull2 title='Example of the message flow of a DTLS session via a stateful Join Proxy' align="center"}
 
 The Join Proxy MUST allocate a unique `IP_Jr:p_Jr` for every unique Pledge that it serves. This is typically done
 by selecting a unique available port `P_Jr` for each Pledge.
@@ -550,7 +548,7 @@ can host all its services on the CoAPS default port (5684).
 |              :                            |     :     |    :      |
 +-------------------------------------------+-----------+-----------+
 ~~~~
-{: #fig-stateless title='Example of the message flow of a DTLS session via a stateless Join Proxy.' align="left"}
+{: #fig-stateless title='Example of the message flow of a DTLS session via a stateless Join Proxy' align="center"}
 
 When a Join Proxy receives an ICMP {{RFC792}} / ICMPv6 {{RFC4443}} error from the Registrar, this may signal a
 permanent change of the Registrar's IP address and/or port, or it may signal a temporary disruption of the network.
