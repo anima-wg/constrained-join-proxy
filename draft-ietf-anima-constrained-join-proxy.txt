@@ -2,39 +2,39 @@
 
 
 
-anima                                                      M. Richardson
-Internet-Draft                                  Sandelman Software Works
-Intended status: Standards Track                         P. van der Stok
-Expires: 6 January 2026                           vanderstok consultancy
+anima                                                       E. Dijk, Ed.
+Internet-Draft                                         IoTconsultancy.nl
+Intended status: Standards Track                           M. Richardson
+Expires: 2 December 2026                        Sandelman Software Works
+                                                         P. van der Stok
+                                                  vanderstok consultancy
                                                            P. Kampanakis
                                                            Cisco Systems
-                                                                 E. Dijk
-                                                       IoTconsultancy.nl
-                                                             5 July 2025
+                                                             31 May 2026
 
 
-      Join Proxy for Bootstrapping of Constrained Network Elements
+       Join Proxy for Onboarding of Constrained Network Elements
              draft-ietf-anima-constrained-join-proxy-latest
 
 Abstract
 
-   This document extends the constrained Bootstrapping Remote Secure Key
-   Infrastructures (cBRSKI) onboarding protocol by adding a new network
-   function, the constrained Join Proxy.  This function can be
-   implemented on a constrained node.  The goal of the Join Proxy is to
-   help new constrained nodes ("Pledges") securely onboard into a new IP
-   network using the cBRSKI protocol.  It acts as a circuit proxy for
-   User Datagram Protocol (UDP) packets that carry the onboarding
-   messages.  The solution is extensible to support other UDP-based
-   onboarding protocols as well.  The Join Proxy functionality is
-   designed for use in constrained networks, including IPv6 over Low-
-   Power Wireless Personal Area Networks (6LoWPAN) based networks in
-   which the onboarding authority server ("Registrar") may be multiple
-   IP hops away from a Pledge.  Despite this distance, the Pledge only
-   needs to use link-local communication to complete cBRSKI onboarding.
-   Two modes of Join Proxy operation are defined, stateless and
-   stateful, to allow different trade-offs regarding resource usage,
-   implementation complexity and security.
+   This document supports the constrained Bootstrapping Remote Secure
+   Key Infrastructures (cBRSKI) onboarding protocol by adding a required
+   network function, the Join Proxy.  This function can be implemented
+   on a constrained node.  The goal of the Join Proxy is to help new
+   constrained nodes ("Pledges") securely onboard into a new IP network
+   using the cBRSKI protocol.  It acts as a circuit proxy for User
+   Datagram Protocol (UDP) packets that carry the onboarding messages.
+   The solution is extensible to support other UDP-based onboarding
+   protocols as well.  The Join Proxy functionality is designed for use
+   in constrained networks, including IPv6 over Low-Power Wireless
+   Personal Area Networks (6LoWPAN) based networks in which the
+   onboarding authority server ("Registrar") may be multiple IP hops
+   away from a Pledge.  Despite this distance, the Pledge only needs to
+   use link-local communication to complete cBRSKI onboarding.  Two
+   modes of Join Proxy operation are defined, stateless and stateful, to
+   allow different trade-offs regarding resource usage, implementation
+   complexity and security.
 
 About This Document
 
@@ -67,11 +67,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 January 2026.
+   This Internet-Draft will expire on 2 December 2026.
 
 Copyright Notice
 
-   Copyright (c) 2025 IETF Trust and the persons identified as the
+   Copyright (c) 2026 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -98,12 +98,13 @@ Table of Contents
      4.3.  Stateful Join Proxy
      4.4.  Stateless Join Proxy
      4.5.  JPY Protocol and Messages
-       4.5.1.  JPY Message Structure
-       4.5.2.  JPY Message Port Usage
-       4.5.3.  JPY Message Overhead and MTU Size
-       4.5.4.  JPY Message Security
-       4.5.5.  Example Format for JPY Header Data
-       4.5.6.  Processing by Registrar
+       4.5.1.  JPY URI Syntax, Port Number and Path
+       4.5.2.  JPY Message Structure
+       4.5.3.  JPY Message Port Usage
+       4.5.4.  JPY Message Overhead and MTU Size
+       4.5.5.  JPY Message Security
+       4.5.6.  Example Format for JPY Header Data
+       4.5.7.  Processing by Registrar
      4.6.  Handling Multiple Registrars
    5.  Discovery
      5.1.  Join Proxy Discovers Registrar
@@ -111,13 +112,14 @@ Table of Contents
        5.1.2.  Stateful Case
        5.1.3.  Examples
      5.2.  Pledge Discovers Join Proxy
-     5.3.  Pledge Discovers Multiple Join Ports
+     5.3.  Pledge Discovers Multiple Join-Ports
    6.  Comparison of Stateless and Stateful Modes
    7.  Security Considerations
    8.  IANA Considerations
      8.1.  Resource Type Attributes Registry
-     8.2.  coaps+jpy Scheme Registration
-     8.3.  Service Name and Transport Protocol Port Number Registry
+     8.2.  Target Attributes Registry
+     8.3.  'jpy' Scheme Registration
+     8.4.  Service Name and Transport Protocol Port Number Registry
    9.  References
      9.1.  Normative References
      9.2.  Informative References
@@ -146,11 +148,11 @@ Table of Contents
    implement the BRSKI functions defined by [RFC8995].
 
    In this document, cBRSKI is extended such that a cBRSKI Pledge can
-   connect to a Registrar via a constrained Join Proxy.  In particular,
-   this solution is intended to support IPv6 over Low-Power Wireless
-   Personal Area Networks (6LoWPAN) [RFC4944] mesh networks. 6TiSCH
-   networks are not in scope of this document since these use the CoJP
-   [RFC9031] proxy mechanism.
+   connect to a Registrar via a (constrained) Join Proxy.  In
+   particular, this solution is intended to support IPv6 over Low-Power
+   Wireless Personal Area Networks (6LoWPAN) [RFC4944] mesh networks.
+   6TiSCH networks are not in scope of this document since these use the
+   CoJP [RFC9031] proxy mechanism.
 
    The Join Proxy as specified in this document is one of the Join Proxy
    options referred to in Section 2.5.2 of [RFC8995] as future work.
@@ -169,9 +171,8 @@ Table of Contents
 
    When this Registrar is not a direct (link-local) neighbor of the
    Pledge but several hops away, the Pledge needs to discover a link-
-   local neighbor that is operating as a constrained Join Proxy, which
-   helps forward the DTLS messages of the session between Pledge and
-   Registrar.
+   local neighbor that is operating as a Join Proxy, which helps forward
+   the DTLS messages of the session between Pledge and Registrar.
 
    Because the Join Proxy is a regular network node that has already
    been onboarded onto the network, it can send IP packets to the
@@ -186,7 +187,7 @@ Table of Contents
    this role it can help other Pledges perform the cBRSKI onboarding
    process.
 
-   Two modes of operation for a constrained Join Proxy are specified:
+   Two modes of operation for a (constrained) Join Proxy are specified:
 
    1.  A stateful Join Proxy that locally stores UDP connection state
        per Pledge.
@@ -214,8 +215,7 @@ Table of Contents
 
    The term "installation" refers to all devices in the network and
    their interconnections, including Registrar, enrolled nodes (with and
-   without constrained Join Proxy functionality) and Pledges (not yet
-   enrolled).
+   without Join Proxy functionality) and Pledges (not yet enrolled).
 
    (Installation) IP addresses are assumed to be routable over the whole
    installation network, except for link-local IP addresses.
@@ -256,11 +256,11 @@ Table of Contents
    link-layer data transmissions.
 
    In this situation, the Pledge can only communicate one-hop to its
-   neighbors, such as the constrained Join Proxy (J), using link-local
-   IPv6 addresses and using no link-layer encryption.  However, the
-   Pledge needs to communicate with end-to-end security with a Registrar
-   to authenticate and obtain its domain identity/credentials.  In the
-   case of cBRSKI, the domain identity is an X.509 certificate.  Domain
+   neighbors, such as the Join Proxy (J), using link-local IPv6
+   addresses and using no link-layer encryption.  However, the Pledge
+   needs to communicate with end-to-end security with a Registrar to
+   authenticate and obtain its domain identity/credentials.  In the case
+   of cBRSKI, the domain identity is an X.509 certificate.  Domain
    credentials may include key material for network access.
 
                        multi-hop mesh
@@ -279,16 +279,17 @@ Table of Contents
    (6LRs), despite the need for an end-to-end secured session between
    both.
 
-   Furthermore, the Pledge is not be able to discover the IP address of
-   the Registrar because it is not yet allowed onto the network.
+   Furthermore, the Pledge is not able to discover the IP address of the
+   Registrar because it is not yet allowed onto the network.
 
 3.2.  Solution
 
-   To overcome these problems, the constrained Join Proxy is introduced.
-   This is specific functionality that all, or a specific subset of,
-   authenticated nodes in an IP network can implement.  When the Join
-   Proxy functionality is enabled in a node, it can help a neighboring
-   Pledge securely onboard the network.
+   To overcome these problems, the Join Proxy for onboarding of
+   constrained network elements is introduced.  This is specific
+   functionality that all, or a specific subset of, authenticated nodes
+   in an IP network can implement.  When the Join Proxy functionality is
+   enabled in a node, it can help a neighboring Pledge securely onboard
+   the network.
 
    The Join Proxy performs relaying of UDP packets from the Pledge to
    the intended Registrar, and relaying of the subsequent return
@@ -383,7 +384,7 @@ Table of Contents
 
    Once the 6LBR is enabled, it requires an active Registrar reachable
    via IP communication to onboard any Pledges.  Once cBRSKI onboarding
-   is enabled (either administratively, or automatically) on the 6BLR,
+   is enabled (either administratively, or automatically) on the 6LBR,
    it can support the onboarding of 6LoWPAN-enabled Pledges, via its
    6LoWPAN network interface.  This 6LBR may host the cBRSKI Registrar
    itself, but the Registrar may also be hosted elsewhere on the
@@ -396,7 +397,7 @@ Table of Contents
 
    A Registrar hosted on the 6LBR will, per [cBRSKI], make itself
    discoverable as a Join Proxy so that Pledges can use it for cBRSKI
-   onboarding over a 6LoWPAN link (one hop).  Note that only some of
+   onboarding over a 6LoWPAN link (one hop).  Note that only some of the
    Pledges waiting to onboard may be direct neighbors of the
    Registrar/6LBR.  Other Pledges would need their traffic to be relayed
    by Join Proxies across one or more enrolled mesh devices (6LR, see
@@ -449,29 +450,34 @@ Table of Contents
 
    3.  Only stateless mode is implemented.
 
-   Option 2 and 3 have the advantage of reducing code size, testing
-   efforts and deployment complexity, but requires all devices in the
-   deployment to standardize on the same choice.
+   Options 2 and 3 have the advantage of reducing code size, testing
+   efforts and deployment complexity, but require all Join Proxy devices
+   in the deployment to standardize on the same choice.
 
    A standard for a network-wide application or ecosystem profile, that
    integrates the Join Proxy functionality as defined in this document,
    MAY specify the use of any of these three options.  It is expected
-   that most deployments of constrained Join Proxies will be in the
-   context of such standards and that these standards will be able to
-   pick either option 2 or 3 based on considerations such as those in
-   Section 6.
+   that most deployments of Join Proxies will be in the context of such
+   standards and that these standards will be able to pick either option
+   2 or 3 based on considerations such as those in Section 6.
 
    A Join Proxy that is not adhering to such an additional standard MUST
    implement both modes (option 1).  A Join Proxy or Registrar not
-   adhering to such additional standards is called "generic".
+   adhering to such additional standards is called "generic".  A generic
+   Join Proxy that implements auto-discovery of Registrars and mode
+   gives precedence to the stateless mode.  Specifically, if one or more
+   Registrars with brski.rjp are discovered, the Join Proxy MUST use
+   stateless mode in this network.  Otherwise, if at least one Registrar
+   with resource type brski is discovered, it MUST use stateful mode in
+   this network.
 
    If a Join Proxy implements both modes but does not implement methods
-   to discover available Registrars (for either method), then it MUST
-   use only the mode that is currently configured for the network, or
+   to discover available Registrars (for either mode), then it MUST use
+   only the mode that is currently configured for the network, or
    configured individually for the device.  The method or profile that
    defines such a configuration is outside the scope of this document.
-   If the mode is not configured and also can not be discovered
-   automatically, then the device MUST NOT operate as a Join Proxy.
+   If the mode is not explicitly configured in this case, the device
+   MUST NOT operate as a Join Proxy.
 
    For a Join Proxy to be operational, the node on which it is running
    has to be able to communicate with a Registrar (that is, exchange UDP
@@ -505,7 +511,7 @@ Table of Contents
    stateful or stateless mode, which can be useful in a particular
    deployment.  A cBRSKI Registrar that is only implemented to support
    an aforementioned network-wide application or ecosystem profile MAY
-   implement either stateful and/or stateless mode.
+   implement one of stateful mode, stateless mode, or both.
 
 4.2.  Notation
 
@@ -555,8 +561,8 @@ Table of Contents
    represented as a list of tuples, one for each active Pledge, as
    follows:
 
-     Local UDP state              Routable UDP state     Time state
-    (IP_P:p_P, IP_Jl:p_Jl) <===> (IP_Jr:p_Jr, IP_R:p_R)  (Exp-timer)
+      Local UDP state              Routable UDP state     Time state
+     (IP_P:p_P, IP_Jl:p_Jl) <===> (IP_Jr:p_Jr, IP_R:p_R)  (Exp-timer)
 
    In case a Join Proxy has multiple network interfaces that accept
    Pledges, an interface identifier needs to be added on the leftmost
@@ -574,7 +580,7 @@ Table of Contents
    Figure 2 depicts an example DTLS session via the Join Proxy, to show
    how this state is used in practice.  In this case the Join Proxy
    knows the IP address of the Registrar (IP_R) and the default CoAPS
-   port (P_R = 5684) on the Registrar is used to access cBRSKI
+   port (p_R = 5684) on the Registrar is used to access cBRSKI
    resources.
 
    +------------+------------+-------------+--------------------------+
@@ -599,11 +605,11 @@ Table of Contents
    +---------------------------------------+-------------+------------+
 
        Figure 2: Example of the message flow of a DTLS session via a
-                            stateful Join Proxy.
+                            stateful Join Proxy
 
    The Join Proxy MUST allocate a unique IP_Jr:p_Jr for every unique
    Pledge that it serves.  This is typically done by selecting a unique
-   available port P_Jr for each Pledge.  Doing so enables the Join Proxy
+   available port p_Jr for each Pledge.  Doing so enables the Join Proxy
    to correctly map the UDP packets received from the Registrar back to
    the corresponding Pledges.  Also, it enables the Registrar to
    correctly distinguish multiple DTLS clients by means of IP address/
@@ -629,7 +635,7 @@ Table of Contents
 
    To protect itself and the Registrar against malfunctioning Pledges
    and/or denial of service (DoS) attacks, the Join Proxy SHOULD limit
-   the number of simultaneous state tuples for a given IP_p to at most
+   the number of simultaneous state tuples for a given IP_P to at most
    2, and it SHOULD limit the number of simultaneous state tuples per
    network interface to at most 10.
 
@@ -665,7 +671,7 @@ Table of Contents
    source UDP port.  When the Registrar sends packets for the Pledge, it
    MUST return the Header field unchanged, so that the join proxy can
    decode the Header to reconstruct the Pledge's link-local IP address,
-   interace and UDP (destination) port for the return UDP packet.
+   interface and UDP (destination) port for the return UDP packet.
    Figure 3 shows this per-packet mapping on the join proxy for a DTLS
    session.
 
@@ -714,8 +720,8 @@ Table of Contents
    |              :                            |     :     |    :      |
    |          [ DTLS messages ]                |     :     |    :      |
    |              :                            |     :     |    :      |
-   |   ---Finished--->                         | IP_P:p_P  |IP_Jr:p_Jr |
-   |                   ---JPY[H(IP_P:p_P), --> | IP_Jl:p_Jl|IP_R:p_Rj  |
+   |   ---Finished--->                         | IP_P:p_P  |IP_Jl:p_Jl |
+   |                   ---JPY[H(IP_P:p_P), --> | IP_Jr:p_Jr|IP_R:p_Rj  |
    |                          C(Finished)]     |           |           |
    |                   <--JPY[H(IP_P:p_P), --- | IP_R:p_Rj |IP_Jr:p_Jr |
    |                          C(Finished)]     |           |           |
@@ -724,7 +730,7 @@ Table of Contents
    +-------------------------------------------+-----------+-----------+
 
        Figure 3: Example of the message flow of a DTLS session via a
-                           stateless Join Proxy.
+                            stateless Join Proxy
 
    When a Join Proxy receives an ICMP [RFC792] / ICMPv6 [RFC4443] error
    from the Registrar, this may signal a permanent change of the
@@ -740,16 +746,27 @@ Table of Contents
 4.5.  JPY Protocol and Messages
 
    JPY messages are used by a stateless Join Proxy to carry required
-   state information in the relayed UDP messages, such that it does not
-   need to store this state in memory.  JPY messages are carried
-   directly over the UDP layer.  So, there is no CoAP or DTLS layer used
-   between the JPY messages and the UDP layer.
+   state information in relayed UDP messages, such that it does not need
+   to store this state in memory.  JPY messages are carried directly
+   over the UDP layer.  So, there is no CoAP or DTLS layer used between
+   the JPY messages and the UDP layer.
 
-   A Registrar that supports the JPY protocol also uses JPY message to
+   A Registrar that supports the JPY protocol also uses JPY messages to
    return relayed UDP messages to the stateless Join Proxy, including
    the state information that it needs.
 
-4.5.1.  JPY Message Structure
+4.5.1.  JPY URI Syntax, Port Number and Path
+
+   A JPY URI MUST include an explicit port number, otherwise it is not
+   valid.  There is no default UDP port defined for the jpy scheme.
+
+   Although a path (other than an empty or root path) MAY be present in
+   a JPY URI, this document does not define a particular semantics for
+   such a path.  A receiver MUST ignore any path included in a JPY URI,
+   while a future specification might define a particular use for the
+   URI path.
+
+4.5.2.  JPY Message Structure
 
    Each JPY message consists of one CBOR [RFC8949] array with 2
    elements:
@@ -792,7 +809,7 @@ Table of Contents
 
    Detailed examples of a complete JPY message are shown in Appendix A.
 
-4.5.2.  JPY Message Port Usage
+4.5.3.  JPY Message Port Usage
 
    For the JPY messages sent to the Registrar, the Join Proxy SHOULD use
    the same UDP source port and IP source address for the JPY messages
@@ -803,7 +820,7 @@ Table of Contents
    constrained system, but possible) could, for instance, use different
    UDP source port numbers to demultiplex connections across CPUs.
 
-4.5.3.  JPY Message Overhead and MTU Size
+4.5.4.  JPY Message Overhead and MTU Size
 
    The use of the JPY message CBOR encoding adds a 3-6 byte overhead on
    top of the data carried within the Header and Contents fields.  The
@@ -811,8 +828,8 @@ Table of Contents
    each UDP message exchanged between Join Proxy and Registrar.
    Therefore, a protocol using the stateless Join Proxy MUST use (UDP)
    payloads that are bounded in size, such that the maximum payload
-   length used minus the maximum overhead size (38 bytes) stays below
-   the MTU size of the network. cBRSKI is designed to work even for the
+   length used plus the maximum overhead size (38 bytes) stays below the
+   MTU size of the network. cBRSKI is designed to work even for the
    minimum IPv6 MTU of 1280 bytes, by configuring the DTLS maximum
    fragment length and using CoAP blockwise transfer for large resource
    transfers [cBRSKI].
@@ -824,7 +841,7 @@ Table of Contents
    the addition of the JPY message structure without violating MTU
    sizes.
 
-4.5.4.  JPY Message Security
+4.5.5.  JPY Message Security
 
    Application or ecosystem standards adopting the stateless Join Proxy
    need to determine if there is the potential for attacks originating
@@ -859,17 +876,17 @@ Table of Contents
    it in a CBOR byte string in jpy_header.
 
    It SHOULD be encrypted with a symmetric key known only to the Join
-   Proxy itself.  When the Join Proxy attempts to decrypt a receiver
+   Proxy itself.  When the Join Proxy attempts to decrypt a received
    jpy_header byte string, and either the decryption or the integrity
    check fails, it MUST silently discard the JPY message.
 
    The symmetric key need not persist on a long-term basis, and MAY be
    changed periodically.  Because a key change during an onboarding
    attempt of a Pledge could lead to DTLS retransmissions, or even
-   failure of the onboarding attempt, it is RECOMMENDED to change the
+   failure of gthe onboarding attempt, it is RECOMMENDED to change the
    key infrequently: for example every 24 hours.
 
-4.5.5.  Example Format for JPY Header Data
+4.5.6.  Example Format for JPY Header Data
 
    A typical JPY message header format, prior to encryption, could be
    constructed using the following binary data structure (expressed in C
@@ -911,8 +928,8 @@ Table of Contents
 
    Note: when IPv6 is used only the lower 64-bits of the source IPv6
    address need to be recorded, because they must be by design all IPv6
-   link-Local addresses, so the upper 64-bits are just "fe80::" and can
-   be elided.  For IPv4, a link-Local IPv4 address [RFC3927] would be
+   link-local addresses, so the upper 64-bits are just "fe80::" and can
+   be elided.  For IPv4, a link-local IPv4 address [RFC3927] would be
    used, and it would always fit into the 64 bits of the iid field.  On
    link types where the Interface IDentifier (IID) is not 64-bits, a
    different field size for iid will be necessary.
@@ -921,27 +938,27 @@ Table of Contents
    because the regular transport layers of cBRSKI and BRSKI,
    respectively UDP and TCP, also do not provide replay protection.
    Rather, replay protection is handled by the higher layer protocol,
-   respectively DTLS and TLS.  If replay attack protection is desired,
-   AES with GCM [RFC5288] SHOULD be used.
+   respectively DTLS and TLS.  If replay protection is desired, AES with
+   GCM [RFC5288] SHOULD be used.
 
    Detailed examples of a complete JPY message are shown in Appendix A.
 
-4.5.6.  Processing by Registrar
+4.5.7.  Processing by Registrar
 
    On reception of a JPY message by the Registrar, the Registrar MUST
    verify that the number of CBOR array elements is 2 or more.  To
    implement this specification, only the first two elements are used.
 
-   The data in the jpy_content field must be provided as input to a DTLS
+   The data in the jpy_content field is provided as input to a DTLS
    library [RFC9147], which along with the 5-tuple defined in
    Section 4.4 provides enough information for the Registrar to pick an
    appropriate (active) client context.  Note that the same UDP socket
    will need to be used for multiple DTLS flows, which is atypical for
-   how DTLS usually uses sockets.  The jpy_context field can be used to
+   how DTLS usually uses sockets.  The jpy_header field can be used to
    select an appropriate DTLS context, as DTLS headers do not contain
-   any kind of per-session context.  The jpy_context field needs to be
-   linked to the DTLS context, and when a DTLS message need to be sent
-   back to the client, the jpy_context needs to be included in a JPY
+   any kind of per-session context.  The jpy_header field needs to be
+   linked to the DTLS context, and when a DTLS message needs to be sent
+   back to the client, the jpy_header needs to be included in a JPY
    message along with the DTLS message in the jpy_content field.
 
 4.6.  Handling Multiple Registrars
@@ -950,10 +967,10 @@ Table of Contents
    present, each host operating one or more Registrar service(s).
    Regardless of the number of (physical or logical) hosts, each of
    these Registrar services is considered a separate Registrar.  One or
-   more of these Registrars MAY be configured in a Join Proxy, by a
-   method out of scope of this specification.  Also one or more of these
-   Registrars MAY be found by a Join Proxy using its discovery
-   method(s).
+   more of these Registrars MAY be administratively configured in a Join
+   Proxy, by a method out of scope of this specification.  Also one or
+   more of these Registrars MAY be found by a Join Proxy using its
+   discovery method(s).
 
    The Join Proxy is not necessarily aware of all onboarding protocol
    variants that are enabled in its network.  Specifically, it may not
@@ -983,8 +1000,8 @@ Table of Contents
    Join Proxy in range will respond with both services in a CoAP
    discovery response.  The Join Proxy is able to distinguish the
    properties of the two Registrar services by the differences in the
-   CoRE Link Format parameters included in the two responded onboarding
-   service descriptions.
+   CoRE Link Format [RFC6690] parameters included in the two responded
+   onboarding service descriptions.
 
 5.  Discovery
 
@@ -1009,8 +1026,8 @@ Table of Contents
    The CoAP discovery query to use depends on the intended mode of
    operation of the Join Proxy: stateless or stateful.  A stateless Join
    Proxy needs to discover a UDP endpoint (address and port) that can
-   accept JPY messages, supporting the coaps+jpy scheme.  On the other
-   hand, a stateful Join Proxy needs to discover a single CoAPS endpoint
+   accept JPY messages, supporting the jpy scheme.  On the other hand, a
+   stateful Join Proxy needs to discover a single CoAPS endpoint
    supporting the coaps scheme that offers the full set of cBRSKI
    Registrar resources.
 
@@ -1022,16 +1039,18 @@ Table of Contents
    parameter "brski.rjp".  The latter CoAP resource type is defined in
    Section 8.1.
 
-   Upon success, the return payload will contain the port of the
-   Registrar on which the JPY protocol handler is hosted.  This exchange
-   is shown below:
+   Upon success, the return payload MUST contain the port of the
+   Registrar on which the JPY protocol handler is hosted.  The resource
+   path returned in this payload MUST be the root (/) resource, the only
+   resource currently defined for the JPY protocol.  This exchange is
+   shown below:
 
      REQ: GET coap://[ff05::fd]/.well-known/core?rt=brski.rjp
 
      RES: 2.05 Content
-       Content-Format: 40
+       Content-Format: 40 (application/link-format)
        Payload:
-         <coaps+jpy://[ipv6_address]:port>;rt=brski.rjp
+         <jpy://[ipv6_address]:port>;rt=brski.rjp
 
    In this case, the multicast CoAP request is sent to the site-local
    "All CoAP Nodes" multicast IPv6 address ff05::fd.  In some
@@ -1044,13 +1063,13 @@ Table of Contents
    The reason that the IPv6 address (field ipv6_address) is always
    included in the link-format result is that in the [RFC6690] link
    format, and per Section 3.2 of [RFC3986], the authority component
-   cannot include only a port number but has to include also the IP
-   address.
+   cannot include only a port number but has to include also one of an
+   IP literal or a hostname.
 
-   The returned port is expected to process the encapsulated JPY
-   messages described in Section 4.5.  The scheme is coaps+jpy,
-   described in Section 8.2, and not regular coaps because the JPY
-   messages effectively form a new protocol that encapsulates CoAPS.
+   The returned port (field port) is expected to process the
+   encapsulated JPY messages described in Section 4.5.  The scheme is
+   jpy, described in Section 8.3, and not coaps because the JPY messages
+   effectively form a new protocol that encapsulates CoAPS messages.
 
 5.1.2.  Stateful Case
 
@@ -1059,14 +1078,13 @@ Table of Contents
    known/core" resource including a resource type (rt) query parameter
    "brski".  The latter CoAP resource type is defined in [cBRSKI].
 
-   Upon success, the return payload will contain the URI path and port
-   of the Registrar on which the cBRSKI resources are hosted.  This
-   exchange is shown below:
+   Upon success, the return payload contains the URI of the Registrar on
+   which the cBRSKI resources are hosted.  This exchange is shown below:
 
      REQ: GET coap://[ff05::fd]/.well-known/core?rt=brski
 
      RES: 2.05 Content
-       Content-Format: 40
+       Content-Format: 40 (application/link-format)
        Payload:
          <coaps://[ipv6_address]:port/uri_path>;rt=brski
 
@@ -1091,9 +1109,9 @@ Table of Contents
      REQ: GET coap://[ff05::fd]/.well-known/core?rt=brski
 
      RES: 2.05 Content
-       Content-Format: 40
+       Content-Format: 40 (application/link-format)
        Payload:
-           <coaps://[2001:db8:0:abcd::52]/b>;rt=brski
+         <coaps://[2001:db8:0:abcd::52]/b>;rt=brski
 
    The same Registrar could for example reply to a multicast CoAP query
    of a stateless Join Proxy as follows:
@@ -1101,9 +1119,9 @@ Table of Contents
      REQ: GET coap://[ff05::fd]/.well-known/core?rt=brski.rjp
 
      RES: 2.05 Content
-       Content-Format: 40
+       Content-Format: 40 (application/link-format)
        Payload:
-           <coaps+jpy://[2001:db8:0:abcd::52]:7634>;rt=brski.rjp
+         <jpy://[2001:db8:0:abcd::52]:7634>;rt=brski.rjp
 
    In these examples, the Join Proxy in a specific mode of operation
    (stateful or stateless) only queries for those cBRSKI services that
@@ -1122,34 +1140,39 @@ Table of Contents
    of the scope of this document, the default method MAY be deactivated.
 
    The join-port of the Join Proxy is discovered by sending a multicast
-   GET request to "/.well-known/core" including a resource type (rt)
-   parameter with the value "brski.jp".  This value is defined in
-   Section 8.1.  Upon success, the return payload will contain the join-
-   port.
+   GET request to "/.well-known/core" including a query parameter with
+   wildcard value "brski-jp=*".  This CoRE link format target attribute
+   ("brski-jp") is defined in Section 8.2.  Upon success, the return
+   payload will contain a link that indicates the join-port.
 
-   The meta-example below shows the discovery of the join-port (field
-   join_port) of the Join Proxy:
+   The target attribute "brski-jp" in a link signals that the link's
+   sender functions as a cBRSKI Join Proxy, offering cBRSKI/EST-coaps
+   resources of a (remote) Registrar at the indicated join-port, via the
+   CoAPS protocol, at the well-known URIs /.well-known/brski and /.well-
+   known/est.
 
-     REQ: GET coap://[ff02::fd]/.well-known/core?rt=brski.jp
+   The meta-example below shows the discovery of the join-port (value
+   join_port) at the Join Proxy:
+
+     REQ: GET coap://[ff02::fd]/.well-known/core?brski-jp=*
 
      RES: 2.05 Content
-       Content-Format: 40
+       Content-Format: 40 (application/link-format)
        Payload:
-         <coaps://[IP_address]:join_port>;rt=brski.jp
+         <>;brski-jp=join_port
 
-   In actual examples based on this, the field IP_address would contain
-   the link-local IP address of the Join Proxy and the field join_port
-   would contain the join-port value as a decimal number.
+   In actual examples based on this, the string join_port would be a
+   decimal number string.
 
-   Note that the join_port field and preceding colon MAY be absent in
-   the discovery response: this indicates that the join-port is the
-   default CoAPS port 5684.
+   In the returned CoRE LF link, the target URI (within <>) is an empty,
+   unused <URI-Reference> pointing to the /.well-known/core resource
+   from which the link format document was retrieved (see Section 5.1 of
+   [RFC3986] for relative URI resolution details).
 
-   In the returned CoRE link format document, discoverable port numbers
-   are usually returned for the Join Proxy resource in the <URI-
-   Reference> of the link (see Section 5.1 of [RFC6690] for details).
+   This specific target URI is used to minimize the size of the link
+   format document.
 
-5.3.  Pledge Discovers Multiple Join Ports
+5.3.  Pledge Discovers Multiple Join-Ports
 
    A Pledge MUST be able to handle multiple join-ports being returned in
    a discovery response sent by a Join Proxy.  This can happen if the
@@ -1159,42 +1182,33 @@ Table of Contents
    implementation) so that a Pledge is enabled to failover to another
    Registrar if a prior onboarding attempt fails.
 
-   How the Pledge selects between the onboarding services matching its
-   query, is implementation-specific and out of scope of this document.
-
    Discovery of multiple Registrars works in the same way as discovery
    of a single Registrar as defined in Section 5.2, except that multiple
-   links are returned in the CoRE Link Format document.
+   links are returned in the CoRE link format document.
 
-   The meta-example below shows the discovery of two join-ports (fields
-   join_port1 and join_port2) on a Join Proxy, each associated to a
-   different cBRSKI protocol variant, defined by two CoRE Link Format
-   links:
+   The meta-example below shows the Pledge's discovery of two join-ports
+   (57101 and 57102) on a Join Proxy, each associated to a different
+   cBRSKI protocol variant, defined by two CoRE link format links:
 
-     REQ: GET coap://[ff02::fd]/.well-known/core?rt=brski.jp
+     REQ: GET coap://[ff02::fd]/.well-known/core?brski-jp=*
 
      RES: 2.05 Content
-       Content-Format: 40
+       Content-Format: 40 (application/link-format)
        Payload:
-         <coaps://[IP_address]:join_port1>;rt=brski.jp,
-         <coaps://[IP_address]:join_port2>;rt=brski.jp;
-                               param1=value1;param2=value2
-
-   In actual examples based on this, the field IP_address would contain
-   the link-local IP address of the Join Proxy and the fields join_port1
-   and join_port2 would contain distinct decimal port number values.
+         <>;brski-jp=57101,
+         <>;brski-jp=57102;param1=value1;param2=value2
 
    The parameter values (param1 and param2) are included for
-   illustrative purposes.  In a real example, these would contain Link
-   Format parameters specifically defined for the brski.jp resource
-   type.  Such parameters may be defined in future work
-   ([I-D.ietf-anima-brski-discovery]).  These parameters, if understood
-   by the Pledge, help in selecting the optimal matching onboarding
-   protocol variant of cBRSKI.  If the Pledge does not understand these
-   parameters, it can select any one of the two join-ports for cBRSKI
-   onboarding.  If the attempt subsequently fails, the Pledge repeats
-   the attempt using the other discovered join-port as defined by
-   [cBRSKI].
+   illustrative purposes and are not actual parameter values.  In a real
+   example, these would contain Link Format parameters specifically
+   defined for the cBRSKI service discovery.  Such parameters may be
+   defined in future work ([I-D.ietf-anima-brski-discovery]).  These
+   parameters, if understood by the Pledge, help in selecting the
+   optimal matching onboarding protocol variant of cBRSKI.  If the
+   Pledge does not understand these parameters, it can select any one of
+   the returned join-ports for cBRSKI onboarding.  If the attempt
+   subsequently fails, the Pledge repeats the attempt using another
+   discovered join-port as defined by [cBRSKI].
 
 6.  Comparison of Stateless and Stateful Modes
 
@@ -1360,7 +1374,7 @@ Table of Contents
    discovery method used in the network.  If the discovery of Registrars
    is performed in an unsecured manner within the trusted network, it
    would allow the malicious Registrar to present itself as a Registrar
-   candidate.  CoAP discovery defined in Section 5) is, for example,
+   candidate.  CoAP discovery defined in Section 5 is, for example,
    defined without any transport-layer or application-layer security.  A
    trusted Join Proxy may therefore relay a Pledge's messages to it.
 
@@ -1369,12 +1383,12 @@ Table of Contents
    Proxy (in case of multiple) is proceeding sufficiently quickly.  If
    this is not the case, the Pledge needs to switch to another join-port
    and/or another Join Proxy to retry its onboarding attempt.  See
-   Section 4.6 for specification details on this.
+   Section 4.6 for more details on this.
 
    In some installations, layer 2 (link layer) security is provided
    between all node pairs of a mesh network.  In such an environment, in
    case all mesh nodes are trusted, and the Registrar is also located on
-   the mesh network, and on-mesh attackers are not considered, then
+   the mesh network, and on-mesh attackers are not a concern, then
    encryption of the JPY Header field as specified in this document is
    not necessary because the layer 2 security already protects it.
 
@@ -1382,60 +1396,72 @@ Table of Contents
 
 8.1.  Resource Type Attributes Registry
 
-   This specification registers two new Resource Type (rt=) Link Target
+   This specification registers one new Resource Type (rt=) Link Target
    Attributes in the "Resource Type (rt=) Link Target Attribute Values"
    registry under the "Constrained RESTful Environments (CoRE)
    Parameters" registry group, per the [RFC6690] procedure.
 
-   Attribute Value: brski.jp
-   Description: Constrained Join Proxy for cBRSKI onboarding protocol.
-   Reference:   [This RFC]
-
    Attribute Value: brski.rjp
-   Description: cBRSKI Registrar Join Proxy endpoint that supports the
-                JPY protocol.
+   Description: cBRSKI Registrar JPY Port for cBRSKI onboarding.
    Reference:   [This RFC]
 
-8.2.  coaps+jpy Scheme Registration
+8.2.  Target Attributes Registry
+
+   This specification registers one new target attribute in the "Target
+   Attributes" registry under the "Constrained RESTful Environments
+   (CoRE) Parameters" registry group, per the [RFC9423] procedure.
+
+   Attribute Name: brski-jp
+   Description:    cBRSKI Join Proxy UDP port for cBRSKI onboarding.
+   Change Controller: IESG
+   Reference:      [This RFC]
+
+8.3.  'jpy' Scheme Registration
 
    This specification registers a new URI scheme per [RFC7595] under the
    IANA "Uniform Resource Identifier (URI) Schemes" registry.
 
-   Scheme name: coaps+jpy
-   Status:      permanent
+   Scheme name: jpy
+   Status:      Permanent
    Applications/protocols that use this scheme name:
-                cBRSKI, constrained Join Proxy
+                cBRSKI Join Proxy, JPY protocol
    Contact:     ANIMA WG
    Change controller: IESG
    References:  [This RFC]
 
    The scheme specification is provided below.
 
-   *  Scheme syntax: identical to the "coaps" scheme defined in
-      [RFC7252].
+   *  Scheme syntax: defined in Section 4.5 of [This RFC].
 
-   *  Scheme semantics: identical to the "coaps" scheme, except that the
-      JPY message encapsulation mechanism described in Section 4.5 of
-      [This RFC] is used to transport each CoAPS UDP datagram.
+   *  Scheme semantics: JPY protocol as defined in Section 4.5 of [This
+      RFC].
 
-   *  Encoding considerations: identical to the "coaps" scheme.
+   *  Encoding considerations: the scheme encoding conforms to the
+      encoding rules established for URIs in [RFC3986], i.e.,
+      internationalized and reserved characters are expressed using UTF-
+      8-based percent-encoding.
 
-   *  Interoperability considerations: identical to the "coaps" scheme.
+   *  Interoperability considerations: none.
 
-   *  Security considerations: all of the security considerations of the
-      "coaps" scheme apply.  Users of this scheme should be aware that
-      as part of the intended use, a UDP message that was formed using
-      the "coaps" scheme is embedded by a Join Proxy as defined by [This
-      RFC] into a UDP message conforming to the "coaps+jpy" scheme
-      without the Join Proxy being able to parse/decode which CoAPS URI
-      was originally used by the sender, since that information is
-      stored as DTLS-protected data.  The receiving server can transform
-      the "coaps+jpy" scheme back to the original "coaps" scheme by
-      decoding the JPY message payload.  However, any CoAP-related
-      information not stored in the DTLS-protected data (such as in the
-      UDP/IP headers) may be changed by these scheme transforms.
+   *  Security considerations: all of the security considerations for
+      the coaps scheme as defined in Section 11.1 of [RFC7252] apply
+      when CoAPS protocol traffic is transported over the JPY protocol.
+      In addition, users of this scheme should be aware that as part of
+      the intended use, a UDP payload that was created under the coaps
+      scheme is embedded by a Join Proxy into a new UDP message
+      conforming to the jpy scheme, without the Join Proxy being able to
+      reconstruct which CoAPS URI was originally used by the sender of
+      the CoAPS message, since most of the URI information is stored in
+      DTLS-protected data.  The receiving server can transform the JPY
+      message sent under the jpy scheme back to a DTLS-encrypted CoAP
+      message that uses the coaps scheme, by extracting the JPY message
+      payload.  However, any CoAP-related information not stored in the
+      DTLS-protected data (such as data in UDP/IP headers) is subject to
+      modification by the Join Proxy or other proxies in the
+      communication path to the receiver.  Any protocol transported in
+      JPY messages MUST be resilient against such modifications.
 
-8.3.  Service Name and Transport Protocol Port Number Registry
+8.4.  Service Name and Transport Protocol Port Number Registry
 
    This specification registers two service names under the IANA
    "Service Name and Transport Protocol Port Number" registry.
@@ -1444,17 +1470,17 @@ Table of Contents
    Transport Protocol(s): udp
    Assignee:  IESG <iesg@ietf.org>
    Contact:  IESG <iesg@ietf.org>
-   Description: Bootstrapping Remote Secure Key Infrastructure
-                constrained Join Proxy
+   Description: Constrained Bootstrapping Remote Secure Key
+                Infrastructure (cBRSKI) Join Proxy for onboarding
    Reference:   [This RFC]
 
    Service Name: brski-rjp
    Transport Protocol(s): udp
    Assignee:  IESG <iesg@ietf.org>
    Contact:  IESG <iesg@ietf.org>
-   Description: Bootstrapping Remote Secure Key Infrastructure
-                Registrar join-port, supporting the coaps+jpy
-                scheme, used by stateless constrained Join Proxy
+   Description: Constrained Bootstrapping Remote Secure Key
+                Infrastructure (cBRSKI) Registrar JPY Port, supporting
+                the JPY protocol, used by stateless cBRSKI Join Proxies
    Reference:   [This RFC]
 
 9.  References
@@ -1464,9 +1490,9 @@ Table of Contents
    [cBRSKI]   Richardson, M., Van der Stok, P., Kampanakis, P., and E.
               Dijk, "Constrained Bootstrapping Remote Secure Key
               Infrastructure (cBRSKI)", Work in Progress, Internet-
-              Draft, draft-ietf-anima-constrained-voucher-27, 3 March
-              2025, <https://datatracker.ietf.org/doc/html/draft-ietf-
-              anima-constrained-voucher-27>.
+              Draft, draft-ietf-anima-constrained-voucher-30, 27
+              February 2026, <https://datatracker.ietf.org/doc/html/
+              draft-ietf-anima-constrained-voucher-30>.
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -1497,12 +1523,12 @@ Table of Contents
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
    [RFC8366bis]
-              Watsen, K., Richardson, M., Pritikin, M., Eckert, T. T.,
-              and Q. Ma, "A Voucher Artifact for Bootstrapping
-              Protocols", Work in Progress, Internet-Draft, draft-ietf-
-              anima-rfc8366bis-14, 1 April 2025,
+              Watsen, K., Richardson, M., Dijk, E., Eckert, T. T., and
+              Q. Ma, "A Voucher Artifact for Bootstrapping Protocols",
+              Work in Progress, Internet-Draft, draft-ietf-anima-
+              rfc8366bis-31, 14 May 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-anima-
-              rfc8366bis-14>.
+              rfc8366bis-31>.
 
    [RFC8949]  Bormann, C. and P. Hoffman, "Concise Binary Object
               Representation (CBOR)", STD 94, RFC 8949,
@@ -1530,9 +1556,9 @@ Table of Contents
    [I-D.ietf-anima-brski-discovery]
               Eckert, T. T. and E. Dijk, "BRSKI discovery and
               variations", Work in Progress, Internet-Draft, draft-ietf-
-              anima-brski-discovery-05, 21 October 2024,
+              anima-brski-discovery-11, 18 March 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-anima-
-              brski-discovery-05>.
+              brski-discovery-11>.
 
    [I-D.kumar-dice-dtls-relay]
               Kumar, S. S., Keoh, S. L., and O. Garcia-Morchon, "DTLS
@@ -1645,6 +1671,11 @@ Table of Contents
               RFC 9031, DOI 10.17487/RFC9031, May 2021,
               <https://www.rfc-editor.org/rfc/rfc9031>.
 
+   [RFC9423]  Bormann, C., "Constrained RESTful Environments (CoRE)
+              Target Attributes Registry", RFC 9423,
+              DOI 10.17487/RFC9423, April 2024,
+              <https://www.rfc-editor.org/rfc/rfc9423>.
+
 Appendix A.  Stateless Join Proxy JPY Message Examples
 
    This appendix shows an example of a JPY message, sent by a stateless
@@ -1712,8 +1743,8 @@ Acknowledgements
    options for building a constrained Join Proxy.
 
    Many thanks for the comments by Bill Atwood, Carsten Bormann, Brian
-   Carpenter, Spencer Dawkins, Esko Dijk, Toerless Eckert, Russ Housley,
-   Ines Robles, Rich Salz, Jürgen Schönwälder, Mališa Vučinić, and Rob
+   Carpenter, Spencer Dawkins, Toerless Eckert, Russ Housley, Ines
+   Robles, Rich Salz, Jürgen Schönwälder, Mališa Vučinić, and Rob
    Wilton.
 
    This document is very much inspired by text published earlier in
@@ -1722,6 +1753,32 @@ Acknowledgements
    draft text has served as a basis for this document.
 
 Changelog
+
+   -19 to -20
+
+      * Title changed to use 'onboarding' instead of 'bootstrapping'.
+      * Replace rt 'brski.jp' by a CoRE LF target attribute brski-jp
+        (#88) and update all related text and examples.
+      * Clarified that a JPY URI MUST included a port number, since
+        no default port is registered.
+      * Editorial: renamed 'constrained Join Proxy' occurrences to
+        general name 'Join Proxy' to match the title.
+      * Editorial updates and text fixes.
+
+   -18 to -19
+
+      * Added normative rules for stateful/stateless mode selection
+        for JP that supports both modes.
+      * Editorial updates and text fixes.
+
+   -17 to -18
+
+      * Changed JPY protocol scheme from coaps+jpy to more generic
+        jpy and rephrased all related definitions (#80).
+      * Clarified that discovery responses from Join Proxy refer to
+        the root CoAP resource (/) or root JPY resource (#79).
+      * Assigned editor role (#78).
+      * Editorial updates.
 
    -16 to -17
 
@@ -1836,6 +1893,11 @@ Changelog
 
 Authors' Addresses
 
+   Esko Dijk (editor)
+   IoTconsultancy.nl
+   Email: esko.dijk@iotconsultancy.nl
+
+
    Michael Richardson
    Sandelman Software Works
    Email: mcr+ietf@sandelman.ca
@@ -1849,8 +1911,3 @@ Authors' Addresses
    Panos Kampanakis
    Cisco Systems
    Email: pkampana@cisco.com
-
-
-   Esko Dijk
-   IoTconsultancy.nl
-   Email: esko.dijk@iotconsultancy.nl
