@@ -671,7 +671,7 @@ integrity check fails, it MUST silently discard the JPY message.
 
 The symmetric key need not persist on a long-term basis, and MAY be changed periodically.
 Because a key change during an onboarding attempt of a Pledge could lead to DTLS retransmissions, or even failure of
-gthe onboarding attempt, it is RECOMMENDED to change the key infrequently: for example every 24 hours.
+the onboarding attempt, it is RECOMMENDED to change the key infrequently: for example every 24 hours.
 
 ### Example Format for JPY Header Data
 
@@ -1106,6 +1106,15 @@ Parameters" registry group, per the {{RFC9423}} procedure.
     Description:    cBRSKI Join Proxy UDP port for cBRSKI onboarding.
     Change Controller: IESG
     Reference:      [This RFC]
+
+The common usage of this attribute is defined in {{discovery-by-pledge}} and can be easily applied without being
+aware of the exact semantics.
+
+The formal semantics of this attribute is defined as follows:
+the attribute "brski-jp", when present in a link with the "hosts" relation per {{Section 2.2 of RFC6690}},
+identifies that the host included in the origin of the link's context URI ({{Section 2.1 of RFC6690}}) additionally
+hosts cBRSKI "/.well-known/brski" resources (as per {{cBRSKI}}) on the endpoint `coaps://host:port` where '`port`' is
+the port number equal to the value of the `brski-jp` attribute.
 
 ## 'jpy' Scheme Registration {#jpyscheme}
 
