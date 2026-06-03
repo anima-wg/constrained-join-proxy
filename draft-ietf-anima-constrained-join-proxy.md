@@ -1271,12 +1271,35 @@ Their draft text has served as a basis for this document.
 
        * Title changed to use 'onboarding' instead of 'bootstrapping'.
        * Replace rt 'brski.jp' by a CoRE LF target attribute brski-jp
-         (#88) and update all related text and examples.
+         (#88) and update all related text and examples (see Note-1).
        * Clarified that a JPY URI MUST included a port number, since
          no default port is registered.
        * Editorial: renamed 'constrained Join Proxy' occurrences to
          general name 'Join Proxy' to match the title.
        * Editorial updates and text fixes.
+
+Note-1: the motivation for making the change from discovery based on "rt=brski.jp" attribute queries, to
+"brski-jp=*" queries, was due to the following properties of the new CoRE Link Format solution:
+
+1. More semantically correct per CoRE Link Format: the "rt" attribute formally pertains to a single CoAP resource or
+a resource tree (single resource with sub-resources as a whole) indicated by the path of the link.
+In our case, we used it to describe a single root
+resource (/) and label this with a rt type, even though the actual resources being discovered are not the root
+resource but the /.well-known/core/brski/... and /.well-known/core/est/... resources.
+By using a new dedicated target attribute "brski-jp",
+the semantic definition can be exactly created to match the present case for discovery of the join-port.
+
+2. Shorter on-the-wire format. For a single returned CoRE LF link the difference is small, but if multiple links are
+returned on a constrained (6LoWPAN) network it could be the difference between a single radio frame or 2 frames.
+
+3. For the Join Proxy, no need to encode its link-local IPv6 address into ASCII/UTF-8 and send it over the wire, for no
+reason (as it was not used by the Pledge/recipient).
+
+4. Minimize confusion on which IPv6 address to use: in the former solution, the IPv6 address was both present in the
+received IPv6 packet header (of the packet carrying the the discovery response),
+as well as in the CoAP (CoRE LF formatted) payload of this packet. This could
+lead to implementer's confusion on which IPv6 address element to use. The new format does not have this 'make the
+right choice' issue.
 
 -18 to -19
 
