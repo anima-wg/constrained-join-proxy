@@ -347,8 +347,8 @@ that these standards will be able to pick either option 2 or 3 based on consider
 A Join Proxy that is not adhering to such an additional standard MUST implement both modes (option 1).
 A Join Proxy or Registrar not adhering to such additional standards is called "generic".
 A generic Join Proxy that implements auto-discovery of Registrars and mode gives precedence to the stateless mode.
-Specifically, if one or more Registrars with `brski.rjp` are discovered, the Join Proxy MUST use stateless mode in
-this network.
+Specifically, if one or more Registrars with `brski.rjp` (see {{discovery-by-jp-stateless}} for details) are discovered,
+the Join Proxy MUST use stateless mode in this network.
 Otherwise, if at least one Registrar with resource type `brski` is discovered, it MUST use stateful mode in this network.
 
 If a Join Proxy implements both modes but does not implement methods to discover available Registrars
@@ -791,7 +791,7 @@ the `jpy` scheme.
 On the other hand, a stateful Join Proxy needs to discover a single CoAPS endpoint supporting the `coaps` scheme that
 offers the full set of cBRSKI Registrar resources.
 
-### Stateless Case
+### Stateless Case  {#discovery-by-jp-stateless}
 
 The stateless Join Proxy can discover the JPY protocol endpoint of the Registrar by sending a multicast CoAP GET
 discovery query to the "/.well-known/core" resource including a resource type (rt) query parameter "brski.rjp".
