@@ -1128,6 +1128,7 @@ registry.
     Contact:     ANIMA WG
     Change controller: IESG
     References:  [This RFC]
+    CRI Scheme Number: TBA from the First Come First Served range
 
 The scheme specification is provided below.
 
@@ -1151,13 +1152,12 @@ The scheme specification is provided below.
 
 ## Service Name and Transport Protocol Port Number Registry {#dns-sd-spec}
 
-This specification registers two service names under the IANA "Service Name and Transport Protocol Port
-Number" registry.
+This specification registers two service names under the IANA "Service Name and Transport Protocol Port Number" registry.
 
     Service Name: brski-jp
     Transport Protocol(s): udp
     Assignee:  IESG <iesg@ietf.org>
-    Contact:  IESG <iesg@ietf.org>
+    Contact:  IESG <chair@ietf.org>
     Description: Constrained Bootstrapping Remote Secure Key
                  Infrastructure (cBRSKI) Join Proxy for onboarding
     Reference:   [This RFC]
@@ -1165,7 +1165,7 @@ Number" registry.
     Service Name: brski-rjp
     Transport Protocol(s): udp
     Assignee:  IESG <iesg@ietf.org>
-    Contact:  IESG <iesg@ietf.org>
+    Contact:  IESG <chair@ietf.org>
     Description: Constrained Bootstrapping Remote Secure Key
                  Infrastructure (cBRSKI) Registrar JPY Port, supporting
                  the JPY protocol, used by stateless cBRSKI Join Proxies
